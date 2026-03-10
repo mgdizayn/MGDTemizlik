@@ -6,27 +6,18 @@
     <meta name="theme-color" content="#0d1117">
     <title>MGD Temizlik Sistemi</title>
     
-    <!-- PWA manifest -->
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon-192.png">
     
-    <!-- QR Scanner -->
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-    
-    <!-- MQTT (WebSocket) -->
-    <script src="https://unpkg.com/mqtt/dist/mqtt.esm.js"></script>
+    <script src="https://unpkg.com/mqtt@5.0.3/dist/mqtt.min.js"></script>
     
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         
         :root {
             --bg: #0d1117;
             --card: #161b22;
-            --card-light: #1c2128;
             --blue: #58a6ff;
             --green: #238636;
             --green-hover: #2ea043;
@@ -47,17 +38,12 @@
             padding-bottom: 20px;
         }
         
-        /* Header */
         .header {
             text-align: center;
             padding: 20px;
-            background: var(--bg);
         }
         
-        .header-icon {
-            font-size: 40px;
-            margin-bottom: 5px;
-        }
+        .header-icon { font-size: 40px; margin-bottom: 5px; }
         
         .header h1 {
             color: var(--blue);
@@ -82,7 +68,6 @@
             margin: 15px 40px;
         }
         
-        /* Status */
         .status {
             text-align: center;
             padding: 10px;
@@ -91,8 +76,8 @@
         
         .status.online { color: var(--green); }
         .status.offline { color: var(--red); }
+        .status.connecting { color: var(--orange); }
         
-        /* Cards */
         .card {
             background: var(--card);
             border: 1px solid var(--border);
@@ -108,10 +93,7 @@
             text-align: center;
         }
         
-        /* Form */
-        .form-group {
-            margin-bottom: 15px;
-        }
+        .form-group { margin-bottom: 15px; }
         
         .form-label {
             display: block;
@@ -136,7 +118,6 @@
             border-color: var(--blue);
         }
         
-        /* Buttons */
         .btn {
             width: 100%;
             padding: 15px;
@@ -172,7 +153,6 @@
             color: white;
         }
         
-        /* QR Scanner */
         #qr-reader {
             width: 100% !important;
             border: none !important;
@@ -184,9 +164,7 @@
             border-radius: 15px !important;
         }
         
-        #qr-reader__dashboard {
-            display: none !important;
-        }
+        #qr-reader__dashboard { display: none !important; }
         
         .qr-container {
             position: relative;
@@ -196,10 +174,7 @@
             margin: 15px 0;
         }
         
-        /* Active Job */
-        .active-job {
-            border-left: 4px solid var(--blue);
-        }
+        .active-job { border-left: 4px solid var(--blue); }
         
         .timer {
             font-size: 24px;
@@ -208,7 +183,6 @@
             margin: 15px 0;
         }
         
-        /* History */
         .history-item {
             display: flex;
             justify-content: space-between;
@@ -221,7 +195,6 @@
         .history-status-completed { color: var(--green); }
         .history-status-active { color: var(--blue); }
         
-        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -257,14 +230,9 @@
             line-height: 1.6;
         }
         
-        .modal-buttons {
-            display: flex;
-            gap: 10px;
-        }
-        
+        .modal-buttons { display: flex; gap: 10px; }
         .modal-buttons .btn { flex: 1; margin: 0; }
         
-        /* Alert */
         .alert {
             padding: 15px;
             border-radius: 10px;
@@ -284,7 +252,6 @@
             color: var(--green);
         }
         
-        /* Footer */
         .footer {
             text-align: center;
             color: var(--gray-dark);
@@ -292,17 +259,27 @@
             padding: 20px;
         }
         
-        /* Hidden */
         .hidden { display: none !important; }
         
-        /* Page transition */
-        .page {
-            animation: fadeIn 0.3s ease;
-        }
+        .page { animation: fadeIn 0.3s ease; }
         
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
     </style>
 </head>
@@ -317,7 +294,7 @@
     </div>
     
     <!-- Status -->
-    <div class="status offline" id="status">🔴 Bağlantı Yok</div>
+    <div class="status connecting" id="status">🟡 Bağlanıyor...</div>
     
     <!-- PAGE: Login -->
     <div id="page-login" class="page">
@@ -336,8 +313,6 @@
             
             <div id="login-error"></div>
         </div>
-        
-        <div id="history-section"></div>
         
         <div class="footer">
             🔌 Cihaz: <span id="device-id"></span> | v1.0
@@ -426,23 +401,18 @@
     </div>
     
     <script>
-        // =========================================================================
-        // CONFIG
-        // =========================================================================
+        // ==================== CONFIG ====================
         const MQTT_BROKER = 'wss://broker.hivemq.com:8884/mqtt';
         const TOPIC_ISTEK = 'MGD/Temizlik/Istek';
         const TOPIC_CEVAP_BASE = 'MGD/Temizlik/Cevap/';
         
-        // Cihaz ID
-        const DEV_ID = Math.random().toString(36).substr(2, 6).toUpperCase();
+        const DEV_ID = 'WEB_' + Math.random().toString(36).substr(2, 6).toUpperCase();
         document.getElementById('device-id').textContent = DEV_ID;
         
-        // =========================================================================
-        // STATE
-        // =========================================================================
+        // ==================== STATE ====================
         let mqttClient = null;
         let isConnected = false;
-        let currentResponse = null;
+        let pendingRequests = new Map();
         let qrScanner = null;
         
         let state = {
@@ -455,108 +425,118 @@
             seciliBirimAdi: ''
         };
         
-        // =========================================================================
-        // MQTT
-        // =========================================================================
+        // ==================== MQTT ====================
         function connectMQTT() {
-            mqttClient = mqtt.connect(MQTT_BROKER);
+            updateStatus('connecting', '🟡 Bağlanıyor...');
             
-            mqttClient.on('connect', () => {
-                isConnected = true;
-                updateStatus(true);
-                mqttClient.subscribe(`${TOPIC_CEVAP_BASE}${DEV_ID}`);
-            });
-            
-            mqttClient.on('disconnect', () => {
-                isConnected = false;
-                updateStatus(false);
-            });
-            
-            mqttClient.on('message', (topic, message) => {
-                try {
-                    currentResponse = JSON.parse(message.toString());
-                } catch(e) {
-                    console.error('MQTT parse error:', e);
-                }
-            });
+            try {
+                mqttClient = mqtt.connect(MQTT_BROKER, {
+                    clientId: DEV_ID,
+                    clean: true,
+                    connectTimeout: 4000,
+                    reconnectPeriod: 1000,
+                });
+                
+                mqttClient.on('connect', () => {
+                    console.log('MQTT Bağlandı');
+                    isConnected = true;
+                    updateStatus('online', '🟢 Sistem Aktif');
+                    
+                    // Cevap kanalına abone ol
+                    mqttClient.subscribe(`${TOPIC_CEVAP_BASE}${DEV_ID}`, (err) => {
+                        if (err) console.error('Subscribe hatası:', err);
+                    });
+                });
+                
+                mqttClient.on('disconnect', () => {
+                    console.log('MQTT Bağlantı kesildi');
+                    isConnected = false;
+                    updateStatus('offline', '🔴 Bağlantı Yok');
+                });
+                
+                mqttClient.on('message', (topic, message) => {
+                    try {
+                        const data = JSON.parse(message.toString());
+                        console.log('MQTT Mesaj:', data);
+                        
+                        // Bekleyen isteği bul ve çöz
+                        const requestId = data.request_id || 'default';
+                        if (pendingRequests.has(requestId)) {
+                            const { resolve } = pendingRequests.get(requestId);
+                            pendingRequests.delete(requestId);
+                            resolve(data);
+                        }
+                    } catch(e) {
+                        console.error('MQTT parse error:', e);
+                    }
+                });
+                
+                mqttClient.on('error', (err) => {
+                    console.error('MQTT Hata:', err);
+                    isConnected = false;
+                    updateStatus('offline', '🔴 Bağlantı Hatası');
+                });
+                
+            } catch(e) {
+                console.error('MQTT Bağlantı hatası:', e);
+                updateStatus('offline', '🔴 Bağlantı Yok');
+            }
         }
         
-        function updateStatus(online) {
+        function updateStatus(type, text) {
             const status = document.getElementById('status');
-            if (online) {
-                status.className = 'status online';
-                status.textContent = '🟢 Sistem Aktif';
-            } else {
-                status.className = 'status offline';
-                status.textContent = '🔴 Bağlantı Yok';
-            }
+            status.className = 'status ' + type;
+            status.textContent = text;
         }
         
         function sendMQTT(tip, birim = '', tc = '') {
-            return new Promise((resolve) => {
-                if (!isConnected) {
-                    // Simülasyon modu
-                    setTimeout(() => resolve(simulateResponse(tip, birim, tc)), 500);
-                    return;
-                }
-                
-                currentResponse = null;
-                
+            return new Promise((resolve, reject) => {
+                const requestId = Date.now().toString();
                 const payload = {
                     dev_id: DEV_ID,
+                    request_id: requestId,
                     tip: tip,
                     birim: birim,
-                    tc: tc
+                    tc: tc,
+                    timestamp: new Date().toISOString()
                 };
                 
-                mqttClient.publish(TOPIC_ISTEK, JSON.stringify(payload));
-                
-                // 10 saniye bekle
-                let attempts = 0;
-                const interval = setInterval(() => {
-                    attempts++;
-                    if (currentResponse || attempts > 100) {
-                        clearInterval(interval);
-                        resolve(currentResponse || {status: 'HATA', message: 'Zaman aşımı'});
+                // 10 saniye timeout
+                const timeout = setTimeout(() => {
+                    if (pendingRequests.has(requestId)) {
+                        pendingRequests.delete(requestId);
+                        reject(new Error('Zaman aşımı - Sunucu yanıt vermedi'));
                     }
-                }, 100);
+                }, 10000);
+                
+                // Promise'i kaydet
+                pendingRequests.set(requestId, {
+                    resolve: (data) => {
+                        clearTimeout(timeout);
+                        resolve(data);
+                    },
+                    reject: (err) => {
+                        clearTimeout(timeout);
+                        reject(err);
+                    }
+                });
+                
+                // MQTT'ye gönder
+                if (isConnected && mqttClient) {
+                    mqttClient.publish(TOPIC_ISTEK, JSON.stringify(payload), (err) => {
+                        if (err) {
+                            pendingRequests.delete(requestId);
+                            reject(err);
+                        }
+                    });
+                } else {
+                    pendingRequests.delete(requestId);
+                    reject(new Error('MQTT bağlı değil'));
+                }
             });
         }
         
-        function simulateResponse(tip, birim, tc) {
-            // Test modu - gerçek server yoksa
-            if (tip === 'KONTROL') {
-                if (tc === '12345678901') {
-                    return {
-                        status: 'OK',
-                        personel: {ad: 'Test', soyad: 'Personel'},
-                        aktif_islem: null
-                    };
-                }
-                return {status: 'HATA', message: 'Personel bulunamadı'};
-            }
-            
-            if (tip === 'BIRIM_DETAY') {
-                return {
-                    status: 'OK',
-                    birim: {adi: `Birim ${birim}`, kat: '3', tip: 'Oda'}
-                };
-            }
-            
-            if (tip === 'START') {
-                return {status: 'OK', message: 'İşlem başlatıldı'};
-            }
-            
-            if (tip === 'END') {
-                return {status: 'OK', message: 'İşlem tamamlandı'};
-            }
-            
-            return {status: 'HATA', message: 'Bilinmeyen işlem'};
-        }
-        
-        // =========================================================================
-        // NAVIGATION
-        // =========================================================================
+        // ==================== NAVIGATION ====================
         function showPage(pageId) {
             document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
             document.getElementById(`page-${pageId}`).classList.remove('hidden');
@@ -571,47 +551,54 @@
             return `🌙 İyi geceler ${ad}`;
         }
         
-        // =========================================================================
-        // LOGIN PAGE
-        // =========================================================================
+        // ==================== LOGIN ====================
         async function login() {
             const tc = document.getElementById('tc-input').value.trim();
             const btn = document.getElementById('btn-login');
             const errorDiv = document.getElementById('login-error');
             
             if (tc.length !== 11 || !/^\d+$/.test(tc)) {
-                errorDiv.innerHTML = '<div class="alert alert-error">❌ Geçersiz TC No (11 haneli)</div>';
+                errorDiv.innerHTML = '<div class="alert alert-error">❌ Geçersiz TC No (11 haneli olmalı)</div>';
+                return;
+            }
+            
+            if (!isConnected) {
+                errorDiv.innerHTML = '<div class="alert alert-error">❌ Sunucuya bağlı değil. Lütfen bekleyin...</div>';
                 return;
             }
             
             btn.disabled = true;
-            btn.textContent = 'Kontrol ediliyor...';
+            btn.innerHTML = '<span class="loading"></span> Kontrol ediliyor...';
             errorDiv.innerHTML = '';
             
-            const yanit = await sendMQTT('KONTROL', '', tc);
+            try {
+                const yanit = await sendMQTT('KONTROL', '', tc);
+                
+                if (yanit && yanit.status === 'OK') {
+                    state.tcNo = tc;
+                    state.personelAd = yanit.personel?.ad || '';
+                    state.personelSoyad = yanit.personel?.soyad || '';
+                    
+                    // Aktif işlem varsa onu göster, yoksa QR'a git
+                    if (yanit.aktif_islem) {
+                        state.aktifIslem = yanit.aktif_islem;
+                        showJobPage();
+                    } else {
+                        state.aktifIslem = null;
+                        showQRPage();
+                    }
+                } else {
+                    errorDiv.innerHTML = `<div class="alert alert-error">❌ ${yanit?.message || 'Personel bulunamadı'}</div>`;
+                }
+            } catch (err) {
+                errorDiv.innerHTML = `<div class="alert alert-error">❌ ${err.message || 'Bağlantı hatası'}</div>`;
+            }
             
             btn.disabled = false;
             btn.textContent = 'GİRİŞ YAP →';
-            
-            if (yanit && yanit.status === 'OK') {
-                state.tcNo = tc;
-                state.personelAd = yanit.personel?.ad || '';
-                state.personelSoyad = yanit.personel?.soyad || '';
-                
-                if (yanit.aktif_islem) {
-                    state.aktifIslem = yanit.aktif_islem;
-                    showJobPage();
-                } else {
-                    showQRPage();
-                }
-            } else {
-                errorDiv.innerHTML = `<div class="alert alert-error">❌ ${yanit?.message || 'Giriş başarısız'}</div>`;
-            }
         }
         
-        // =========================================================================
-        // QR PAGE
-        // =========================================================================
+        // ==================== QR ====================
         function showQRPage() {
             document.getElementById('greeting-qr').textContent = getGreeting();
             document.getElementById('personel-info-qr').textContent = 
@@ -623,7 +610,7 @@
         
         function startScanner() {
             if (qrScanner) {
-                qrScanner.start();
+                qrScanner.start({ facingMode: "environment" }, {}, onQRDetected, () => {});
                 return;
             }
             
@@ -631,20 +618,12 @@
             
             qrScanner.start(
                 { facingMode: "environment" },
-                {
-                    fps: 10,
-                    qrbox: { width: 250, height: 250 }
-                },
-                (decodedText) => {
-                    // QR bulundu
-                    onQRDetected(decodedText);
-                },
-                (error) => {
-                    // Hata (normal, sürekli deniyor)
-                }
+                { fps: 10, qrbox: { width: 250, height: 250 } },
+                onQRDetected,
+                () => {}
             ).catch(err => {
                 console.error("Kamera hatası:", err);
-                alert("Kamera erişimi reddedildi. Lütfen izin verin.");
+                showModal('Kamera Hatası', 'Kamera erişimi reddedildi. Lütfen tarayıcı izinlerini kontrol edin.', null, true);
             });
         }
         
@@ -658,21 +637,24 @@
             stopScanner();
             state.seciliBirimKodu = code;
             
-            // Detay sorgula
-            const yanit = await sendMQTT('BIRIM_DETAY', code, state.tcNo);
-            
-            if (yanit && yanit.status === 'OK') {
-                state.seciliBirimAdi = yanit.birim?.adi || code;
-            } else {
-                state.seciliBirimAdi = `Birim: ${code}`;
+            try {
+                // Sunucudan birim detayını al
+                const yanit = await sendMQTT('BIRIM_DETAY', code, state.tcNo);
+                
+                if (yanit && yanit.status === 'OK') {
+                    state.seciliBirimAdi = yanit.birim?.adi || code;
+                } else {
+                    state.seciliBirimAdi = `Birim: ${code}`;
+                }
+                
+                showConfirmPage();
+            } catch (err) {
+                showModal('Hata', 'Birim bilgisi alınamadı: ' + err.message, null, true);
+                showQRPage();
             }
-            
-            showConfirmPage();
         }
         
-        // =========================================================================
-        // CONFIRM PAGE
-        // =========================================================================
+        // ==================== CONFIRM ====================
         function showConfirmPage() {
             document.getElementById('greeting-confirm').textContent = getGreeting();
             document.getElementById('confirm-birim-adi').textContent = state.seciliBirimAdi;
@@ -684,31 +666,38 @@
         async function startCleaning() {
             const btn = document.getElementById('btn-start');
             btn.disabled = true;
-            btn.textContent = 'Gönderiliyor...';
+            btn.innerHTML = '<span class="loading"></span> Gönderiliyor...';
             
-            const yanit = await sendMQTT('START', state.seciliBirimKodu, state.tcNo);
-            
-            btn.disabled = false;
-            btn.textContent = '✨ TEMİZLİĞE BAŞLA';
-            
-            if (yanit && yanit.status === 'OK') {
-                state.islemGecmisi.push({
-                    saat: new Date().toLocaleTimeString('tr-TR', {hour: '2-digit', minute: '2-digit'}),
-                    birim: state.seciliBirimAdi,
-                    durum: 'Başlatıldı'
-                });
+            try {
+                const yanit = await sendMQTT('START', state.seciliBirimKodu, state.tcNo);
                 
-                state.aktifIslem = {
-                    birim_kodu: state.seciliBirimKodu,
-                    birim_adi: state.seciliBirimAdi,
-                    baslama_zamani: new Date().toISOString()
-                };
-                
-                showModal('✓ Başarılı', 'Temizliğiniz başlatıldı!', () => {
-                    showJobPage();
-                });
-            } else {
-                showModal('✗ Hata', yanit?.message || 'Başlatma başarısız', null, true);
+                if (yanit && yanit.status === 'OK') {
+                    // Geçmişe ekle
+                    state.islemGecmisi.push({
+                        saat: new Date().toLocaleTimeString('tr-TR', {hour: '2-digit', minute: '2-digit'}),
+                        birim: state.seciliBirimAdi,
+                        durum: 'Başlatıldı'
+                    });
+                    
+                    // Aktif işlem olarak kaydet
+                    state.aktifIslem = {
+                        birim_kodu: state.seciliBirimKodu,
+                        birim_adi: state.seciliBirimAdi,
+                        baslama_zamani: new Date().toISOString()
+                    };
+                    
+                    showModal('✓ Başarılı', 'Temizliğiniz başlatıldı! İşlemlerim menüsünden takip edebilirsiniz.', () => {
+                        showJobPage();
+                    });
+                } else {
+                    showModal('✗ Hata', yanit?.message || 'Başlatma başarısız', null, true);
+                    btn.disabled = false;
+                    btn.textContent = '✨ TEMİZLİĞE BAŞLA';
+                }
+            } catch (err) {
+                showModal('✗ Hata', 'Bağlantı hatası: ' + err.message, null, true);
+                btn.disabled = false;
+                btn.textContent = '✨ TEMİZLİĞE BAŞLA';
             }
         }
         
@@ -716,9 +705,7 @@
             showQRPage();
         }
         
-        // =========================================================================
-        // JOB PAGE
-        // =========================================================================
+        // ==================== JOB ====================
         function showJobPage() {
             document.getElementById('greeting-job').textContent = getGreeting();
             document.getElementById('personel-info-job').textContent = 
@@ -746,9 +733,14 @@
                 return;
             }
             
-            const baslama = new Date(state.aktifIslem.baslama_zamani);
-            const simdi = new Date();
-            const dakika = Math.floor((simdi - baslama) / 60000);
+            // Süre hesapla
+            let sureText = 'Hesaplanamadı';
+            try {
+                const baslama = new Date(state.aktifIslem.baslama_zamani);
+                const simdi = new Date();
+                const dakika = Math.floor((simdi - baslama) / 60000);
+                sureText = `${dakika} dk`;
+            } catch(e) {}
             
             container.innerHTML = `
                 <div class="card active-job">
@@ -756,12 +748,12 @@
                         🔵 DEVAM EDEN TEMİZLİK
                     </div>
                     <div style="font-size: 20px; font-weight: bold; margin: 10px 0;">
-                        🏢 ${state.aktifIslem.birim_adi}
+                        🏢 ${state.aktifIslem.birim_adi || state.aktifIslem.birim_kodu}
                     </div>
                     <div style="color: var(--gray); margin-bottom: 15px;">
                         Kod: ${state.aktifIslem.birim_kodu}
                     </div>
-                    <div class="timer">⏱️ Süre: ${dakika} dk</div>
+                    <div class="timer">⏱️ Süre: ${sureText}</div>
                     <button class="btn btn-primary" onclick="confirmEndJob()" style="height: 60px; font-size: 18px;">
                         ✓ TEMİZLİĞİ BİTİR
                     </button>
@@ -797,7 +789,7 @@
         function confirmEndJob() {
             showModal(
                 '✓ Onay',
-                `Sayın ${state.personelAd},<br><br>${state.aktifIslem.birim_adi} temizliğini bitirmek istediğinize emin misiniz?`,
+                `Sayın ${state.personelAd},<br><br><b>${state.aktifIslem.birim_adi || state.aktifIslem.birim_kodu}</b> temizliğini bitirmek istediğinize emin misiniz?`,
                 endJob,
                 false,
                 true
@@ -805,33 +797,37 @@
         }
         
         async function endJob() {
-            const yanit = await sendMQTT('END', state.aktifIslem.birim_kodu, state.tcNo);
-            
-            if (yanit && yanit.status === 'OK') {
-                state.islemGecmisi.push({
-                    saat: new Date().toLocaleTimeString('tr-TR', {hour: '2-digit', minute: '2-digit'}),
-                    birim: state.aktifIslem.birim_adi,
-                    durum: 'Tamamlandı'
-                });
+            try {
+                const yanit = await sendMQTT('END', state.aktifIslem.birim_kodu, state.tcNo);
                 
-                state.aktifIslem = null;
-                
-                const hour = new Date().getHours();
-                let veda = 'İyi çalışmalar! ☀️';
-                if (hour >= 17 && hour < 21) veda = 'İyi akşamlar! 👋';
-                else if (hour >= 21 || hour < 5) veda = 'İyi geceler! 🌙';
-                
-                showModal('✓ Tamamlandı', `Temizliğiniz tamamlandı!<br><br>${veda}`, () => {
-                    showJobPage();
-                });
-            } else {
-                showModal('✗ Hata', yanit?.message || 'Bitirme başarısız', null, true);
+                if (yanit && yanit.status === 'OK') {
+                    // Geçmişe ekle
+                    state.islemGecmisi.push({
+                        saat: new Date().toLocaleTimeString('tr-TR', {hour: '2-digit', minute: '2-digit'}),
+                        birim: state.aktifIslem.birim_adi || state.aktifIslem.birim_kodu,
+                        durum: 'Tamamlandı'
+                    });
+                    
+                    state.aktifIslem = null;
+                    
+                    // Veda mesajı
+                    const hour = new Date().getHours();
+                    let veda = 'İyi çalışmalar! ☀️';
+                    if (hour >= 17 && hour < 21) veda = 'İyi akşamlar! 👋';
+                    else if (hour >= 21 || hour < 5) veda = 'İyi geceler! 🌙';
+                    
+                    showModal('✓ Tamamlandı', `Temizliğiniz başarıyla tamamlandı!<br><br>${veda}`, () => {
+                        showJobPage();
+                    });
+                } else {
+                    showModal('✗ Hata', yanit?.message || 'Bitirme başarısız', null, true);
+                }
+            } catch (err) {
+                showModal('✗ Hata', 'Bağlantı hatası: ' + err.message, null, true);
             }
         }
         
-        // =========================================================================
-        // MODAL
-        // =========================================================================
+        // ==================== MODAL ====================
         function showModal(title, text, onConfirm, isError = false, showCancel = false) {
             const modal = document.getElementById('modal');
             document.getElementById('modal-title').textContent = title;
@@ -860,9 +856,7 @@
             modal.classList.add('active');
         }
         
-        // =========================================================================
-        // UTILS
-        // =========================================================================
+        // ==================== UTILS ====================
         function logout() {
             state.tcNo = '';
             state.personelAd = '';
@@ -872,17 +866,17 @@
             showPage('login');
         }
         
-        // =========================================================================
-        // INIT
-        // =========================================================================
-        connectMQTT();
-        
-        // TC input sadece sayı
+        // ==================== INIT ====================
         document.getElementById('tc-input').addEventListener('input', function(e) {
             this.value = this.value.replace(/[^0-9]/g, '');
         });
         
-        // Service Worker (PWA)
+        // Sayfa yüklendiğinde MQTT bağlan
+        window.addEventListener('load', () => {
+            connectMQTT();
+        });
+        
+        // PWA
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('sw.js').catch(() => {});
         }

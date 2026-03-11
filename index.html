@@ -28,6 +28,8 @@
             --gray: #8b949e;
             --gray-dark: #484f58;
             --border: #30363d;
+            --warning-bg: #341a1a;
+            --warning-text: #f85149;
         }
         
         body {
@@ -158,7 +160,7 @@
         #qr-reader {
             width: 100% !important;
             border: none !important;
-            background: var(--bg) !important;
+            background: var(--card) !important;
         }
         
         #qr-reader__scan_region {
@@ -218,12 +220,23 @@
             padding: 25px;
             width: 90%;
             max-width: 400px;
+            max-height: 80vh;
+            overflow-y: auto;
             text-align: center;
+        }
+        
+        .modal-content.talimatlar-modal {
+            max-width: 95%;
+            width: 95%;
+            max-height: 85vh;
+            padding: 20px;
         }
         
         .modal-title {
             font-size: 20px;
             margin-bottom: 15px;
+            color: var(--blue);
+            font-weight: bold;
         }
         
         .modal-text {
@@ -296,6 +309,100 @@
             margin-top: 10px;
             font-size: 12px;
         }
+        
+        /* YENİ: Talimatlar Sayfası Stilleri */
+        .talimatlar-header {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid var(--border);
+        }
+        
+        .talimatlar-birim-adi {
+            color: var(--blue);
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .talimatlar-birim-kod {
+            color: var(--gray);
+            font-size: 13px;
+        }
+        
+        .talimat-liste {
+            background: var(--bg);
+            border-radius: 12px;
+            padding: 10px;
+            margin-bottom: 15px;
+            max-height: 50vh;
+            overflow-y: auto;
+        }
+        
+        .talimat-madde {
+            background: var(--card);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 8px;
+            border-left: 3px solid var(--blue);
+            text-align: left;
+            font-size: 15px;
+            line-height: 1.5;
+            color: var(--gray-light);
+        }
+        
+        .talimat-madde-numara {
+            color: var(--blue);
+            font-weight: bold;
+            margin-right: 5px;
+        }
+        
+        .talimat-uyari {
+            background: var(--warning-bg);
+            border: 1px solid var(--warning-text);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 15px;
+            color: var(--warning-text);
+            font-size: 13px;
+            line-height: 1.4;
+        }
+        
+        .nav-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 20px;
+            background: var(--card);
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 10px;
+        }
+        
+        .nav-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: var(--blue);
+        }
+        
+        .nav-back {
+            background: none;
+            border: none;
+            color: var(--gray-light);
+            font-size: 24px;
+            cursor: pointer;
+            padding: 5px 10px;
+        }
+        
+        .info-badge {
+            display: inline-block;
+            background: rgba(88, 166, 255, 0.1);
+            color: var(--blue);
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
@@ -303,8 +410,8 @@
         <div class="header-icon">🏥</div>
         <h1>MGD TEMİZLİK SİSTEMİ</h1>
         <div class="header-sub">Mustafa GÜNEŞDOĞDU - Bilgisayar Programcısı</div>
-        <div class="header-sub">Ahmet KAHREMAN - Birim Sorumlusu</div>
-        <div class="header-sub2">Nazilli Devlet Hastanesi Bilgi İşlem</div>
+        <div class="header-sub">Ahmet KAHREMAN - Bilgi İşlem Sorumlusu</div>
+		<div class="header-sub2">Nazilli Devlet Hastanesi Bilgi İşlem 2026</div>
         <div class="divider"></div>
     </div>
     
@@ -312,6 +419,7 @@
         🟡 Bağlanıyor... <button class="retry-btn hidden" id="retry-btn" onclick="retryConnection()">Yeniden Dene</button>
     </div>
     
+    <!-- Sayfa 1: Login -->
     <div id="page-login" class="page">
         <div class="card">
             <div class="card-title">👤 Personel Girişi</div>
@@ -330,10 +438,11 @@
         </div>
         
         <div class="footer">
-            🔌 Cihaz: <span id="device-id"></span> | v1.5_Beta
+            🔌 Cihaz: <span id="device-id"></span> | v2.0_Beta
         </div>
     </div>
     
+    <!-- Sayfa 2: QR Okuma -->
     <div id="page-qr" class="page hidden">
         <div style="text-align: center; padding: 10px;">
             <h3 id="greeting-qr"></h3>
@@ -350,12 +459,13 @@
                 <div id="qr-reader"></div>
             </div>
             
-            <button class="btn btn-secondary" onclick="stopScanner(); showPage('login')">
+            <button class="btn btn-secondary" onclick="logout()">
                 ← Çıkış
             </button>
         </div>
     </div>
     
+    <!-- Sayfa 3: Onay ve Talimatlar -->
     <div id="page-confirm" class="page hidden">
         <div style="text-align: center; padding: 10px;">
             <h3 id="greeting-confirm"></h3>
@@ -366,7 +476,17 @@
             <div style="text-align: center; margin: 20px 0;">
                 <div id="confirm-birim-adi" style="font-size: 20px; color: var(--blue); font-weight: bold;"></div>
                 <div id="confirm-birim-kod" style="color: var(--gray); margin-top: 10px;"></div>
+                
+                <!-- YENİ: Talimatlar Bilgisi -->
+                <div id="talimat-info" class="hidden">
+                    <span class="info-badge">📋 <span id="talimat-sayisi">0</span> Talimat</span>
+                </div>
             </div>
+            
+            <!-- YENİ: Talimatları Gör Butonu -->
+            <button class="btn btn-blue" onclick="showTalimatlarPage()" style="margin-bottom: 15px;">
+                📋 Talimatları Gör
+            </button>
         </div>
         
         <div class="card">
@@ -384,6 +504,35 @@
         </div>
     </div>
     
+    <!-- YENİ: Sayfa 4 - Talimatlar (Tam Ekran) -->
+    <div id="page-talimatlar" class="page hidden">
+        <div class="nav-header">
+            <button class="nav-back" onclick="backToConfirm()">←</button>
+            <div class="nav-title">📋 Talimatlar</div>
+            <div style="width: 40px;"></div> <!-- Spacer for centering -->
+        </div>
+        
+        <div class="talimatlar-header">
+            <div class="talimatlar-birim-adi" id="talimat-birim-adi">Birim Adı</div>
+            <div class="talimatlar-birim-kod" id="talimat-birim-kod">Kod: XXX</div>
+        </div>
+        
+        <div class="card" style="margin-top: 0;">
+            <div class="talimat-uyari">
+                ⚠️ Bu talimatları dikkatlice okuyunuz. Temizliğe başlamadan önce tüm maddeleri uyguladığınızdan emin olunuz.
+            </div>
+            
+            <div class="talimat-liste" id="talimat-liste">
+                <!-- Talimatlar buraya dinamik olarak eklenecek -->
+            </div>
+            
+            <button class="btn btn-primary" onclick="backToConfirm()">
+                ✓ Anladım, Geri Dön
+            </button>
+        </div>
+    </div>
+    
+    <!-- Sayfa 5: İşlem Yönetimi -->
     <div id="page-job" class="page hidden">
         <div style="text-align: center; padding: 10px;">
             <h3 id="greeting-job"></h3>
@@ -403,6 +552,7 @@
         </div>
     </div>
     
+    <!-- Modal -->
     <div class="modal" id="modal">
         <div class="modal-content">
             <div class="modal-title" id="modal-title"></div>
@@ -441,7 +591,8 @@
             aktifIslem: null,
             islemGecmisi: [],
             seciliBirimKodu: '',
-            seciliBirimAdi: ''
+            seciliBirimAdi: '',
+            seciliBirimTalimatlar: ''  // YENİ: Talimatlar
         };
         
         // ==================== MQTT ====================
@@ -460,8 +611,8 @@
                     clientId: DEV_ID,
                     clean: true,
                     connectTimeout: 15000, 
-                    reconnectPeriod: 2000, 
-                    keepalive: 30, 
+                    reconnectPeriod: 2000,
+                    keepalive: 30,
                     rejectUnauthorized: false
                 };
                 
@@ -507,17 +658,7 @@
                 
                 mqttClient.on('message', (topic, message) => {
                     try {
-                        // Sunucudan mesaj geldiğinde canlılık (ping) süresini güncelle
-                        lastPingTime = Date.now();
-                        
                         currentResponse = JSON.parse(message.toString());
-                        
-                        // Gelen yanıt sadece PONG ise ekrana yazdır ve çık
-                        if (currentResponse.status === 'PONG') {
-                            updateStatus('online', '🟢 Sistem Aktif - Sunucuya Bağlı');
-                            return; 
-                        }
-                        
                         console.log('📨 MQTT Cevap:', currentResponse);
                     } catch(e) {
                         console.error('MQTT parse error:', e);
@@ -538,25 +679,12 @@
             showRetryButton();
         }
         
-        // PING/PONG KONTROL MERKEZİ
         function startConnectionCheck() {
             stopConnectionCheck();
-            
-            // Bağlanır bağlanmaz ilk PING'i at
-            sendPing();
-            
             connectionCheckInterval = setInterval(() => {
                 if (!mqttClient || !isConnected) {
                     handleDisconnect();
                     return;
-                }
-                
-                // Her 5 saniyede bir PING at
-                sendPing();
-                
-                // Eğer 10 saniyedir cevap gelmediyse sunucunun kapandığını anla
-                if (Date.now() - lastPingTime > 10000) {
-                    updateStatus('error', '🔴 Arka Plan Sunucusu Kapalı');
                 }
             }, 5000);
         }
@@ -565,18 +693,6 @@
             if (connectionCheckInterval) {
                 clearInterval(connectionCheckInterval);
                 connectionCheckInterval = null;
-            }
-        }
-        
-        function sendPing() {
-            if (isConnected && mqttClient) {
-                const payload = {
-                    dev_id: DEV_ID,
-                    tip: 'PING',
-                    birim: '',
-                    tc: ''
-                };
-                mqttClient.publish(TOPIC_ISTEK, JSON.stringify(payload));
             }
         }
         
@@ -624,8 +740,7 @@
                 }, 10000);
                 
                 const checkResponse = () => {
-                    // PONG dışındaki asıl işlemi yakalamak için kontrol
-                    if (currentResponse && currentResponse.status !== 'PONG') {
+                    if (currentResponse) {
                         clearTimeout(responseTimeout);
                         resolve(currentResponse);
                     } else {
@@ -671,7 +786,7 @@
             }
             
             if (!isConnected) {
-                errorDiv.innerHTML = '<div class="alert alert-error">❌ Sunucuya bağlı değil. Lütfen bağlantıyı kontrol edin.</div>';
+                errorDiv.innerHTML = '<div class="alert alert-error">❌ Sunucuya bağlı değil. Lütfen bağlantıyı kontrol edin veya "Yeniden Dene" butonuna tıklayın.</div>';
                 return;
             }
             
@@ -754,8 +869,16 @@
             }
             
             try {
-                // Koddan ziyade birim adını getirmek için doğrudan devam edebilirsiniz
-                state.seciliBirimAdi = `Birim: ${code}`;
+                const yanit = await sendMQTT('BIRIM_DETAY', code, state.tcNo);
+                
+                if (yanit && yanit.status === 'OK') {
+                    state.seciliBirimAdi = yanit.birim?.adi || code;
+                    state.seciliBirimTalimatlar = yanit.birim?.talimatlar || '';  // YENİ
+                } else {
+                    state.seciliBirimAdi = `Birim: ${code}`;
+                    state.seciliBirimTalimatlar = '';
+                }
+                
                 showConfirmPage();
             } catch (err) {
                 showModal('Hata', err.message, null, true);
@@ -769,7 +892,52 @@
             document.getElementById('confirm-birim-adi').textContent = state.seciliBirimAdi;
             document.getElementById('confirm-birim-kod').textContent = `Kod: ${state.seciliBirimKodu}`;
             
+            // YENİ: Talimatlar bilgisi göster
+            const talimatInfo = document.getElementById('talimat-info');
+            const talimatSayisi = document.getElementById('talimat-sayisi');
+            
+            if (state.seciliBirimTalimatlar && state.seciliBirimTalimatlar.trim()) {
+                const satirSayisi = state.seciliBirimTalimatlar.split('\n').filter(s => s.trim()).length;
+                talimatSayisi.textContent = satirSayisi;
+                talimatInfo.classList.remove('hidden');
+            } else {
+                talimatInfo.classList.add('hidden');
+            }
+            
             showPage('confirm');
+        }
+        
+        // YENİ: Talimatlar Sayfasını Göster
+        function showTalimatlarPage() {
+            document.getElementById('talimat-birim-adi').textContent = state.seciliBirimAdi;
+            document.getElementById('talimat-birim-kod').textContent = `Kod: ${state.seciliBirimKodu}`;
+            
+            const liste = document.getElementById('talimat-liste');
+            liste.innerHTML = '';
+            
+            if (state.seciliBirimTalimatlar) {
+                const satirlar = state.seciliBirimTalimatlar.split('\n').filter(s => s.trim());
+                
+                satirlar.forEach((satir, index) => {
+                    const madde = document.createElement('div');
+                    madde.className = 'talimat-madde';
+                    
+                    // Eğer satır zaten numaralandırılmışsa (1. - * gibi) kullan, yoksa numara ekle
+                    const icerik = /^\d+[\.\-]\s|^[\-\*]\s/.test(satir) ? satir : `${index + 1}. ${satir}`;
+                    
+                    madde.innerHTML = `<span class="talimat-madde-numara">${icerik.substring(0, icerik.indexOf(' ') + 1)}</span>${icerik.substring(icerik.indexOf(' ') + 1)}`;
+                    liste.appendChild(madde);
+                });
+            } else {
+                liste.innerHTML = '<div style="text-align: center; color: var(--gray); padding: 20px;">Bu birim için talimat bulunmamaktadır.</div>';
+            }
+            
+            showPage('talimatlar');
+        }
+        
+        // YENİ: Onay sayfasına geri dön
+        function backToConfirm() {
+            showConfirmPage();
         }
         
         async function startCleaning() {
@@ -816,6 +984,7 @@
         }
         
         function cancelCleaning() {
+            state.seciliBirimTalimatlar = '';
             showQRPage();
         }
         
@@ -855,6 +1024,16 @@
                 sureText = `${dakika} dk`;
             } catch(e) {}
             
+            // YENİ: Talimatlar butonu aktif işlemde de göster
+            let talimatBtnHTML = '';
+            if (state.seciliBirimTalimatlar) {
+                talimatBtnHTML = `
+                    <button class="btn btn-blue" onclick="showTalimatlarPage()" style="margin-bottom: 10px;">
+                        📋 Talimatları Gör
+                    </button>
+                `;
+            }
+            
             container.innerHTML = `
                 <div class="card active-job">
                     <div style="color: var(--blue); font-weight: bold; margin-bottom: 10px;">
@@ -867,6 +1046,7 @@
                         Kod: ${state.aktifIslem.birim_kodu}
                     </div>
                     <div class="timer">⏱️ Süre: ${sureText}</div>
+                    ${talimatBtnHTML}
                     <button class="btn btn-primary" onclick="confirmEndJob()" style="height: 60px; font-size: 18px;">
                         ✓ TEMİZLİĞİ BİTİR
                     </button>
@@ -979,6 +1159,7 @@
             state.personelAd = '';
             state.personelSoyad = '';
             state.aktifIslem = null;
+            state.seciliBirimTalimatlar = '';
             document.getElementById('tc-input').value = '';
             showPage('login');
         }
@@ -992,7 +1173,6 @@
             connectMQTT();
         });
         
-        // Sayfa kapanırken temizlik
         window.addEventListener('beforeunload', () => {
             stopConnectionCheck();
             if (mqttClient) {
@@ -1006,5 +1186,3 @@
     </script>
 </body>
 </html>
-
-

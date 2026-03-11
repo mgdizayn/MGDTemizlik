@@ -3,7 +3,7 @@ const urlsToCache = [
     '/',
     '/index.html',
     'https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js',
-    'https://unpkg.com/mqtt@5.0.3/dist/mqtt.min.js' // DÜZELTİLDİ: index.html ile aynı sürüm
+    'https://unpkg.com/mqtt@5.0.3/dist/mqtt.min.js'
 ];
 
 self.addEventListener('install', event => {

@@ -447,78 +447,82 @@
         
         // ==================== MQTT ====================
         function connectMQTT() {
-            console.log('MQTT bağlanıyor...');
-            updateStatus('connecting', '🟡 Bağlanıyor...');
-            hideRetryButton();
+    // 1. Mobil veri (hücresel) engelini aşmak için wss:// protokolü ve /mqtt yolu
+    const brokerUrl = 'wss://broker.hivemq.com:8884/mqtt';
+    
+    // 2. Cihaz çakışmalarını (birbirini hattan düşürmeyi) önlemek için benzersiz ID
+    const clientId = 'mgd_mobil_' + Math.random().toString(16).substr(2, 8);
+
+    const options = {
+        clientId: clientId,
+        keepalive: 30, // Hücresel ağlarda bağlantı kopmasını önlemek için ideal süre
+        protocolId: 'MQTT',
+        protocolVersion: 4,
+        clean: true,
+        reconnectPeriod: 1000, 
+        connectTimeout: 30 * 1000,
+        rejectUnauthorized: false
+    };
+
+    updateStatus("🟡 Bağlanıyor...", "warning");
+    console.log("MQTT sunucusuna WSS üzerinden bağlanılıyor...");
+    
+    try {
+        mqttClient = mqtt.connect(brokerUrl, options);
+
+        mqttClient.on('connect', function () {
+            console.log("MQTT Bağlantısı Başarılı!");
+            updateStatus("🟢 Bağlandı", "success");
             
-            try {
-                // Önceki bağlantıyı temizle
-                if (mqttClient) {
-                    mqttClient.end(true);
+            // Abone olunacak topic'i dinamik olarak state üzerinden alıyoruz
+            const topicBase = "MGD/Temizlik/Cevap/" + state.devId;
+            mqttClient.subscribe(topicBase, function (err) {
+                if (!err) {
+                    console.log(topicBase + " kanalına abone olundu.");
+                } else {
+                    console.error("Abonelik hatası:", err);
                 }
-                
-                mqttClient = mqtt.connect(MQTT_BROKER, {
-                    clientId: DEV_ID,
-                    clean: true,
-                    connectTimeout: 5000,
-                    reconnectPeriod: 0, // Otomatik reconnect kapalı, manuel yapacağız
-                    keepalive: 10
-                });
-                
-                mqttClient.on('connect', () => {
-                    console.log('✅ MQTT Bağlandı');
-                    isConnected = true;
-                    lastPingTime = Date.now();
-                    updateStatus('online', '🟢 Sistem Aktif - Sunucuya Bağlı');
-                    hideRetryButton();
-                    
-                    mqttClient.subscribe(`${TOPIC_CEVAP_BASE}${DEV_ID}`, (err) => {
-                        if (err) {
-                            console.error('Subscribe hatası:', err);
-                            updateStatus('error', '🔴 Abonelik hatası');
-                        }
-                    });
-                    
-                    // Bağlantı kontrolü başlat
-                    startConnectionCheck();
-                });
-                
-                mqttClient.on('disconnect', () => {
-                    console.log('❌ MQTT Bağlantı kesildi');
-                    handleDisconnect();
-                });
-                
-                mqttClient.on('close', () => {
-                    console.log('❌ MQTT Kapandı');
-                    handleDisconnect();
-                });
-                
-                mqttClient.on('offline', () => {
-                    console.log('❌ MQTT Offline');
-                    handleDisconnect();
-                });
-                
-                mqttClient.on('error', (err) => {
-                    console.error('❌ MQTT Hata:', err.message);
-                    updateStatus('error', '🔴 Bağlantı Hatası: ' + err.message);
-                    showRetryButton();
-                });
-                
-                mqttClient.on('message', (topic, message) => {
-                    try {
-                        currentResponse = JSON.parse(message.toString());
-                        console.log('📨 MQTT Cevap:', currentResponse);
-                    } catch(e) {
-                        console.error('MQTT parse error:', e);
-                    }
-                });
-                
-            } catch(e) {
-                console.error('❌ MQTT Bağlantı hatası:', e);
-                updateStatus('error', '🔴 Bağlantı Kurulamadı');
-                showRetryButton();
+            });
+            
+            // UI/durum güncellemelerini tetikleyen kendi fonksiyonunuz
+            if (typeof startConnectionCheck === "function") {
+                startConnectionCheck();
             }
-        }
+        });
+
+        mqttClient.on('message', function (topic, message) {
+            console.log("Mesaj geldi:", topic, message.toString());
+            try {
+                const data = JSON.parse(message.toString());
+                // Gelen cevabı işleyen mevcut fonksiyonunuzu çağırıyoruz
+                if (typeof handleMqttResponse === "function") {
+                    handleMqttResponse(data); 
+                }
+            } catch (e) {
+                console.error("JSON parse hatası:", e);
+            }
+        });
+
+        mqttClient.on('error', function (err) {
+            console.error("MQTT Hatası: ", err);
+            updateStatus("🔴 Bağlantı Hatası", "danger");
+        });
+
+        mqttClient.on('close', function () {
+            console.log("MQTT Bağlantısı koptu.");
+            updateStatus("🔴 Çevrimdışı", "danger");
+        });
+
+        mqttClient.on('reconnect', function () {
+            console.log("Yeniden bağlanılıyor...");
+            updateStatus("🟡 Yeniden Bağlanıyor...", "warning");
+        });
+
+    } catch (error) {
+        console.error("MQTT Bağlantı başlatma hatası:", error);
+        updateStatus("🔴 Bağlantı Başlatılamadı", "danger");
+    }
+}
         
         function handleDisconnect() {
             isConnected = false;

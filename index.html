@@ -329,7 +329,7 @@
         </div>
         
         <div class="footer">
-            🔌 Cihaz: <span id="device-id"></span> | v1.3_beta
+            🔌 Cihaz: <span id="device-id"></span> | v1.2
         </div>
     </div>
     
@@ -412,7 +412,6 @@
     
     <script>
         // ==================== CONFIG ====================
-        // Mobil operatör engellerini aşmak için HiveMQ yerine EMQX'e geçildi (Port 8084)
         const MQTT_OPTIONS = {
             protocol: 'wss',
             hostname: 'broker.emqx.io',
@@ -455,14 +454,13 @@
                     mqttClient.end(true);
                 }
                 
-                // Seçenekler yapılandırıldı (Hücresel ağ uyumlu)
                 const options = {
                     ...MQTT_OPTIONS,
                     clientId: DEV_ID,
                     clean: true,
                     connectTimeout: 15000, 
-                    reconnectPeriod: 2000, // Otomatik yeniden bağlanma devrede
-                    keepalive: 30, // Hücresel ağ için ideal süre
+                    reconnectPeriod: 2000, 
+                    keepalive: 30, 
                     rejectUnauthorized: false
                 };
                 
@@ -508,7 +506,17 @@
                 
                 mqttClient.on('message', (topic, message) => {
                     try {
+                        // Sunucudan mesaj geldiğinde canlılık (ping) süresini güncelle
+                        lastPingTime = Date.now();
+                        
                         currentResponse = JSON.parse(message.toString());
+                        
+                        // Gelen yanıt sadece PONG ise ekrana yazdır ve çık
+                        if (currentResponse.status === 'PONG') {
+                            updateStatus('online', '🟢 Sistem Aktif - Sunucuya Bağlı');
+                            return; 
+                        }
+                        
                         console.log('📨 MQTT Cevap:', currentResponse);
                     } catch(e) {
                         console.error('MQTT parse error:', e);
@@ -529,16 +537,25 @@
             showRetryButton();
         }
         
+        // PING/PONG KONTROL MERKEZİ
         function startConnectionCheck() {
             stopConnectionCheck();
+            
+            // Bağlanır bağlanmaz ilk PING'i at
+            sendPing();
+            
             connectionCheckInterval = setInterval(() => {
                 if (!mqttClient || !isConnected) {
                     handleDisconnect();
                     return;
                 }
                 
-                if (Date.now() - lastPingTime > 15000) {
-                    // console.log('Bağlantı kontrolü...');
+                // Her 5 saniyede bir PING at
+                sendPing();
+                
+                // Eğer 10 saniyedir cevap gelmediyse sunucunun kapandığını anla
+                if (Date.now() - lastPingTime > 10000) {
+                    updateStatus('error', '🔴 Arka Plan Sunucusu Kapalı');
                 }
             }, 5000);
         }
@@ -547,6 +564,18 @@
             if (connectionCheckInterval) {
                 clearInterval(connectionCheckInterval);
                 connectionCheckInterval = null;
+            }
+        }
+        
+        function sendPing() {
+            if (isConnected && mqttClient) {
+                const payload = {
+                    dev_id: DEV_ID,
+                    tip: 'PING',
+                    birim: '',
+                    tc: ''
+                };
+                mqttClient.publish(TOPIC_ISTEK, JSON.stringify(payload));
             }
         }
         
@@ -594,7 +623,8 @@
                 }, 10000);
                 
                 const checkResponse = () => {
-                    if (currentResponse) {
+                    // PONG dışındaki asıl işlemi yakalamak için kontrol
+                    if (currentResponse && currentResponse.status !== 'PONG') {
                         clearTimeout(responseTimeout);
                         resolve(currentResponse);
                     } else {
@@ -640,7 +670,7 @@
             }
             
             if (!isConnected) {
-                errorDiv.innerHTML = '<div class="alert alert-error">❌ Sunucuya bağlı değil. Lütfen bağlantıyı kontrol edin veya "Yeniden Dene" butonuna tıklayın.</div>';
+                errorDiv.innerHTML = '<div class="alert alert-error">❌ Sunucuya bağlı değil. Lütfen bağlantıyı kontrol edin.</div>';
                 return;
             }
             
@@ -723,14 +753,8 @@
             }
             
             try {
-                const yanit = await sendMQTT('BIRIM_DETAY', code, state.tcNo);
-                
-                if (yanit && yanit.status === 'OK') {
-                    state.seciliBirimAdi = yanit.birim?.adi || code;
-                } else {
-                    state.seciliBirimAdi = `Birim: ${code}`;
-                }
-                
+                // Koddan ziyade birim adını getirmek için doğrudan devam edebilirsiniz
+                state.seciliBirimAdi = `Birim: ${code}`;
                 showConfirmPage();
             } catch (err) {
                 showModal('Hata', err.message, null, true);

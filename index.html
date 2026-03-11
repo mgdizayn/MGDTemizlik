@@ -299,22 +299,18 @@
     </style>
 </head>
 <body>
-    <!-- Header -->
     <div class="header">
         <div class="header-icon">🏥</div>
         <h1>MGD TEMİZLİK SİSTEMİ</h1>
         <div class="header-sub">Mustafa GÜNEŞDOĞDU - Bilgisayar Programcısı</div>
-        <div class="header-sub">Ahmet KAHREMAN - Bilgi İşlem Sorumlusu</div>
         <div class="header-sub2">Nazilli Devlet Hastanesi Bilgi İşlem</div>
         <div class="divider"></div>
     </div>
     
-    <!-- Status -->
     <div class="status connecting" id="status">
         🟡 Bağlanıyor... <button class="retry-btn hidden" id="retry-btn" onclick="retryConnection()">Yeniden Dene</button>
     </div>
     
-    <!-- PAGE: Login -->
     <div id="page-login" class="page">
         <div class="card">
             <div class="card-title">👤 Personel Girişi</div>
@@ -333,11 +329,10 @@
         </div>
         
         <div class="footer">
-            🔌 Cihaz: <span id="device-id"></span> | v1.2Beta
+            🔌 Cihaz: <span id="device-id"></span> | v1.3_beta
         </div>
     </div>
     
-    <!-- PAGE: QR Scanner -->
     <div id="page-qr" class="page hidden">
         <div style="text-align: center; padding: 10px;">
             <h3 id="greeting-qr"></h3>
@@ -360,7 +355,6 @@
         </div>
     </div>
     
-    <!-- PAGE: Confirm -->
     <div id="page-confirm" class="page hidden">
         <div style="text-align: center; padding: 10px;">
             <h3 id="greeting-confirm"></h3>
@@ -389,7 +383,6 @@
         </div>
     </div>
     
-    <!-- PAGE: Job Management -->
     <div id="page-job" class="page hidden">
         <div style="text-align: center; padding: 10px;">
             <h3 id="greeting-job"></h3>
@@ -409,7 +402,6 @@
         </div>
     </div>
     
-    <!-- Modal -->
     <div class="modal" id="modal">
         <div class="modal-content">
             <div class="modal-title" id="modal-title"></div>
@@ -420,7 +412,13 @@
     
     <script>
         // ==================== CONFIG ====================
-        const MQTT_BROKER = 'wss://broker.hivemq.com:8884/mqtt';
+        // Mobil operatör engellerini aşmak için HiveMQ yerine EMQX'e geçildi (Port 8084)
+        const MQTT_OPTIONS = {
+            protocol: 'wss',
+            hostname: 'broker.emqx.io',
+            port: 8084,
+            path: '/mqtt'
+        };
         const TOPIC_ISTEK = 'MGD/Temizlik/Istek';
         const TOPIC_CEVAP_BASE = 'MGD/Temizlik/Cevap/';
         
@@ -448,82 +446,81 @@
         
         // ==================== MQTT ====================
         function connectMQTT() {
-    // 1. Mobil veri (hücresel) engelini aşmak için wss:// protokolü ve /mqtt yolu
-    const brokerUrl = 'wss://broker.hivemq.com:8884/mqtt';
-    
-    // 2. Cihaz çakışmalarını (birbirini hattan düşürmeyi) önlemek için benzersiz ID
-    const clientId = 'mgd_mobil_' + Math.random().toString(16).substr(2, 8);
-
-    const options = {
-        clientId: clientId,
-        keepalive: 30, // Hücresel ağlarda bağlantı kopmasını önlemek için ideal süre
-        protocolId: 'MQTT',
-        protocolVersion: 4,
-        clean: true,
-        reconnectPeriod: 1000, 
-        connectTimeout: 30 * 1000,
-        rejectUnauthorized: false
-    };
-
-    updateStatus("🟡 Bağlanıyor...", "warning");
-    console.log("MQTT sunucusuna WSS üzerinden bağlanılıyor...");
-    
-    try {
-        mqttClient = mqtt.connect(brokerUrl, options);
-
-        mqttClient.on('connect', function () {
-            console.log("MQTT Bağlantısı Başarılı!");
-            updateStatus("🟢 Bağlandı", "success");
+            console.log('MQTT bağlanıyor...');
+            updateStatus('connecting', '🟡 Bağlanıyor...');
+            hideRetryButton();
             
-            // Abone olunacak topic'i dinamik olarak state üzerinden alıyoruz
-            const topicBase = "MGD/Temizlik/Cevap/" + state.devId;
-            mqttClient.subscribe(topicBase, function (err) {
-                if (!err) {
-                    console.log(topicBase + " kanalına abone olundu.");
-                } else {
-                    console.error("Abonelik hatası:", err);
-                }
-            });
-            
-            // UI/durum güncellemelerini tetikleyen kendi fonksiyonunuz
-            if (typeof startConnectionCheck === "function") {
-                startConnectionCheck();
-            }
-        });
-
-        mqttClient.on('message', function (topic, message) {
-            console.log("Mesaj geldi:", topic, message.toString());
             try {
-                const data = JSON.parse(message.toString());
-                // Gelen cevabı işleyen mevcut fonksiyonunuzu çağırıyoruz
-                if (typeof handleMqttResponse === "function") {
-                    handleMqttResponse(data); 
+                if (mqttClient) {
+                    mqttClient.end(true);
                 }
-            } catch (e) {
-                console.error("JSON parse hatası:", e);
+                
+                // Seçenekler yapılandırıldı (Hücresel ağ uyumlu)
+                const options = {
+                    ...MQTT_OPTIONS,
+                    clientId: DEV_ID,
+                    clean: true,
+                    connectTimeout: 15000, 
+                    reconnectPeriod: 2000, // Otomatik yeniden bağlanma devrede
+                    keepalive: 30, // Hücresel ağ için ideal süre
+                    rejectUnauthorized: false
+                };
+                
+                mqttClient = mqtt.connect(options);
+                
+                mqttClient.on('connect', () => {
+                    console.log('✅ MQTT Bağlandı');
+                    isConnected = true;
+                    lastPingTime = Date.now();
+                    updateStatus('online', '🟢 Sistem Aktif - Sunucuya Bağlı');
+                    hideRetryButton();
+                    
+                    mqttClient.subscribe(`${TOPIC_CEVAP_BASE}${DEV_ID}`, (err) => {
+                        if (err) {
+                            console.error('Subscribe hatası:', err);
+                            updateStatus('error', '🔴 Abonelik hatası');
+                        }
+                    });
+                    
+                    startConnectionCheck();
+                });
+                
+                mqttClient.on('disconnect', () => {
+                    console.log('❌ MQTT Bağlantı kesildi');
+                    handleDisconnect();
+                });
+                
+                mqttClient.on('close', () => {
+                    console.log('❌ MQTT Kapandı');
+                    handleDisconnect();
+                });
+                
+                mqttClient.on('offline', () => {
+                    console.log('❌ MQTT Offline');
+                    handleDisconnect();
+                });
+                
+                mqttClient.on('error', (err) => {
+                    console.error('❌ MQTT Hata:', err.message);
+                    updateStatus('error', '🔴 Bağlantı Hatası: ' + err.message);
+                    showRetryButton();
+                });
+                
+                mqttClient.on('message', (topic, message) => {
+                    try {
+                        currentResponse = JSON.parse(message.toString());
+                        console.log('📨 MQTT Cevap:', currentResponse);
+                    } catch(e) {
+                        console.error('MQTT parse error:', e);
+                    }
+                });
+                
+            } catch(e) {
+                console.error('❌ MQTT Bağlantı hatası:', e);
+                updateStatus('error', '🔴 Bağlantı Kurulamadı');
+                showRetryButton();
             }
-        });
-
-        mqttClient.on('error', function (err) {
-            console.error("MQTT Hatası: ", err);
-            updateStatus("🔴 Bağlantı Hatası", "danger");
-        });
-
-        mqttClient.on('close', function () {
-            console.log("MQTT Bağlantısı koptu.");
-            updateStatus("🔴 Çevrimdışı", "danger");
-        });
-
-        mqttClient.on('reconnect', function () {
-            console.log("Yeniden bağlanılıyor...");
-            updateStatus("🟡 Yeniden Bağlanıyor...", "warning");
-        });
-
-    } catch (error) {
-        console.error("MQTT Bağlantı başlatma hatası:", error);
-        updateStatus("🔴 Bağlantı Başlatılamadı", "danger");
-    }
-}
+        }
         
         function handleDisconnect() {
             isConnected = false;
@@ -540,10 +537,8 @@
                     return;
                 }
                 
-                // 15 saniyedir mesaj yoksa kontrol et
                 if (Date.now() - lastPingTime > 15000) {
-                    console.log('Bağlantı kontrolü...');
-                    // Ping gönderilebilir burada
+                    // console.log('Bağlantı kontrolü...');
                 }
             }, 5000);
         }
@@ -592,14 +587,12 @@
                     tc: tc
                 };
                 
-                // 10 saniye timeout
                 if (responseTimeout) clearTimeout(responseTimeout);
                 
                 responseTimeout = setTimeout(() => {
                     reject(new Error('Sunucu yanıt vermedi (10 saniye). Sunucu kapalı olabilir.'));
                 }, 10000);
                 
-                // Cevap kontrolü
                 const checkResponse = () => {
                     if (currentResponse) {
                         clearTimeout(responseTimeout);
@@ -609,7 +602,6 @@
                     }
                 };
                 
-                // Gönder
                 mqttClient.publish(TOPIC_ISTEK, JSON.stringify(payload), (err) => {
                     if (err) {
                         clearTimeout(responseTimeout);
@@ -676,7 +668,6 @@
                 }
             } catch (err) {
                 errorDiv.innerHTML = `<div class="alert alert-error">❌ ${err.message}</div>`;
-                // Bağlantı hatası varsa durumu güncelle
                 if (err.message.includes('Sunucu') || err.message.includes('bağlı')) {
                     handleDisconnect();
                 }
@@ -990,5 +981,3 @@
     </script>
 </body>
 </html>
-
-

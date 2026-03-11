@@ -157,25 +157,20 @@
             color: white;
         }
         
-        #qr-reader {
-            width: 100% !important;
-            border: none !important;
-            background: var(--card) !important;
-        }
-        
-        #qr-reader__scan_region {
-            background: var(--card) !important;
-            border-radius: 15px !important;
-        }
-        
-        #qr-reader__dashboard { display: none !important; }
-        
         .qr-container {
-            position: relative;
+            width: 100%;
+            height: 300px;
             background: var(--card);
             border-radius: 15px;
             overflow: hidden;
             margin: 15px 0;
+            position: relative;
+        }
+        
+        .qr-container video {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover;
         }
         
         .active-job { border-left: 4px solid var(--blue); }
@@ -206,10 +201,11 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.9);
+            background: rgba(0,0,0,0.95);
             z-index: 1000;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
+            padding-top: 20px;
         }
         
         .modal.active { display: flex; }
@@ -220,22 +216,12 @@
             padding: 25px;
             width: 90%;
             max-width: 400px;
-            max-height: 80vh;
+            max-height: 85vh;
             overflow-y: auto;
             text-align: center;
         }
         
-        .modal-content.talimatlar-modal {
-            max-width: 95%;
-            width: 95%;
-            max-height: 85vh;
-            padding: 20px;
-        }
-        
-        /* YENİ: QR Doğrulama Modal Stilleri */
-        .modal-content.verification-modal {
-            max-width: 95%;
-            width: 95%;
+        .verification-content {
             border: 2px solid var(--red);
         }
         
@@ -266,24 +252,22 @@
             font-size: 14px;
         }
         
-        .qr-verification-container {
+        .verification-camera-box {
+            width: 100%;
+            height: 300px;
             background: var(--bg);
             border-radius: 15px;
             border: 2px solid var(--border);
-            margin: 15px 0;
             overflow: hidden;
-            min-height: 300px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            margin: 15px 0;
             position: relative;
         }
         
-        .qr-verification-container.scanning {
+        .verification-camera-box.success {
             border-color: var(--green);
         }
         
-        .qr-verification-container.error {
+        .verification-camera-box.error {
             border-color: var(--red);
             animation: shake 0.5s;
         }
@@ -295,14 +279,17 @@
         }
         
         .verification-status {
-            margin-top: 15px;
-            padding: 10px;
+            margin: 15px 0;
+            padding: 12px;
             border-radius: 8px;
             font-weight: bold;
+            font-size: 14px;
             min-height: 50px;
             display: flex;
             align-items: center;
             justify-content: center;
+            flex-direction: column;
+            gap: 5px;
         }
         
         .verification-status.success {
@@ -390,18 +377,31 @@
             to { transform: rotate(360deg); }
         }
         
-        .retry-btn {
-            background: var(--orange);
-            color: white;
-            padding: 8px 16px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 10px;
-            font-size: 12px;
+        .nav-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 20px;
+            background: var(--card);
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 10px;
         }
         
-        /* YENİ: Talimatlar Sayfası Stilleri */
+        .nav-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: var(--blue);
+        }
+        
+        .nav-back {
+            background: none;
+            border: none;
+            color: var(--gray-light);
+            font-size: 24px;
+            cursor: pointer;
+            padding: 5px 10px;
+        }
+        
         .talimatlar-header {
             background: var(--card);
             border-radius: 12px;
@@ -443,12 +443,6 @@
             color: var(--gray-light);
         }
         
-        .talimat-madde-numara {
-            color: var(--blue);
-            font-weight: bold;
-            margin-right: 5px;
-        }
-        
         .talimat-uyari {
             background: var(--warning-bg);
             border: 1px solid var(--warning-text);
@@ -459,48 +453,6 @@
             font-size: 13px;
             line-height: 1.4;
         }
-        
-        .nav-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 15px 20px;
-            background: var(--card);
-            border-bottom: 1px solid var(--border);
-            margin-bottom: 10px;
-        }
-        
-        .nav-title {
-            font-size: 16px;
-            font-weight: bold;
-            color: var(--blue);
-        }
-        
-        .nav-back {
-            background: none;
-            border: none;
-            color: var(--gray-light);
-            font-size: 24px;
-            cursor: pointer;
-            padding: 5px 10px;
-        }
-        
-        .info-badge {
-            display: inline-block;
-            background: rgba(88, 166, 255, 0.1);
-            color: var(--blue);
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 12px;
-            margin-top: 10px;
-        }
-        
-        .qr-placeholder {
-            text-align: center;
-            color: var(--gray);
-            font-size: 60px;
-            padding: 40px;
-        }
     </style>
 </head>
 <body>
@@ -509,12 +461,12 @@
         <h1>MGD TEMİZLİK SİSTEMİ</h1>
         <div class="header-sub">Mustafa GÜNEŞDOĞDU - Bilgisayar Programcısı</div>
         <div class="header-sub">Ahmet KAHREMAN - Bilgi İşlem Sorumlusu</div>
-		<div class="header-sub2">Nazilli Devlet Hastanesi Bilgi İşlem 2026</div>
+        <div class="header-sub2">Nazilli Devlet Hastanesi Bilgi İşlem 2026</div>
         <div class="divider"></div>
     </div>
     
     <div class="status connecting" id="status">
-        🟡 Bağlanıyor... <button class="retry-btn hidden" id="retry-btn" onclick="retryConnection()">Yeniden Dene</button>
+        🟡 Bağlanıyor...
     </div>
     
     <!-- Sayfa 1: Login -->
@@ -536,11 +488,11 @@
         </div>
         
         <div class="footer">
-            🔌 Cihaz: <span id="device-id"></span> | v3.9_WEB_QR
+            🔌 Cihaz: <span id="device-id"></span> | v4.0_WEB_QR
         </div>
     </div>
     
-    <!-- Sayfa 2: QR Okuma -->
+    <!-- Sayfa 2: QR Okuma (Birim Seçimi) -->
     <div id="page-qr" class="page hidden">
         <div style="text-align: center; padding: 10px;">
             <h3 id="greeting-qr"></h3>
@@ -548,13 +500,13 @@
         </div>
         
         <div class="card">
-            <div class="card-title">📱 QR KOD OKUMA</div>
+            <div class="card-title">📱 BİRİM SEÇİMİ</div>
             <p style="color: var(--gray); text-align: center; margin-bottom: 15px;">
-                Kamerayı birime doğru tutun
+                Temizlenecek birimin QR kodunu okutun
             </p>
             
-            <div class="qr-container">
-                <div id="qr-reader"></div>
+            <div class="qr-container" id="main-qr-container">
+                <!-- Kamera buraya gelecek -->
             </div>
             
             <button class="btn btn-secondary" onclick="logout()">
@@ -563,7 +515,7 @@
         </div>
     </div>
     
-    <!-- Sayfa 3: Onay ve Talimatlar -->
+    <!-- Sayfa 3: Onay -->
     <div id="page-confirm" class="page hidden">
         <div style="text-align: center; padding: 10px;">
             <h3 id="greeting-confirm"></h3>
@@ -576,7 +528,9 @@
                 <div id="confirm-birim-kod" style="color: var(--gray); margin-top: 10px;"></div>
                 
                 <div id="talimat-info" class="hidden">
-                    <span class="info-badge">📋 <span id="talimat-sayisi">0</span> Talimat</span>
+                    <span style="display: inline-block; background: rgba(88, 166, 255, 0.1); color: var(--blue); padding: 5px 10px; border-radius: 15px; font-size: 12px; margin-top: 10px;">
+                        📋 <span id="talimat-sayisi">0</span> Talimat
+                    </span>
                 </div>
             </div>
             
@@ -586,14 +540,14 @@
         </div>
         
         <div class="card">
-            <p style="text-align: center; color: var(--orange); margin-bottom: 20px; font-weight: bold;">
+            <p style="text-align: center; color: var(--orange); margin-bottom: 10px; font-weight: bold;">
                 🔐 Güvenlik Doğrulaması Gereklidir
             </p>
             <p style="text-align: center; color: var(--gray); margin-bottom: 20px; font-size: 14px;">
-                Temizliğe başlamak için birim QR kodunu tekrar okutmanız gerekmektedir.
+                Temizliğe başlamak için birim QR kodunu tekrar okutun
             </p>
             
-            <button class="btn btn-primary" id="btn-start" onclick="startCleaning()">
+            <button class="btn btn-primary" id="btn-start" onclick="openVerification('baslat')" style="height: 55px;">
                 🔐 QR DOĞRULAMA - BAŞLA
             </button>
             
@@ -622,7 +576,7 @@
             </div>
             
             <div class="talimat-liste" id="talimat-liste">
-                <!-- Talimatlar buraya dinamik olarak eklenecek -->
+                <!-- Talimatlar buraya -->
             </div>
             
             <button class="btn btn-primary" onclick="backToConfirm()">
@@ -638,7 +592,7 @@
             <p style="color: var(--gray);" id="personel-info-job"></p>
         </div>
         
-        <div class="card-title" style="text-align: center; margin: 20px;">📋 İŞLEM YÖNETİMİ</div>
+        <div class="card-title" style="text-align: center; margin: 20px;">🧹 AKTİF İŞLEM</div>
         
         <div id="active-job-card"></div>
         
@@ -651,21 +605,12 @@
         </div>
     </div>
     
-    <!-- Modal -->
-    <div class="modal" id="modal">
-        <div class="modal-content" id="modal-content">
-            <div class="modal-title" id="modal-title"></div>
-            <div class="modal-text" id="modal-text"></div>
-            <div class="modal-buttons" id="modal-buttons"></div>
-        </div>
-    </div>
-    
-    <!-- YENİ: QR Doğrulama Modal -->
+    <!-- QR Doğrulama Modal (Tek Kamera) -->
     <div class="modal" id="verification-modal">
-        <div class="modal-content verification-modal">
+        <div class="modal-content verification-content">
             <div class="verification-header">🔐 GÜVENLİK DOĞRULAMA</div>
-            <div style="color: var(--gray-light); margin-bottom: 15px; font-size: 14px;">
-                İşlem yapabilmek için doğru birimin QR kodunu okutun
+            <div style="color: var(--gray-light); margin-bottom: 10px; font-size: 14px;">
+                İşlem yapabilmek için doğru birimi okutun
             </div>
             
             <div class="verification-info">
@@ -674,24 +619,33 @@
                 <div class="verification-kod" id="verification-birim-kod">Kod: XXX</div>
             </div>
             
-            <div class="qr-verification-container" id="qr-verification-container">
-                <div id="qr-verification-reader"></div>
-                <div class="qr-placeholder" id="qr-placeholder">📷<br><small style="font-size: 16px;">Kamera başlatılıyor...</small></div>
+            <!-- Kamera Container (Tek Kamera Burada Çalışacak) -->
+            <div class="verification-camera-box" id="verification-camera-box">
+                <div id="verification-reader" style="width: 100%; height: 100%;"></div>
             </div>
             
             <div class="verification-status waiting" id="verification-status">
-                Kamerayı birim QR koduna doğru tutun...
+                Kamerayı QR koda doğru tutun...
             </div>
             
-            <button class="btn btn-danger" onclick="closeVerificationModal()" style="margin-top: 15px;">
+            <button class="btn btn-danger" onclick="closeVerification()">
                 ✗ İPTAL
             </button>
         </div>
     </div>
     
+    <!-- Bilgi Modal -->
+    <div class="modal" id="info-modal">
+        <div class="modal-content">
+            <div class="modal-title" id="info-modal-title"></div>
+            <div class="modal-text" id="info-modal-text"></div>
+            <button class="btn btn-primary" onclick="closeInfoModal()">TAMAM</button>
+        </div>
+    </div>
+
     <script>
-        // ==================== CONFIG ====================
-        const MQTT_OPTIONS = {
+        // ==================== AYARLAR ====================
+        const MQTT_CONFIG = {
             protocol: 'wss',
             hostname: 'broker.emqx.io',
             port: 8084,
@@ -699,18 +653,14 @@
         };
         const TOPIC_ISTEK = 'MGD/Temizlik/Istek';
         const TOPIC_CEVAP_BASE = 'MGD/Temizlik/Cevap/';
-        
         const DEV_ID = 'WEB_' + Math.random().toString(36).substr(2, 6).toUpperCase();
-        document.getElementById('device-id').textContent = DEV_ID;
         
-        // ==================== STATE ====================
+        // ==================== DURUM ====================
         let mqttClient = null;
         let isConnected = false;
-        let connectionCheckInterval = null;
+        let qrScanner = null; // TEK KAMERA INSTANCE'I
         let currentResponse = null;
         let responseTimeout = null;
-        let qrScanner = null;
-        let verificationScanner = null; // YENİ: Doğrulama için ayrı scanner
         
         let state = {
             tcNo: '',
@@ -721,121 +671,65 @@
             seciliBirimKodu: '',
             seciliBirimAdi: '',
             seciliBirimTalimatlar: '',
-            verificationMod: null // YENİ: 'baslat' veya 'bitir'
+            verificationMode: null // 'baslat' veya 'bitir'
         };
         
-        // ==================== MQTT ====================
+        // ==================== MQTT BAĞLANTI ====================
         function connectMQTT() {
-            console.log('MQTT bağlanıyor...');
             updateStatus('connecting', '🟡 Bağlanıyor...');
-            hideRetryButton();
             
             try {
-                if (mqttClient) {
-                    mqttClient.end(true);
-                }
-                
                 const options = {
-                    ...MQTT_OPTIONS,
+                    ...MQTT_CONFIG,
                     clientId: DEV_ID,
                     clean: true,
-                    connectTimeout: 15000, 
-                    reconnectPeriod: 2000,
-                    keepalive: 30,
-                    rejectUnauthorized: false
+                    connectTimeout: 10000,
+                    reconnectPeriod: 3000
                 };
                 
                 mqttClient = mqtt.connect(options);
                 
                 mqttClient.on('connect', () => {
-                    console.log('✅ MQTT Bağlandı');
+                    console.log('MQTT Bağlandı');
                     isConnected = true;
                     updateStatus('online', '🟢 Sistem Aktif');
-                    hideRetryButton();
-                    
-                    mqttClient.subscribe(`${TOPIC_CEVAP_BASE}${DEV_ID}`, (err) => {
-                        if (err) {
-                            console.error('Subscribe hatası:', err);
-                            updateStatus('error', '🔴 Abonelik hatası');
-                        }
-                    });
-                    
-                    startConnectionCheck();
+                    mqttClient.subscribe(`${TOPIC_CEVAP_BASE}${DEV_ID}`);
                 });
                 
-                mqttClient.on('disconnect', () => handleDisconnect());
-                mqttClient.on('close', () => handleDisconnect());
-                mqttClient.on('offline', () => handleDisconnect());
+                mqttClient.on('disconnect', () => {
+                    isConnected = false;
+                    updateStatus('offline', '🔴 Bağlantı Kesildi');
+                });
                 
                 mqttClient.on('error', (err) => {
-                    console.error('❌ MQTT Hata:', err.message);
+                    console.error('MQTT Hata:', err);
                     updateStatus('error', '🔴 Bağlantı Hatası');
-                    showRetryButton();
                 });
                 
                 mqttClient.on('message', (topic, message) => {
                     try {
                         currentResponse = JSON.parse(message.toString());
-                        console.log('📨 MQTT Cevap:', currentResponse);
+                        console.log('MQTT Cevap:', currentResponse);
                     } catch(e) {
-                        console.error('MQTT parse error:', e);
+                        console.error('Parse hatası:', e);
                     }
                 });
                 
             } catch(e) {
-                console.error('❌ MQTT Bağlantı hatası:', e);
+                console.error('Bağlantı hatası:', e);
                 updateStatus('error', '🔴 Bağlantı Kurulamadı');
-                showRetryButton();
             }
-        }
-        
-        function handleDisconnect() {
-            isConnected = false;
-            stopConnectionCheck();
-            updateStatus('offline', '🔴 Sunucuya Bağlı Değil');
-            showRetryButton();
-        }
-        
-        function startConnectionCheck() {
-            stopConnectionCheck();
-            connectionCheckInterval = setInterval(() => {
-                if (!mqttClient || !isConnected) {
-                    handleDisconnect();
-                }
-            }, 5000);
-        }
-        
-        function stopConnectionCheck() {
-            if (connectionCheckInterval) {
-                clearInterval(connectionCheckInterval);
-                connectionCheckInterval = null;
-            }
-        }
-        
-        function retryConnection() {
-            console.log('Yeniden bağlanılıyor...');
-            connectMQTT();
         }
         
         function updateStatus(type, text) {
-            const status = document.getElementById('status');
-            status.className = 'status ' + type;
-            status.innerHTML = text + ' <button class="retry-btn hidden" id="retry-btn" onclick="retryConnection()">Yeniden Dene</button>';
+            const el = document.getElementById('status');
+            el.className = 'status ' + type;
+            el.textContent = text;
         }
         
-        function showRetryButton() {
-            const btn = document.getElementById('retry-btn');
-            if (btn) btn.classList.remove('hidden');
-        }
-        
-        function hideRetryButton() {
-            const btn = document.getElementById('retry-btn');
-            if (btn) btn.classList.add('hidden');
-        }
-        
-        function sendMQTT(tip, birim = '', tc = '') {
+        async function sendMQTT(tip, birim = '', tc = '') {
             return new Promise((resolve, reject) => {
-                if (!isConnected || !mqttClient) {
+                if (!isConnected) {
                     reject(new Error('Sunucuya bağlı değil'));
                     return;
                 }
@@ -850,35 +744,32 @@
                 };
                 
                 if (responseTimeout) clearTimeout(responseTimeout);
-                
                 responseTimeout = setTimeout(() => {
-                    reject(new Error('Sunucu yanıt vermedi (10 saniye)'));
+                    reject(new Error('Sunucu yanıt vermedi'));
                 }, 10000);
                 
-                const checkResponse = () => {
+                const checkInterval = setInterval(() => {
                     if (currentResponse) {
                         clearTimeout(responseTimeout);
+                        clearInterval(checkInterval);
                         resolve(currentResponse);
-                    } else {
-                        setTimeout(checkResponse, 100);
                     }
-                };
+                }, 100);
                 
                 mqttClient.publish(TOPIC_ISTEK, JSON.stringify(payload), (err) => {
                     if (err) {
                         clearTimeout(responseTimeout);
-                        reject(new Error('Mesaj gönderilemedi: ' + err.message));
-                    } else {
-                        checkResponse();
+                        clearInterval(checkInterval);
+                        reject(new Error('Gönderim hatası'));
                     }
                 });
             });
         }
         
-        // ==================== NAVIGATION ====================
+        // ==================== SAYFA YÖNETİMİ ====================
         function showPage(pageId) {
             document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
-            document.getElementById(`page-${pageId}`).classList.remove('hidden');
+            document.getElementById('page-' + pageId).classList.remove('hidden');
         }
         
         function getGreeting() {
@@ -890,46 +781,42 @@
             return `🌙 İyi geceler ${ad}`;
         }
         
-        // ==================== LOGIN ====================
+        // ==================== GİRİŞ ====================
         async function login() {
             const tc = document.getElementById('tc-input').value.trim();
             const btn = document.getElementById('btn-login');
             const errorDiv = document.getElementById('login-error');
             
-            if (tc.length !== 11 || !/^\d+$/.test(tc)) {
-                errorDiv.innerHTML = '<div class="alert alert-error">❌ Geçersiz TC No (11 haneli olmalı)</div>';
+            if (!tc || tc.length !== 11 || !/^\d+$/.test(tc)) {
+                errorDiv.innerHTML = '<div class="alert alert-error">❌ Geçersiz TC No</div>';
                 return;
             }
             
             if (!isConnected) {
-                errorDiv.innerHTML = '<div class="alert alert-error">❌ Sunucuya bağlı değil</div>';
+                errorDiv.innerHTML = '<div class="alert alert-error">❌ Bağlantı yok</div>';
                 return;
             }
             
             btn.disabled = true;
             btn.innerHTML = '<span class="loading"></span> Kontrol ediliyor...';
-            errorDiv.innerHTML = '';
             
             try {
                 const yanit = await sendMQTT('KONTROL', '', tc);
                 
-                if (yanit && yanit.status === 'OK') {
+                if (yanit?.status === 'OK') {
                     state.tcNo = tc;
                     state.personelAd = yanit.personel?.ad || '';
                     state.personelSoyad = yanit.personel?.soyad || '';
                     
                     if (yanit.aktif_islem) {
                         state.aktifIslem = yanit.aktif_islem;
-                        // Aktif işlem varsa talimatları da al
-                        if (yanit.aktif_islem.birim_kodu) {
-                            const detay = await sendMQTT('BIRIM_DETAY', yanit.aktif_islem.birim_kodu, tc);
-                            if (detay && detay.status === 'OK') {
-                                state.seciliBirimTalimatlar = detay.birim?.talimatlar || '';
-                            }
+                        // Talimatları da al
+                        const detay = await sendMQTT('BIRIM_DETAY', yanit.aktif_islem.birim_kodu, tc);
+                        if (detay?.status === 'OK') {
+                            state.seciliBirimTalimatlar = detay.birim?.talimatlar || '';
                         }
                         showJobPage();
                     } else {
-                        state.aktifIslem = null;
                         showQRPage();
                     }
                 } else {
@@ -937,90 +824,90 @@
                 }
             } catch (err) {
                 errorDiv.innerHTML = `<div class="alert alert-error">❌ ${err.message}</div>`;
-                if (err.message.includes('Sunucu') || err.message.includes('bağlı')) {
-                    handleDisconnect();
-                }
             }
             
             btn.disabled = false;
             btn.textContent = 'GİRİŞ YAP →';
         }
         
-        // ==================== QR (Birim Seçimi) ====================
-        function showQRPage() {
-            document.getElementById('greeting-qr').textContent = getGreeting();
-            document.getElementById('personel-info-qr').textContent = 
-                `${state.personelAd} ${state.personelSoyad}`;
-            
-            showPage('qr');
-            startScanner();
-        }
+        // ==================== TEK KAMERA YÖNETİMİ ====================
         
-        function startScanner() {
+        // Ana kamerayı başlat (Birim seçimi için)
+        async function startMainScanner() {
             if (qrScanner) {
-                qrScanner.start({ facingMode: "environment" }, {}, onQRDetected, () => {});
-                return;
+                await stopScanner();
             }
             
-            qrScanner = new Html5Qrcode("qr-reader");
+            qrScanner = new Html5Qrcode("main-qr-container");
             
-            qrScanner.start(
-                { facingMode: "environment" },
-                { fps: 10, qrbox: { width: 250, height: 250 } },
-                onQRDetected,
-                () => {}
-            ).catch(err => {
-                console.error("Kamera hatası:", err);
-                showModal('Kamera Hatası', 'Kamera erişimi reddedildi. Lütfen tarayıcı izinlerini kontrol edin.', null, true);
-            });
-        }
-        
-        function stopScanner() {
-            if (qrScanner) {
-                qrScanner.stop().catch(() => {});
+            try {
+                await qrScanner.start(
+                    { facingMode: "environment" },
+                    { fps: 10, qrbox: { width: 250, height: 250 } },
+                    onMainQRDetected,
+                    () => {} // Hata callback (boş)
+                );
+                console.log('Ana kamera başlatıldı');
+            } catch (err) {
+                console.error('Kamera hatası:', err);
+                document.getElementById('main-qr-container').innerHTML = 
+                    '<div style="display: flex; align-items: center; justify-content: center; height: 100%; color: var(--red); text-align: center; padding: 20px;">Kamera erişimi reddedildi.<br>Lütfen izin verin.</div>';
             }
         }
         
-        async function onQRDetected(code) {
-            stopScanner();
+        // Kamerayı durdur
+        async function stopScanner() {
+            if (qrScanner) {
+                try {
+                    await qrScanner.stop();
+                    console.log('Kamera durduruldu');
+                } catch (e) {
+                    console.log('Kamera zaten durdurulmuş');
+                }
+                qrScanner = null;
+            }
+        }
+        
+        // Ana QR algılandı (Birim seçimi)
+        async function onMainQRDetected(code) {
+            console.log('Ana QR algılandı:', code);
+            await stopScanner();
+            
             state.seciliBirimKodu = code;
-            
-            if (!isConnected) {
-                showModal('Bağlantı Hatası', 'Sunucuya bağlı değilsiniz.', null, true);
-                showQRPage();
-                return;
-            }
             
             try {
                 const yanit = await sendMQTT('BIRIM_DETAY', code, state.tcNo);
-                
-                if (yanit && yanit.status === 'OK') {
+                if (yanit?.status === 'OK') {
                     state.seciliBirimAdi = yanit.birim?.adi || code;
                     state.seciliBirimTalimatlar = yanit.birim?.talimatlar || '';
                 } else {
                     state.seciliBirimAdi = `Birim: ${code}`;
                     state.seciliBirimTalimatlar = '';
                 }
-                
                 showConfirmPage();
             } catch (err) {
-                showModal('Hata', err.message, null, true);
+                showInfoModal('Hata', err.message);
                 showQRPage();
             }
         }
         
-        // ==================== CONFIRM ====================
+        // ==================== SAYFALAR ====================
+        function showQRPage() {
+            document.getElementById('greeting-qr').textContent = getGreeting();
+            document.getElementById('personel-info-qr').textContent = `${state.personelAd} ${state.personelSoyad}`;
+            showPage('qr');
+            startMainScanner(); // Tek kamera başlat
+        }
+        
         function showConfirmPage() {
             document.getElementById('greeting-confirm').textContent = getGreeting();
             document.getElementById('confirm-birim-adi').textContent = state.seciliBirimAdi;
             document.getElementById('confirm-birim-kod').textContent = `Kod: ${state.seciliBirimKodu}`;
             
             const talimatInfo = document.getElementById('talimat-info');
-            const talimatSayisi = document.getElementById('talimat-sayisi');
-            
-            if (state.seciliBirimTalimatlar && state.seciliBirimTalimatlar.trim()) {
-                const satirSayisi = state.seciliBirimTalimatlar.split('\n').filter(s => s.trim()).length;
-                talimatSayisi.textContent = satirSayisi;
+            if (state.seciliBirimTalimatlar?.trim()) {
+                const sayi = state.seciliBirimTalimatlar.split('\n').filter(s => s.trim()).length;
+                document.getElementById('talimat-sayisi').textContent = sayi;
                 talimatInfo.classList.remove('hidden');
             } else {
                 talimatInfo.classList.add('hidden');
@@ -1038,16 +925,15 @@
             
             if (state.seciliBirimTalimatlar) {
                 const satirlar = state.seciliBirimTalimatlar.split('\n').filter(s => s.trim());
-                
-                satirlar.forEach((satir, index) => {
+                satirlar.forEach((satir, i) => {
                     const madde = document.createElement('div');
                     madde.className = 'talimat-madde';
-                    const icerik = /^\d+[\.\-]\s|^[\-\*]\s/.test(satir) ? satir : `${index + 1}. ${satir}`;
-                    madde.innerHTML = `<span class="talimat-madde-numara">${icerik.substring(0, icerik.indexOf(' ') + 1)}</span>${icerik.substring(icerik.indexOf(' ') + 1)}`;
+                    const icerik = /^\d+[\.\-]\s|^[\-\*]\s/.test(satir) ? satir : `${i + 1}. ${satir}`;
+                    madde.textContent = icerik;
                     liste.appendChild(madde);
                 });
             } else {
-                liste.innerHTML = '<div style="text-align: center; color: var(--gray); padding: 20px;">Bu birim için talimat bulunmamaktadır.</div>';
+                liste.innerHTML = '<div style="text-align: center; color: var(--gray); padding: 20px;">Talimat bulunmamaktadır.</div>';
             }
             
             showPage('talimatlar');
@@ -1057,126 +943,117 @@
             showConfirmPage();
         }
         
-        // ==================== QR DOĞRULAMA (YENİ) ====================
-        function startCleaning() {
-            // ESKİ: Direkt işlem yapıyordu
-            // YENİ: QR Doğrulama penceresi aç
-            showQRVerificationModal('baslat');
+        function cancelCleaning() {
+            state.seciliBirimTalimatlar = '';
+            showQRPage();
         }
         
-        function confirmEndJob() {
-            // ESKİ: Onay sorusu soruyordu
-            // YENİ: QR Doğrulama penceresi aç
-            showQRVerificationModal('bitir');
-        }
-        
-        function showQRVerificationModal(mod) {
-            // mod: 'baslat' veya 'bitir'
-            state.verificationMod = mod;
+        // ==================== QR DOĞRULAMA (TEK KAMERA) ====================
+        async function openVerification(mode) {
+            // mode: 'baslat' veya 'bitir'
+            state.verificationMode = mode;
             
-            const beklenenKod = mod === 'baslat' ? state.seciliBirimKodu : state.aktifIslem?.birim_kodu;
-            const beklenenAd = mod === 'baslat' ? state.seciliBirimAdi : state.aktifIslem?.birim_adi;
+            const beklenenKod = mode === 'baslat' ? state.seciliBirimKodu : state.aktifIslem?.birim_kodu;
+            const beklenenAd = mode === 'baslat' ? state.seciliBirimAdi : state.aktifIslem?.birim_adi;
             
             document.getElementById('verification-birim-adi').textContent = beklenenAd || 'Bilinmiyor';
             document.getElementById('verification-birim-kod').textContent = `Kod: ${beklenenKod}`;
             
-            const statusDiv = document.getElementById('verification-status');
-            statusDiv.className = 'verification-status waiting';
-            statusDiv.textContent = 'Kamerayı birim QR koduna doğru tutun...';
+            const statusEl = document.getElementById('verification-status');
+            statusEl.className = 'verification-status waiting';
+            statusEl.textContent = 'Kamerayı QR koda doğru tutun...';
             
-            document.getElementById('qr-placeholder').style.display = 'block';
+            document.getElementById('verification-camera-box').className = 'verification-camera-box';
+            
+            // Modalı göster
             document.getElementById('verification-modal').classList.add('active');
             
-            // Kamerayı başlat
-            startVerificationScanner();
+            // Önce ana kamerayı durdur (çok önemli!)
+            await stopScanner();
+            
+            // Kısa bekle ve modal'daki kamerayı başlat
+            setTimeout(() => {
+                startVerificationScanner();
+            }, 300);
         }
         
-        function startVerificationScanner() {
-            const container = document.getElementById('qr-verification-container');
-            
-            if (verificationScanner) {
-                verificationScanner.start(
-                    { facingMode: "environment" },
-                    { fps: 10, qrbox: { width: 250, height: 250 } },
-                    onVerificationQRDetected,
-                    () => {}
-                ).catch(err => {
-                    console.error("Doğrulama kamerası hatası:", err);
-                    document.getElementById('verification-status').textContent = 'Kamera hatası! İzinleri kontrol edin.';
-                    document.getElementById('verification-status').className = 'verification-status error';
-                });
-                return;
+        // Modal içindeki kamerayı başlat (Tek kamera burada çalışır)
+        async function startVerificationScanner() {
+            // Eğer zaten bir scanner varsa temizle
+            if (qrScanner) {
+                await stopScanner();
             }
             
-            verificationScanner = new Html5Qrcode("qr-verification-reader");
+            qrScanner = new Html5Qrcode("verification-reader");
             
-            verificationScanner.start(
-                { facingMode: "environment" },
-                { fps: 10, qrbox: { width: 250, height: 250 } },
-                onVerificationQRDetected,
-                () => {}
-            ).catch(err => {
-                console.error("Doğrulama kamerası hatası:", err);
+            try {
+                await qrScanner.start(
+                    { facingMode: "environment" },
+                    { fps: 10, qrbox: { width: 200, height: 200 } },
+                    onVerificationQRDetected,
+                    () => {} // Boş hata callback
+                );
+                console.log('Doğrulama kamerası başlatıldı');
+            } catch (err) {
+                console.error('Doğrulama kamera hatası:', err);
                 document.getElementById('verification-status').textContent = 'Kamera hatası! İzinleri kontrol edin.';
                 document.getElementById('verification-status').className = 'verification-status error';
-            });
-        }
-        
-        function stopVerificationScanner() {
-            if (verificationScanner) {
-                verificationScanner.stop().catch(() => {});
             }
         }
         
         async function onVerificationQRDetected(code) {
-            const beklenenKod = state.verificationMod === 'baslat' ? state.seciliBirimKodu : state.aktifIslem?.birim_kodu;
+            console.log('Doğrulama QR algılandı:', code);
             
-            if (code === beklenenKod) {
-                // Doğru QR - İşleme devam et
-                stopVerificationScanner();
+            const beklenen = state.verificationMode === 'baslat' ? state.seciliBirimKodu : state.aktifIslem?.birim_kodu;
+            const box = document.getElementById('verification-camera-box');
+            const statusEl = document.getElementById('verification-status');
+            
+            if (code === beklenen) {
+                // Doğru QR
+                await stopScanner();
                 
-                const statusDiv = document.getElementById('verification-status');
-                statusDiv.className = 'verification-status success';
-                statusDiv.textContent = '✓ Doğrulama başarılı! İşlem yapılıyor...';
+                box.classList.add('success');
+                statusEl.className = 'verification-status success';
+                statusEl.innerHTML = '✓ Doğrulama başarılı!<br>İşlem yapılıyor...';
                 
-                // 1.5 saniye bekle ve işlemi yap
                 setTimeout(() => {
-                    closeVerificationModal();
-                    if (state.verificationMod === 'baslat') {
-                        executeStartCleaning();
+                    closeVerification();
+                    if (state.verificationMode === 'baslat') {
+                        executeStart();
                     } else {
-                        executeEndJob();
+                        executeEnd();
                     }
                 }, 1500);
             } else {
-                // Yanlış QR - Hata göster ama kamerayı durdurma (tekrar denesin)
-                const statusDiv = document.getElementById('verification-status');
-                statusDiv.className = 'verification-status error';
+                // Yanlış QR
+                box.classList.add('error');
+                statusEl.className = 'verification-status error';
                 
-                // Yanlış birimin adını öğren
                 try {
                     const yanit = await sendMQTT('BIRIM_DETAY', code, state.tcNo);
-                    const yanlisAd = (yanit && yanit.status === 'OK') ? yanit.birim?.adi : code;
-                    statusDiv.innerHTML = `⚠️ YANLIŞ BİRİM!<br>Okunan: ${yanlisAd}<br>Beklenen: ${state.verificationMod === 'baslat' ? state.seciliBirimAdi : state.aktifIslem?.birim_adi}`;
+                    const yanlisAd = yanit?.status === 'OK' ? yanit.birim?.adi : code;
+                    const beklenenAd = state.verificationMode === 'baslat' ? state.seciliBirimAdi : state.aktifIslem?.birim_adi;
+                    statusEl.innerHTML = `⚠️ YANLIŞ BİRİM!<br>Okunan: ${yanlisAd}<br>Beklenen: ${beklenenAd}`;
                 } catch (e) {
-                    statusDiv.innerHTML = `⚠️ YANLIŞ BİRİM!<br>Okunan: ${code}<br>Lütfen doğru birimi okutun.`;
+                    statusEl.textContent = '⚠️ YANLIŞ BİRİM! Tekrar deneyin.';
                 }
                 
-                // Container'ı salla (animasyon)
-                const container = document.getElementById('qr-verification-container');
-                container.classList.add('error');
-                setTimeout(() => container.classList.remove('error'), 500);
+                setTimeout(() => {
+                    box.classList.remove('error');
+                    statusEl.className = 'verification-status waiting';
+                    statusEl.textContent = 'Kamerayı QR koda doğru tutun...';
+                }, 2000);
             }
         }
         
-        function closeVerificationModal() {
-            stopVerificationScanner();
+        function closeVerification() {
+            stopScanner();
             document.getElementById('verification-modal').classList.remove('active');
-            state.verificationMod = null;
+            state.verificationMode = null;
         }
         
-        // ==================== İŞLEM EXECUTION (QR Sonrası) ====================
-        async function executeStartCleaning() {
+        // ==================== İŞLEMLER ====================
+        async function executeStart() {
             const btn = document.getElementById('btn-start');
             btn.disabled = true;
             btn.innerHTML = '<span class="loading"></span> Gönderiliyor...';
@@ -1184,7 +1061,7 @@
             try {
                 const yanit = await sendMQTT('START', state.seciliBirimKodu, state.tcNo);
                 
-                if (yanit && yanit.status === 'OK') {
+                if (yanit?.status === 'OK') {
                     state.islemGecmisi.push({
                         saat: new Date().toLocaleTimeString('tr-TR', {hour: '2-digit', minute: '2-digit'}),
                         birim: state.seciliBirimAdi,
@@ -1197,60 +1074,49 @@
                         baslama_zamani: new Date().toISOString()
                     };
                     
-                    showModal('✓ Başarılı', 
-                        `Sayın ${state.personelAd},<br><br>✅ <b>${state.seciliBirimAdi}</b> temizliği başlatıldı!<br><br>🔐 Birim doğrulaması yapıldı.`, 
-                        () => showJobPage());
+                    showInfoModal('✓ Başarılı', 
+                        `Sayın ${state.personelAd},<br><br>✅ <b>${state.seciliBirimAdi}</b> temizliği başlatıldı!<br><br>🔐 Birim doğrulaması yapıldı.`);
+                    showJobPage();
                 } else {
-                    showModal('✗ Hata', yanit?.message || 'Başlatma başarısız', null, true);
+                    showInfoModal('✗ Hata', yanit?.message || 'Başlatma başarısız');
                     btn.disabled = false;
                     btn.textContent = '🔐 QR DOĞRULAMA - BAŞLA';
                 }
             } catch (err) {
-                showModal('✗ Hata', err.message, null, true);
+                showInfoModal('✗ Hata', err.message);
                 btn.disabled = false;
                 btn.textContent = '🔐 QR DOĞRULAMA - BAŞLA';
-                handleDisconnect();
             }
         }
         
-        async function executeEndJob() {
+        async function executeEnd() {
             try {
                 const yanit = await sendMQTT('END', state.aktifIslem.birim_kodu, state.tcNo);
                 
-                if (yanit && yanit.status === 'OK') {
+                if (yanit?.status === 'OK') {
+                    const birimAdi = state.aktifIslem.birim_adi || state.aktifIslem.birim_kodu;
+                    
                     state.islemGecmisi.push({
                         saat: new Date().toLocaleTimeString('tr-TR', {hour: '2-digit', minute: '2-digit'}),
-                        birim: state.aktifIslem.birim_adi || state.aktifIslem.birim_kodu,
+                        birim: birimAdi,
                         durum: 'Tamamlandı'
                     });
                     
-                    const birimAdi = state.aktifIslem.birim_adi || state.aktifIslem.birim_kodu;
                     state.aktifIslem = null;
                     state.seciliBirimTalimatlar = '';
                     
-                    const hour = new Date().getHours();
-                    let veda = 'İyi çalışmalar! ☀️';
-                    if (hour >= 17 && hour < 21) veda = 'İyi akşamlar! 👋';
-                    else if (hour >= 21 || hour < 5) veda = 'İyi geceler! 🌙';
-                    
-                    showModal('✓ Tamamlandı', 
-                        `Sayın ${state.personelAd},<br><br>✅ <b>${birimAdi}</b> temizliği tamamlandı!<br><br>🔐 Birim doğrulaması yapıldı.<br>⏰ Bitiş: ${new Date().toLocaleTimeString('tr-TR')}<br><br>${veda}`, 
-                        () => showJobPage());
+                    showInfoModal('✓ Tamamlandı', 
+                        `Sayın ${state.personelAd},<br><br>✅ <b>${birimAdi}</b> temizliği tamamlandı!<br><br>🔐 Birim doğrulaması yapıldı.<br>⏰ Bitiş: ${new Date().toLocaleTimeString('tr-TR')}`);
+                    showJobPage();
                 } else {
-                    showModal('✗ Hata', yanit?.message || 'Bitirme başarısız', null, true);
+                    showInfoModal('✗ Hata', yanit?.message || 'Bitirme başarısız');
                 }
             } catch (err) {
-                showModal('✗ Hata', err.message, null, true);
-                handleDisconnect();
+                showInfoModal('✗ Hata', err.message);
             }
         }
         
-        function cancelCleaning() {
-            state.seciliBirimTalimatlar = '';
-            showQRPage();
-        }
-        
-        // ==================== JOB ====================
+        // ==================== AKTİF İŞLEM SAYFASI ====================
         function showJobPage() {
             document.getElementById('greeting-job').textContent = getGreeting();
             document.getElementById('personel-info-job').textContent = 
@@ -1278,25 +1144,13 @@
                 return;
             }
             
-            let sureText = 'Hesaplanamadı';
+            let sureText = '00:00';
             try {
                 const baslama = new Date(state.aktifIslem.baslama_zamani);
                 const simdi = new Date();
                 const dakika = Math.floor((simdi - baslama) / 60000);
                 sureText = `${dakika} dk`;
             } catch(e) {}
-            
-            let talimatBtnHTML = '';
-            if (state.seciliBirimTalimatlar) {
-                // Talimatları geçici olarak state'e yükle ki buton çalışsın
-                state.seciliBirimAdi = state.aktifIslem.birim_adi || state.aktifIslem.birim_kodu;
-                state.seciliBirimKodu = state.aktifIslem.birim_kodu;
-                talimatBtnHTML = `
-                    <button class="btn btn-blue" onclick="showTalimatlarPage()" style="margin-bottom: 10px;">
-                        📋 Talimatları Gör
-                    </button>
-                `;
-            }
             
             container.innerHTML = `
                 <div class="card active-job">
@@ -1309,9 +1163,8 @@
                     <div style="color: var(--gray); margin-bottom: 15px;">
                         Kod: ${state.aktifIslem.birim_kodu}
                     </div>
-                    <div class="timer">⏱️ Süre: ${sureText}</div>
-                    ${talimatBtnHTML}
-                    <button class="btn btn-primary" onclick="confirmEndJob()" style="height: 60px; font-size: 18px;">
+                    <div class="timer">⏱️ ${sureText}</div>
+                    <button class="btn btn-primary" onclick="openVerification('bitir')" style="height: 60px; font-size: 18px;">
                         🔐 QR DOĞRULAMA - BİTİR
                     </button>
                 </div>
@@ -1320,14 +1173,12 @@
         
         function renderHistory() {
             const container = document.getElementById('history-job-section');
-            
             if (!state.islemGecmisi.length) {
                 container.innerHTML = '';
                 return;
             }
             
             let html = '<div class="card"><div class="card-title">🕐 Son İşlemler</div>';
-            
             [...state.islemGecmisi].reverse().slice(0, 3).forEach(islem => {
                 const durumClass = islem.durum === 'Tamamlandı' ? 'history-status-completed' : 'history-status-active';
                 html += `
@@ -1338,66 +1189,42 @@
                     </div>
                 `;
             });
-            
             html += '</div>';
             container.innerHTML = html;
         }
         
-        // ==================== MODAL ====================
-        function showModal(title, text, onConfirm, isError = false, showCancel = false) {
-            const modal = document.getElementById('modal');
-            document.getElementById('modal-title').textContent = title;
-            document.getElementById('modal-text').innerHTML = text;
-            
-            const buttons = document.getElementById('modal-buttons');
-            buttons.innerHTML = '';
-            
-            if (showCancel) {
-                const btnCancel = document.createElement('button');
-                btnCancel.className = 'btn btn-danger';
-                btnCancel.textContent = 'HAYIR';
-                btnCancel.onclick = () => modal.classList.remove('active');
-                buttons.appendChild(btnCancel);
-            }
-            
-            const btnOk = document.createElement('button');
-            btnOk.className = 'btn btn-primary';
-            btnOk.textContent = showCancel ? 'EVET' : 'TAMAM';
-            btnOk.onclick = () => {
-                modal.classList.remove('active');
-                if (onConfirm) onConfirm();
-            };
-            buttons.appendChild(btnOk);
-            
-            modal.classList.add('active');
+        // ==================== MODALLAR ====================
+        function showInfoModal(title, text) {
+            document.getElementById('info-modal-title').textContent = title;
+            document.getElementById('info-modal-text').innerHTML = text;
+            document.getElementById('info-modal').classList.add('active');
         }
         
-        // ==================== UTILS ====================
+        function closeInfoModal() {
+            document.getElementById('info-modal').classList.remove('active');
+        }
+        
+        // ==================== ÇIKIŞ ====================
         function logout() {
+            stopScanner();
             state.tcNo = '';
             state.personelAd = '';
             state.personelSoyad = '';
             state.aktifIslem = null;
             state.seciliBirimTalimatlar = '';
-            state.verificationMod = null;
             document.getElementById('tc-input').value = '';
-            stopScanner();
-            stopVerificationScanner();
             showPage('login');
         }
         
-        // ==================== INIT ====================
-        document.getElementById('tc-input').addEventListener('input', function(e) {
+        // ==================== BAŞLATMA ====================
+        document.getElementById('tc-input').addEventListener('input', function() {
             this.value = this.value.replace(/[^0-9]/g, '');
         });
         
+        document.getElementById('device-id').textContent = DEV_ID;
+        
         window.addEventListener('load', () => {
             connectMQTT();
-        });
-        
-        window.addEventListener('beforeunload', () => {
-            stopConnectionCheck();
-            if (mqttClient) mqttClient.end(true);
         });
         
         if ('serviceWorker' in navigator) {

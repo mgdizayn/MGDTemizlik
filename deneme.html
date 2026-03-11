@@ -3,830 +3,992 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#FFC107">
-    <title>MGD CleanOS v4.2</title>
+    <meta name="theme-color" content="#202136">
+    <title>MGD CleanOS v4.1</title>
     
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon-192.png">
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;400;500;700&display=swap" rel="stylesheet">
     
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <script src="https://unpkg.com/mqtt@5.0.3/dist/mqtt.min.js"></script>
     
     <style>
-        /* Örnek2 Temel Renkleri */
-        :root {
-            --primary: #FFC107;
-            --primary-dark: #FFA000;
-            --primary-light: #FFD54F;
-            --accent: #FF6F00;
-            --text-dark: #212121;
-            --text-gray: #757575;
-            --text-light: #9E9E9E;
-            --bg-light: #f5f5f5;
-            --bg-white: #ffffff;
-            --border: #e0e0e0;
-            --success: #4CAF50;
-            --error: #f44336;
-            --online: #00c853;
-            --shadow: 0 3px 5px rgba(0,0,0,0.1);
-            --shadow-glow: 0 0 15px rgba(255, 193, 7, 0.5);
-        }
-
         * { 
             margin: 0; 
             padding: 0; 
             box-sizing: border-box; 
-            -webkit-tap-highlight-color: transparent;
-            font-family: 'Open Sans', sans-serif;
         }
-
+        
+        :root {
+            --bg: #202136;
+            --card: #25253d;
+            --header-bg: #202136;
+            --border: #2a2a42;
+            --text-primary: #ffffff;
+            --text-secondary: #9393af;
+            --accent-blue: #4679f6;
+            --accent-green: #00ffab;
+            --accent-orange: #f37055;
+            --accent-purple: #be2fe3;
+            --gradient-1: linear-gradient(135deg, #4679f6 0%, #be2fe3 100%);
+            --gradient-2: linear-gradient(135deg, #be2fe3 0%, #4679f6 100%);
+            --gradient-3: linear-gradient(135deg, #4679f6 0%, #00ffab 100%);
+            --gradient-header: linear-gradient(to right, #4679f6, #00ffab, #f37055, #be2fe3, #622fe1, #4679f6);
+            --shadow: 0 0.5rem 1rem rgba(0,0,0,0.3);
+            --shadow-glow: 0 0 1rem rgba(70, 121, 246, 0.4);
+        }
+        
         body {
-            background: var(--bg-light);
-            color: var(--text-dark);
+            font-family: 'Montserrat', sans-serif;
+            font-size: 16px;
+            color: var(--text-primary);
+            background: linear-gradient(135deg, #1a1f2d 0%, #2d1b2e 100%);
             min-height: 100vh;
-            overflow-x: hidden;
-        }
-
-        /* HEADER - Örnek2 Stili (Sarı Arka Plan) */
-        .header-wrapp {
-            width: 100%;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            padding-bottom: 30px;
-            position: relative;
-        }
-
-        /* FOOTER BİLGİLERİ - ÜSTTE STICKY */
-        .footer-info {
-            background: rgba(0,0,0,0.15);
-            padding: 8px;
-            text-align: center;
-            font-size: 11px;
-            color: rgba(255,255,255,0.95);
-            font-weight: 600;
-            letter-spacing: 0.3px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            backdrop-filter: blur(5px);
-        }
-
-        .footer-info .label {
-            opacity: 0.8;
-            font-weight: 400;
-        }
-
-        .footer-info .name {
-            font-weight: 700;
-        }
-
-        .footer-info span {
-            margin: 0 8px;
-        }
-
-        /* App Detail */
-        .app-detail {
-            text-align: center;
-            padding: 20px 10px 10px;
-            color: #fff;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .app-detail h1 {
-            font-size: 1.6rem;
-            font-weight: 800;
-            margin-bottom: 4px;
-            letter-spacing: -0.5px;
-        }
-
-        .app-detail .subtitle {
-            font-size: 0.75rem;
-            opacity: 0.9;
-            margin-bottom: 8px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .status-indicator {
-            display: inline-flex;
+            display: flex;
+            justify-content: center;
             align-items: center;
-            gap: 6px;
-            background: rgba(255,255,255,0.2);
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 700;
-            margin-top: 8px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.3);
+            padding: 1rem;
         }
-
-        .status-indicator.online { 
-            background: rgba(0, 200, 83, 0.2); 
-            color: #fff;
-            border-color: rgba(0, 200, 83, 0.4);
-        }
-        .status-indicator.connecting { 
-            background: rgba(255, 111, 0, 0.2);
-            color: #fff;
-        }
-        .status-indicator.error { 
-            background: rgba(244, 67, 54, 0.2);
-            color: #fff;
-        }
-
-        /* DALGA ANİMASYONU - Örnek2'den */
-        .wave-wrapp {
-            width: 100%;
-            height: 40px;
-            position: absolute;
-            bottom: -1px;
-            left: 0;
-            overflow: hidden;
-        }
-
-        .wave {
-            display: block;
-            width: 100%;
-            margin: 0;
-            height: 40px;
-        }
-
-        .wave .parallax > use {
-            animation: move-forever 12s linear infinite;
-        }
-
-        .wave .parallax > use:nth-child(1) {
-            animation-delay: -2s;
-            transform: translate(-110px, 0%);
-            opacity: 0.6;
-        }
-
-        .wave .parallax > use:nth-child(2) {
-            animation-delay: -2s;
-            animation-duration: 7s;
-            opacity: 0.8;
-        }
-
-        .wave .parallax > use:nth-child(3) {
-            animation-delay: -4s;
-            animation-duration: 4s;
-            transform: translate(-65px, 0%);
-            opacity: 1;
-        }
-
-        @keyframes move-forever {
-            0% { transform: translate(-90px, 0%); }
-            100% { transform: translate(85px, 0%); }
-        }
-
-        /* CONTENT - Örnek2 Stili */
-        .content-wrapp {
-            width: 100%;
-            min-height: calc(100vh - 160px);
+        
+        /* Ana Container - Telefon Simülasyonu */
+        .window {
             position: relative;
-            padding: 20px;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        /* Cards - Beyaz/Zemin */
-        .card {
-            background: var(--bg-white);
-            border-radius: 16px;
-            padding: 24px;
-            margin-bottom: 16px;
-            box-shadow: var(--shadow);
-            animation: slideUp 0.4s ease-out;
-            border: 1px solid var(--border);
-        }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .input-label { 
-            display: block; 
-            color: var(--text-gray); 
-            font-size: 0.75rem; 
-            margin-bottom: 10px; 
-            text-align: center; 
-            font-weight: 700; 
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        /* Inputs - Örnek2 Stili */
-        .form-input {
+            overflow: hidden;
             width: 100%;
-            padding: 18px;
-            background: var(--bg-light);
-            border: 2px solid var(--border);
-            border-radius: 12px;
-            color: var(--text-dark);
-            font-size: 22px;
+            max-width: 23em;
+            height: 42em;
+            max-height: calc(100vh - 2rem);
+            background-color: var(--bg);
+            border-radius: 1.25em;
+            box-shadow: 0 1rem 3rem rgba(0,0,0,0.5), 
+                        0 0 0 1px rgba(255,255,255,0.05);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Header */
+        .window__header {
+            position: relative;
+            padding: 1.5em 1em 1em;
+            z-index: 99;
+            background: var(--header-bg);
+            box-shadow: 0 0.5rem 0.5rem rgba(32, 33, 54, 0.8);
             text-align: center;
-            letter-spacing: 4px;
-            font-weight: 700;
-            margin-bottom: 16px;
-            transition: all 0.3s;
         }
-
-        .form-input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: var(--shadow-glow);
-            background: #fff;
-        }
-
-        /* Buttons - Örnek2 Material Stili */
-        .btn {
+        
+        .window__header::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
             width: 100%;
-            padding: 16px;
-            border-radius: 50px;
-            border: none;
+            height: 2px;
+            background: var(--gradient-header);
+            background-size: 300% 100%;
+            animation: animatedgradient 20s ease alternate infinite;
+        }
+        
+        @keyframes animatedgradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .window__header__title {
+            font-size: 1.1em;
             font-weight: 700;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.3s;
+            letter-spacing: 0.05em;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            position: relative;
-            overflow: hidden;
+            gap: 0.5em;
         }
-
-        .btn:active {
+        
+        .window__header__title small {
+            font-size: 0.6rem;
+            font-weight: 200;
+            color: var(--text-secondary);
+            background: rgba(255,255,255,0.1);
+            padding: 2px 6px;
+            border-radius: 10px;
+        }
+        
+        .header-sub {
+            font-size: 0.7em;
+            color: var(--text-secondary);
+            margin-top: 0.5em;
+            font-weight: 300;
+        }
+        
+        .header-sub2 {
+            font-size: 0.65em;
+            color: var(--text-secondary);
+            opacity: 0.7;
+            margin-top: 0.3em;
+        }
+        
+        /* Status Chip */
+        .status-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5em;
+            padding: 0.4em 1em;
+            border-radius: 2em;
+            font-size: 0.75em;
+            font-weight: 600;
+            margin-top: 0.8em;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .status-chip.online {
+            background: rgba(0, 255, 171, 0.1);
+            color: var(--accent-green);
+            border-color: rgba(0, 255, 171, 0.3);
+            box-shadow: 0 0 10px rgba(0, 255, 171, 0.2);
+        }
+        
+        .status-chip.offline {
+            background: rgba(218, 54, 51, 0.1);
+            color: var(--accent-orange);
+            border-color: rgba(243, 112, 85, 0.3);
+        }
+        
+        .status-chip.connecting {
+            background: rgba(255, 166, 87, 0.1);
+            color: var(--accent-orange);
+            border-color: rgba(255, 166, 87, 0.3);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+        
+        /* Content Area */
+        .window__content {
+            position: relative;
+            overflow-y: auto;
+            overflow-x: hidden;
+            flex: 1;
+            padding: 1em;
+            scrollbar-width: none;
+        }
+        
+        .window__content::-webkit-scrollbar {
+            display: none;
+        }
+        
+        /* Group/Sayfa Yapısı */
+        .control__group__flag {
+            display: none;
+        }
+        
+        .control__group {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+        
+        .control__group__flag:checked + .control__group {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Kartlar */
+        .control__group__header {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem;
+            border-radius: 1.25rem;
+            background: var(--card);
+            margin-bottom: 1rem;
+            box-shadow: 0 0.1rem 0.75rem rgba(243, 112, 85, 0.2);
+            background: linear-gradient(135deg, rgba(243, 112, 85, 0.2) 0%, rgba(190, 47, 227, 0.2) 100%);
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        
+        .control__group__icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.25rem;
+            height: 2.25rem;
+            margin-right: 1ex;
+            border-radius: 0.75em;
+            background-color: rgba(0, 0, 0, 0.2);
+            box-shadow: inset 0 0.1rem 0.5rem rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(204, 92, 233, 0.3);
+        }
+        
+        .control__group__title h4 {
+            font-weight: 700;
+            font-size: 1.1em;
+        }
+        
+        .control__item {
+            background: var(--card);
+            border-radius: 1.25rem;
+            margin-bottom: 0.75rem;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .control__item:active {
             transform: scale(0.98);
         }
-
-        .btn-primary { 
-            background: var(--primary);
-            color: var(--text-dark);
-            box-shadow: 0 4px 15px rgba(255, 193, 7, 0.4);
+        
+        .control__item__trigger {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem;
+            cursor: pointer;
+            transition: all 0.3s;
         }
-        .btn-primary:hover { 
-            background: var(--primary-dark);
-            box-shadow: 0 6px 20px rgba(255, 193, 7, 0.5);
+        
+        .control__item__icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.25rem;
+            height: 2.25rem;
+            margin-right: 1ex;
+            border-radius: 0.75em;
+            background-color: rgba(0, 0, 0, 0.2);
+            box-shadow: inset 0 0.1rem 0.5rem rgba(0, 0, 0, 0.15);
+            color: var(--text-primary);
         }
-        .btn-primary:disabled { 
+        
+        .control__item__caption {
+            flex-grow: 1;
+            line-height: 1.2em;
+        }
+        
+        .control__item__caption h3 {
+            font-weight: 700;
+            font-size: 0.95em;
+            margin-bottom: 0.2em;
+        }
+        
+        .control__item__caption p {
+            font-size: 0.75em;
+            font-weight: 500;
+            color: var(--text-secondary);
+            letter-spacing: 0.05em;
+        }
+        
+        .control__item__state {
+            width: 0.5rem;
+            height: 0.5rem;
+            border-radius: 50%;
+            background-color: var(--text-secondary);
+            margin-left: 0.5rem;
+        }
+        
+        .control__item__flag {
+            display: none;
+        }
+        
+        .control__item__flag:checked + .control__item__trigger {
+            background: linear-gradient(135deg, rgba(70, 121, 246, 0.2) 0%, rgba(0, 255, 171, 0.2) 100%);
+            box-shadow: 0 0 1rem rgba(0, 255, 171, 0.2);
+        }
+        
+        .control__item__flag:checked + .control__item__trigger > .control__item__state {
+            background-color: var(--accent-green);
+            box-shadow: 0 0 8px var(--accent-green);
+        }
+        
+        /* Form Elemanları */
+        .form-input {
+            width: 100%;
+            padding: 1em;
+            font-size: 1em;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border);
+            border-radius: 1.25rem;
+            color: var(--text-primary);
+            text-align: center;
+            font-family: 'Montserrat', sans-serif;
+            transition: all 0.3s;
+            margin-top: 0.5em;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 3px rgba(70, 121, 246, 0.2);
+        }
+        
+        .form-label {
+            display: block;
+            color: var(--text-secondary);
+            font-size: 0.8em;
+            margin-bottom: 0.5em;
+            font-weight: 500;
+        }
+        
+        /* Butonlar */
+        .btn {
+            width: 100%;
+            padding: 1em;
+            font-size: 0.9em;
+            font-weight: 700;
+            border: none;
+            border-radius: 1.25rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Montserrat', sans-serif;
+            letter-spacing: 0.05em;
+            margin-top: 0.75rem;
+            text-transform: uppercase;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #4679f6 0%, #00ffab 100%);
+            color: #202136;
+            box-shadow: 0 0.25rem 1rem rgba(70, 121, 246, 0.4);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0.5rem 1.5rem rgba(70, 121, 246, 0.6);
+        }
+        
+        .btn-primary:disabled {
             opacity: 0.6;
             cursor: not-allowed;
+            transform: none;
         }
-
-        .btn-secondary { 
-            background: #fff;
-            color: var(--text-gray);
-            border: 1px solid var(--border);
+        
+        .btn-secondary {
+            background: rgba(255,255,255,0.1);
+            color: var(--text-primary);
+            border: 1px solid rgba(255,255,255,0.2);
         }
+        
         .btn-secondary:hover {
-            background: var(--bg-light);
-            color: var(--text-dark);
+            background: rgba(255,255,255,0.15);
         }
-
-        .btn-danger { 
-            background: var(--error);
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #f37055 0%, #da3633 100%);
             color: white;
-            box-shadow: 0 4px 15px rgba(244, 67, 54, 0.3);
+            box-shadow: 0 0.25rem 1rem rgba(243, 112, 85, 0.4);
         }
-        .btn-danger:hover {
-            background: #d32f2f;
-        }
-
-        .btn-blue { 
-            background: #2196F3;
+        
+        .btn-blue {
+            background: linear-gradient(135deg, #4679f6 0%, #be2fe3 100%);
             color: white;
-            box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
+            box-shadow: 0 0.25rem 1rem rgba(70, 121, 246, 0.4);
         }
-
-        /* QR Container - Örnek2 Shadow Stili */
-        .qr-wrapper {
-            border-radius: 20px;
+        
+        .btn-action {
+            background: linear-gradient(135deg, #be2fe3 0%, #4679f6 100%);
+            color: white;
+            box-shadow: 0 0.1rem 0.75rem rgba(190, 47, 227, 0.4);
+        }
+        
+        /* QR Container */
+        .qr-container {
+            width: 100%;
+            height: 250px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 1.25rem;
             overflow: hidden;
-            border: 3px solid var(--primary);
-            background: #000;
+            margin: 1rem 0;
             position: relative;
-            margin: 20px 0;
-            min-height: 280px;
-            box-shadow: var(--shadow-glow);
-        }
-
-        .qr-wrapper::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 220px;
-            height: 220px;
-            border: 2px dashed rgba(255, 193, 7, 0.5);
-            border-radius: 16px;
-            pointer-events: none;
-        }
-
-        /* Timer */
-        .timer { 
-            font-size: 42px; 
-            font-weight: 800; 
-            color: var(--primary-dark); 
-            text-align: center; 
-            margin: 20px 0; 
-            font-variant-numeric: tabular-nums;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        /* Talimatlar - Örnek2 Message Stili */
-        .talimat-container { 
-            background: var(--bg-light); 
-            border-radius: 16px; 
-            padding: 16px; 
-            margin: 16px 0; 
-            max-height: 40vh; 
-            overflow-y: auto;
-            border: 1px solid var(--border);
+            border: 2px solid var(--border);
         }
         
-        .talimat-item { 
-            background: #fff; 
-            border-radius: 12px; 
-            padding: 16px; 
-            margin-bottom: 10px; 
-            border-left: 4px solid var(--primary);
-            font-size: 14px; 
-            color: var(--text-gray);
-            line-height: 1.5;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            transition: all 0.2s;
+        .qr-container video {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover;
         }
         
-        .talimat-item:hover {
-            transform: translateX(4px);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-
-        /* Modal - Bottom Sheet Örnek2 Stili */
+        /* Verification Modal */
         .modal {
+            display: none;
             position: fixed;
-            bottom: -100%; 
-            left: 0; 
-            width: 100%; 
+            top: 0;
+            left: 0;
+            width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.6); 
-            z-index: 1000; 
-            display: flex; 
-            align-items: flex-end;
-            transition: bottom 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(0,0,0,0.95);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+            backdrop-filter: blur(10px);
         }
         
-        .modal.active { bottom: 0; }
+        .modal.active {
+            display: flex;
+        }
         
         .modal-content {
-            background: #fff; 
-            width: 100%; 
-            border-radius: 24px 24px 0 0;
-            padding: 28px; 
-            border-top: 4px solid var(--primary);
-            max-height: 85vh; 
-            overflow-y: auto;
-            box-shadow: 0 -10px 40px rgba(0,0,0,0.3);
+            background: var(--card);
+            border-radius: 1.25rem;
+            padding: 1.5rem;
+            width: 100%;
+            max-width: 400px;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 1rem 3rem rgba(0,0,0,0.5);
+            animation: slideUp 0.3s ease;
         }
-
+        
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
         .verification-content {
-            border-top: 4px solid var(--error);
+            border: 2px solid rgba(243, 112, 85, 0.5);
+            background: linear-gradient(135deg, rgba(32, 33, 54, 0.95) 0%, rgba(40, 30, 60, 0.95) 100%);
         }
-
+        
         .verification-header {
-            color: var(--error);
-            font-size: 1.2rem;
-            font-weight: 800;
-            margin-bottom: 12px;
+            color: var(--accent-orange);
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 10px;
             text-align: center;
         }
-
+        
         .verification-info {
-            background: var(--bg-light);
-            border-radius: 16px;
-            padding: 20px;
-            margin: 16px 0;
-            border: 1px solid var(--border);
+            background: rgba(0,0,0,0.3);
+            border-radius: 1rem;
+            padding: 1rem;
+            margin: 1rem 0;
+            border: 1px solid rgba(255,255,255,0.1);
             text-align: center;
         }
-
+        
         .verification-birim {
-            color: var(--primary-dark);
-            font-size: 1.3rem;
-            font-weight: 800;
-            margin-bottom: 4px;
+            color: var(--accent-blue);
+            font-size: 1.1em;
+            font-weight: bold;
+            margin-bottom: 0.3em;
         }
-
+        
         .verification-kod {
-            color: var(--text-gray);
-            font-size: 0.9rem;
-            font-family: monospace;
+            color: var(--text-secondary);
+            font-size: 0.8em;
         }
-
+        
         .verification-camera-box {
             width: 100%;
-            height: 280px;
-            background: #000;
-            border-radius: 16px;
-            border: 3px solid var(--border);
+            height: 200px;
+            background: rgba(0,0,0,0.5);
+            border-radius: 1rem;
+            border: 2px solid var(--border);
             overflow: hidden;
-            margin: 20px 0;
+            margin: 1rem 0;
             position: relative;
         }
-
+        
         .verification-camera-box.success {
-            border-color: var(--success);
-            box-shadow: 0 0 30px rgba(76, 175, 80, 0.4);
+            border-color: var(--accent-green);
+            box-shadow: 0 0 20px rgba(0, 255, 171, 0.3);
         }
-
+        
         .verification-camera-box.error {
-            border-color: var(--error);
+            border-color: var(--accent-orange);
             animation: shake 0.5s;
         }
-
+        
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
             25% { transform: translateX(-10px); }
             75% { transform: translateX(10px); }
         }
-
+        
         .verification-status {
-            margin: 16px 0;
-            padding: 14px;
-            border-radius: 12px;
-            font-weight: 700;
-            font-size: 14px;
-            min-height: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
+            padding: 0.75rem;
+            border-radius: 1rem;
             text-align: center;
+            font-weight: 600;
+            font-size: 0.85em;
+            margin-bottom: 1rem;
         }
-
+        
         .verification-status.success {
-            background: rgba(76, 175, 80, 0.1);
-            color: var(--success);
-            border: 2px solid var(--success);
+            background: rgba(0, 255, 171, 0.1);
+            color: var(--accent-green);
+            border: 1px solid rgba(0, 255, 171, 0.3);
         }
-
+        
         .verification-status.error {
-            background: rgba(244, 67, 54, 0.1);
-            color: var(--error);
-            border: 2px solid var(--error);
+            background: rgba(243, 112, 85, 0.1);
+            color: var(--accent-orange);
+            border: 1px solid rgba(243, 112, 85, 0.3);
         }
-
+        
         .verification-status.waiting {
-            background: rgba(255, 111, 0, 0.1);
-            color: #ef6c00;
-            border: 2px solid #ef6c00;
+            background: rgba(255, 166, 87, 0.1);
+            color: var(--accent-orange);
+            border: 1px solid rgba(255, 166, 87, 0.3);
         }
-
-        .modal-title {
-            font-size: 1.3rem;
-            margin-bottom: 12px;
-            color: var(--primary-dark);
-            font-weight: 800;
+        
+        /* Alert */
+        .alert {
+            padding: 1rem;
+            border-radius: 1rem;
+            margin: 1rem 0;
             text-align: center;
+            font-size: 0.85em;
+            font-weight: 500;
         }
-
-        .modal-text {
-            color: var(--text-gray);
-            margin-bottom: 20px;
-            line-height: 1.5;
-            text-align: center;
-            font-size: 15px;
+        
+        .alert-error {
+            background: rgba(243, 112, 85, 0.1);
+            border: 1px solid rgba(243, 112, 85, 0.3);
+            color: var(--accent-orange);
         }
-
-        /* History - Örnek2 Mesaj Stili */
-        .history-row { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center;
-            padding: 14px; 
-            border-bottom: 1px solid var(--border);
-            font-size: 14px;
-            transition: background 0.2s;
+        
+        .alert-success {
+            background: rgba(0, 255, 171, 0.1);
+            border: 1px solid rgba(0, 255, 171, 0.3);
+            color: var(--accent-green);
         }
-        .history-row:hover {
-            background: var(--bg-light);
-            border-radius: 8px;
-        }
-        .history-row:last-child { border-bottom: none; }
-        .history-status-completed { color: var(--success); font-weight: 700; }
-        .history-status-active { color: #2196F3; font-weight: 700; }
-
-        /* Navigation Header */
-        .nav-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 20px;
-            padding: 0 4px;
-        }
-
-        .nav-title {
-            font-size: 1.2rem;
-            font-weight: 800;
-            color: var(--text-dark);
-        }
-
-        .nav-back {
-            background: var(--bg-light);
-            border: 1px solid var(--border);
-            color: var(--text-gray);
-            font-size: 24px;
-            cursor: pointer;
-            padding: 8px;
+        
+        /* Active Job Card */
+        .active-job-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: var(--accent-green);
             border-radius: 50%;
-            width: 40px;
-            height: 40px;
+            margin-right: 0.5em;
+            box-shadow: 0 0 10px var(--accent-green);
+            animation: blink 2s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+        
+        .timer {
+            font-size: 2em;
+            color: var(--accent-green);
+            text-align: center;
+            margin: 0.5em 0;
+            font-weight: 200;
+            letter-spacing: 0.1em;
+            text-shadow: 0 0 20px rgba(0, 255, 171, 0.3);
+        }
+        
+        /* History */
+        .history-item {
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.85em;
         }
-        .nav-back:hover {
-            background: var(--primary);
-            color: var(--text-dark);
-            border-color: var(--primary);
+        
+        .history-item:last-child {
+            border-bottom: none;
         }
-
-        /* Birim Info Box */
-        .birim-info-box {
-            text-align: center; 
-            margin: 20px 0; 
-            background: var(--bg-light); 
-            padding: 24px; 
-            border-radius: 16px; 
-            border: 2px solid var(--primary);
-            box-shadow: var(--shadow-glow);
+        
+        .history-time {
+            color: var(--text-secondary);
+            font-size: 0.8em;
         }
-
-        .birim-info-box .title {
-            font-size: 1.5rem; 
-            font-weight: 800; 
-            color: var(--primary-dark);
-            margin-bottom: 6px;
+        
+        .history-status-completed {
+            color: var(--accent-green);
+            font-weight: 600;
+            font-size: 0.75em;
         }
-
-        .birim-info-box .kod {
-            color: var(--text-gray); 
-            font-family: monospace; 
-            font-size: 0.9rem;
+        
+        .history-status-active {
+            color: var(--accent-blue);
+            font-weight: 600;
+            font-size: 0.75em;
         }
-
-        /* Security Card */
-        .security-card {
-            border: 2px solid #ff9800;
-            background: linear-gradient(180deg, rgba(255, 152, 0, 0.05) 0%, transparent 100%);
+        
+        /* Talimatlar */
+        .talimat-liste {
+            max-height: 40vh;
+            overflow-y: auto;
+            margin: 1rem 0;
         }
-
-        .security-warning {
-            color: #ef6c00;
-            font-weight: 800;
-            font-size: 14px;
-            text-align: center;
-            margin-bottom: 8px;
+        
+        .talimat-madde {
+            background: rgba(0,0,0,0.2);
+            border-radius: 0.75rem;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            border-left: 3px solid var(--accent-blue);
+            font-size: 0.85em;
+            line-height: 1.4;
+            color: var(--text-secondary);
         }
-
-        .security-subtext {
-            color: var(--text-gray);
-            font-size: 13px;
-            text-align: center;
-            margin-bottom: 20px;
+        
+        .talimat-uyari {
+            background: rgba(243, 112, 85, 0.1);
+            border: 1px solid rgba(243, 112, 85, 0.3);
+            border-radius: 0.75rem;
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+            color: var(--accent-orange);
+            font-size: 0.8em;
+            line-height: 1.4;
         }
-
-        /* Active Job - Örnek2 Chat Bubble Stili */
-        .active-job-card {
-            border-left: 5px solid var(--primary);
-            background: linear-gradient(90deg, rgba(255, 193, 7, 0.1) 0%, transparent 100%);
+        
+        /* Footer Navigation */
+        .window__footer {
             position: relative;
-            overflow: hidden;
+            padding: 1rem;
+            background: var(--bg);
+            border-top: 1px solid var(--border);
+            box-shadow: 0 -0.5rem 1rem rgba(32, 33, 54, 0.5);
         }
-
-        .active-job-card::before {
-            content: '';
+        
+        .navigation__list {
+            display: flex;
+            justify-content: space-around;
+            list-style: none;
+        }
+        
+        .navigation__item {
+            position: relative;
+        }
+        
+        .navigation__item__link {
+            display: block;
+            padding: 0.5em 1em;
+            color: var(--text-secondary);
+            font-size: 0.75em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-radius: 2em;
+        }
+        
+        .navigation__item.active .navigation__item__link {
+            color: var(--accent-green);
+            background: rgba(0, 255, 171, 0.1);
+        }
+        
+        .navigation__item.active::before {
+            content: "";
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
+            bottom: -0.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
             height: 4px;
-            background: linear-gradient(90deg, var(--primary) 0%, transparent 100%);
+            border-radius: 50%;
+            background: var(--accent-green);
+            box-shadow: 0 0 10px var(--accent-green);
         }
-
-        /* Utility */
-        .hidden { display: none !important; }
-        .page { animation: fadeIn 0.4s ease; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
+        
+        /* Loading */
         .loading {
             display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(0,0,0,0.1);
+            width: 1em;
+            height: 1em;
+            border: 2px solid rgba(255,255,255,0.3);
             border-radius: 50%;
-            border-top-color: var(--primary-dark);
-            animation: spin 1s linear infinite;
-            margin-right: 8px;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 0.5em;
+            vertical-align: middle;
         }
-
-        @keyframes spin { to { transform: rotate(360deg); } }
-
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Greeting */
+        .greeting {
+            font-size: 1.2em;
+            font-weight: 300;
+            margin-bottom: 0.3em;
+            background: linear-gradient(135deg, #fff 0%, #9393af 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .personel-info {
+            font-size: 0.8em;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+        
+        /* Utility */
+        .hidden { display: none !important; }
+        .text-center { text-align: center; }
+        
         /* Responsive */
-        @media (max-width: 480px) {
-            .content-wrapp { padding: 16px; }
-            .card { padding: 20px; border-radius: 14px; }
-            .timer { font-size: 36px; }
-            .app-detail h1 { font-size: 1.4rem; }
-            .footer-info { font-size: 10px; }
-            .footer-info span { margin: 0 4px; }
+        @media (max-height: 700px) {
+            .window {
+                height: calc(100vh - 2rem);
+            }
         }
     </style>
 </head>
 <body>
-    <!-- HEADER - ÜSTTE STICKY (Örnek2 Stili) -->
-    <div class="header-wrapp">
-        <!-- FOOTER BİLGİLERİ - ÜSTTE -->
-        <div class="footer-info">
-            <span><span class="label">Kodlayan:</span> <span class="name">Mustafa GÜNEŞDOĞDU</span></span> | 
-            <span><span class="label">Destek:</span> <span class="name">Ahmet KAHREMAN</span></span>
-        </div>
-        
-        <div class="app-detail">
-            <h1>MGD CleanOS v4.2</h1>
-            <div class="subtitle">Nazilli Devlet Hastanesi</div>
-            <div class="status-indicator connecting" id="status-indicator">
-                <span class="material-icons" style="font-size: 14px;">sync</span>
-                <span id="status-text">BAĞLANIYOR...</span>
+    <div class="window">
+        <!-- Header -->
+        <div class="window__header"> 
+            <h1 class="window__header__title">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-green);">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                </svg>
+                MGD CleanOS<small>v4.1</small>
+            </h1>
+            <div class="header-sub">Mustafa GÜNEŞDOĞDU - Bilgisayar Programcısı</div>
+            <div class="header-sub2">Nazilli Devlet Hastanesi Bilgi İşlem 2026</div>
+            <div class="status connecting" id="status-chip">
+                <span class="loading"></span> Bağlanıyor...
             </div>
         </div>
         
-        <!-- DALGA ANİMASYONU -->
-        <div class="wave-wrapp">
-            <svg class="wave" xmlns="http://www.w3.org/2000/svg" viewBox="0 24 150 28" preserveAspectRatio="none">
-                <defs>
-                    <path id="gentle-wave" d="m -160,44.4 c 30,0 58,-18 87.7,-18 30.3,0 58.3,18 87.3,18 30,0 58,-18 88,-18 30,0 58,18 88,18 l 0,34.5 -351,0 z" />
-                </defs>
-                <g class="parallax">
-                    <use xlink:href="#gentle-wave" x="50" y="0" fill="rgba(255, 255, 255, 0.7)"/>
-                    <use xlink:href="#gentle-wave" x="50" y="3" fill="rgba(255, 255, 255, 0.5)"/>
-                    <use xlink:href="#gentle-wave" x="50" y="6" fill="#f5f5f5"/>  
-                </g>
-            </svg>
-        </div>
-    </div>
-
-    <!-- CONTENT -->
-    <div class="content-wrapp">
-        
-        <!-- Sayfa 1: Login -->
-        <div id="page-login" class="page">
-            <div class="card">
-                <div class="input-label">Personel TC Kimlik</div>
-                <input type="text" class="form-input" id="tc-input" maxlength="11" placeholder="00000000000" inputmode="numeric">
-                <button class="btn btn-primary" id="btn-login" onclick="login()">
-                    <span class="material-icons" style="font-size: 18px;">login</span>
-                    SİSTEME GİRİŞ YAP
-                </button>
-                <div id="login-error" style="color: var(--error); text-align: center; margin-top: 16px; font-size: 13px; font-weight: 700;"></div>
-            </div>
+        <!-- Content -->
+        <div class="window__content" id="main-content">
             
-            <div style="text-align: center; margin-top: 30px; color: var(--text-light); font-size: 12px;">
-                <span class="material-icons" style="font-size: 40px; opacity: 0.3;">cleaning_services</span>
-                <p style="margin-top: 10px; opacity: 0.7;">Dijital Temizlik Yönetim Sistemi</p>
-            </div>
-        </div>
-
-        <!-- Sayfa 2: QR Okuma -->
-        <div id="page-qr" class="page hidden">
-            <div class="card">
-                <div style="text-align: center; margin-bottom: 20px;">
-                    <h3 id="greeting-qr" style="color: var(--primary-dark); margin-bottom: 6px; font-size: 1.3rem; font-weight: 800;"></h3>
-                    <p style="color: var(--text-gray); font-size: 0.9rem;" id="personel-info-qr"></p>
-                </div>
-                
-                <div class="input-label">Birim QR Kodu Okutun</div>
-                <div class="qr-wrapper" id="main-qr-container"></div>
-                
-                <button class="btn btn-secondary" onclick="logout()">
-                    <span class="material-icons" style="font-size: 18px;">logout</span>
-                    Çıkış Yap
-                </button>
-            </div>
-        </div>
-
-        <!-- Sayfa 3: Onay -->
-        <div id="page-confirm" class="page hidden">
-            <div class="card">
-                <div class="input-label">Seçili Birim</div>
-                <div class="birim-info-box">
-                    <div id="confirm-birim-adi" class="title">Birim Adı</div>
-                    <div id="confirm-birim-kod" class="kod">Kod: XXX</div>
-                    
-                    <div id="talimat-info" class="hidden" style="margin-top: 12px;">
-                        <span style="display: inline-flex; align-items: center; gap: 6px; background: var(--primary); color: var(--text-dark); padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 700;">
-                            <span class="material-icons" style="font-size: 16px;">assignment</span>
-                            <span id="talimat-sayisi">0</span> Talimat
-                        </span>
+            <!-- Sayfa 1: Login -->
+            <input class="control__group__flag" id="group-login" type="radio" name="groups" checked>
+            <section class="control__group" id="page-login">
+                <div class="control__group__header">
+                    <div class="control__group__icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                    </div>
+                    <div class="control__group__title">
+                        <h4>Personel Girişi</h4>
                     </div>
                 </div>
                 
-                <button class="btn btn-blue" onclick="showTalimatlarPage()" style="margin-bottom: 12px;">
-                    <span class="material-icons" style="font-size: 18px;">visibility</span>
-                    Talimatları Gör
-                </button>
-            </div>
-            
-            <div class="card security-card">
-                <div class="security-warning">
-                    <span class="material-icons" style="font-size: 20px; vertical-align: middle; margin-right: 4px;">security</span>
-                    Güvenlik Doğrulaması
-                </div>
-                <div class="security-subtext">Temizliğe başlamak için birim QR kodunu tekrar okutun</div>
-                
-                <button class="btn btn-primary" id="btn-start" onclick="openVerification('baslat')" style="height: 56px; font-size: 15px; margin-bottom: 12px;">
-                    <span class="material-icons" style="font-size: 20px;">qr_code_scanner</span>
-                    QR Doğrula ve Başlat
-                </button>
-                <button class="btn btn-secondary" onclick="cancelCleaning()" style="color: var(--error); border-color: rgba(244,67,54,0.3);">
-                    <span class="material-icons" style="font-size: 18px;">cancel</span>
-                    İptal
-                </button>
-            </div>
-        </div>
-
-        <!-- Sayfa 4: Talimatlar -->
-        <div id="page-talimatlar" class="page hidden">
-            <div class="nav-header">
-                <button class="nav-back" onclick="backToConfirm()">
-                    <span class="material-icons">arrow_back</span>
-                </button>
-                <div class="nav-title">Talimatlar</div>
-                <div style="width: 40px;"></div>
-            </div>
-            
-            <div style="background: var(--bg-white); border-radius: 16px; padding: 20px; margin-bottom: 16px; border: 1px solid var(--border); text-align: center; box-shadow: var(--shadow);">
-                <div id="talimat-birim-adi" style="font-size: 1.3rem; font-weight: 800; color: var(--primary-dark); margin-bottom: 4px;"></div>
-                <div id="talimat-birim-kod" style="color: var(--text-gray); font-family: monospace; font-size: 0.85rem;"></div>
-            </div>
-
-            <div class="card" style="margin-top: 0;">
-                <div style="background: rgba(255, 152, 0, 0.1); border: 1px solid rgba(255, 152, 0, 0.3); border-radius: 12px; padding: 14px; margin-bottom: 20px; color: #ef6c00; font-size: 13px; line-height: 1.4; font-weight: 600; display: flex; align-items: center; gap: 8px;">
-                    <span class="material-icons" style="font-size: 20px;">warning</span>
-                    <span>Bu talimatları dikkatlice okuyunuz. Temizliğe başlamadan önce tüm maddeleri uyguladığınızdan emin olunuz.</span>
+                <div class="control__item">
+                    <div style="padding: 1rem;">
+                        <label class="form-label">TC Kimlik Numarası</label>
+                        <input type="text" class="form-input" id="tc-input" 
+                               placeholder="11 haneli TC No" maxlength="11">
+                        <div id="login-error"></div>
+                        <button class="btn btn-primary" id="btn-login" onclick="login()">
+                            GİRİŞ YAP →
+                        </button>
+                    </div>
                 </div>
                 
-                <div class="talimat-container" id="talimat-liste"></div>
+                <div style="text-align: center; margin-top: 2rem; opacity: 0.5;">
+                    <small style="font-size: 0.7em; color: var(--text-secondary);">
+                        🔌 Cihaz: <span id="device-id"></span>
+                    </small>
+                </div>
+            </section>
+            
+            <!-- Sayfa 2: QR Okuma -->
+            <input class="control__group__flag" id="group-qr" type="radio" name="groups">
+            <section class="control__group" id="page-qr">
+                <div class="text-center" style="margin-bottom: 1rem;">
+                    <div class="greeting" id="greeting-qr"></div>
+                    <div class="personel-info" id="personel-info-qr"></div>
+                </div>
                 
-                <button class="btn btn-primary" onclick="backToConfirm()">
-                    <span class="material-icons" style="font-size: 18px;">check_circle</span>
-                    Anladım, Geri Dön
-                </button>
-            </div>
+                <div class="control__group__header">
+                    <div class="control__group__icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="3" y1="9" x2="21" y2="9"></line>
+                            <line x1="9" y1="21" x2="9" y2="9"></line>
+                        </svg>
+                    </div>
+                    <div class="control__group__title">
+                        <h4>Birim Seçimi</h4>
+                    </div>
+                </div>
+                
+                <div class="control__item" style="padding: 1rem;">
+                    <p style="color: var(--text-secondary); text-align: center; margin-bottom: 1rem; font-size: 0.85em;">
+                        Temizlenecek birimin QR kodunu okutun
+                    </p>
+                    
+                    <div class="qr-container" id="main-qr-container">
+                        <!-- Kamera buraya gelecek -->
+                    </div>
+                    
+                    <button class="btn btn-secondary" onclick="logout()">
+                        ← Çıkış
+                    </button>
+                </div>
+            </section>
+            
+            <!-- Sayfa 3: Onay -->
+            <input class="control__group__flag" id="group-confirm" type="radio" name="groups">
+            <section class="control__group" id="page-confirm">
+                <div class="text-center" style="margin-bottom: 1rem;">
+                    <div class="greeting" id="greeting-confirm"></div>
+                </div>
+                
+                <div class="control__group__header">
+                    <div class="control__group__icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                        </svg>
+                    </div>
+                    <div class="control__group__title">
+                        <h4>Birim Bilgisi</h4>
+                    </div>
+                </div>
+                
+                <div class="control__item" style="padding: 1.5rem; text-align: center;">
+                    <div id="confirm-birim-adi" style="font-size: 1.3em; color: var(--accent-blue); font-weight: bold; margin-bottom: 0.5rem;"></div>
+                    <div id="confirm-birim-kod" style="color: var(--text-secondary); font-size: 0.9em; margin-bottom: 1rem;"></div>
+                    
+                    <div id="talimat-info" class="hidden">
+                        <span style="display: inline-block; background: rgba(88, 166, 255, 0.1); color: var(--accent-blue); padding: 0.4em 1em; border-radius: 2em; font-size: 0.75em;">
+                            📋 <span id="talimat-sayisi">0</span> Talimat
+                        </span>
+                    </div>
+                    
+                    <button class="btn btn-blue" onclick="showTalimatlarPage()" style="margin: 1rem 0;">
+                        📋 Talimatları Gör
+                    </button>
+                </div>
+                
+                <div class="control__item" style="padding: 1rem; border: 2px solid rgba(243, 112, 85, 0.3);">
+                    <p style="text-align: center; color: var(--accent-orange); margin-bottom: 1rem; font-weight: bold; font-size: 0.9em;">
+                        🔐 Güvenlik Doğrulaması Gereklidir
+                    </p>
+                    <p style="text-align: center; color: var(--text-secondary); margin-bottom: 1.5rem; font-size: 0.8em;">
+                        Temizliğe başlamak için birim QR kodunu tekrar okutun
+                    </p>
+                    
+                    <button class="btn btn-primary" id="btn-start" onclick="openVerification('baslat')">
+                        🔐 QR DOĞRULAMA - BAŞLA
+                    </button>
+                    
+                    <button class="btn btn-danger" onclick="cancelCleaning()">
+                        ✗ İPTAL
+                    </button>
+                </div>
+            </section>
+            
+            <!-- Sayfa 4: Talimatlar -->
+            <input class="control__group__flag" id="group-talimat" type="radio" name="groups">
+            <section class="control__group" id="page-talimatlar">
+                <div class="control__group__header">
+                    <div class="control__group__icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                    </div>
+                    <div class="control__group__title">
+                        <h4>Talimatlar</h4>
+                    </div>
+                </div>
+                
+                <div style="margin-bottom: 1rem;">
+                    <div style="color: var(--accent-blue); font-size: 1.1em; font-weight: bold;" id="talimat-birim-adi">Birim Adı</div>
+                    <div style="color: var(--text-secondary); font-size: 0.8em;" id="talimat-birim-kod">Kod: XXX</div>
+                </div>
+                
+                <div class="control__item" style="padding: 1rem;">
+                    <div class="talimat-uyari">
+                        ⚠️ Bu talimatları dikkatlice okuyunuz. Temizliğe başlamadan önce tüm maddeleri uyguladığınızdan emin olunuz.
+                    </div>
+                    
+                    <div class="talimat-liste" id="talimat-liste">
+                        <!-- Talimatlar buraya -->
+                    </div>
+                    
+                    <button class="btn btn-primary" onclick="backToConfirm()">
+                        ✓ Anladım, Geri Dön
+                    </button>
+                </div>
+            </section>
+            
+            <!-- Sayfa 5: İşlem Yönetimi -->
+            <input class="control__group__flag" id="group-job" type="radio" name="groups">
+            <section class="control__group" id="page-job">
+                <div class="text-center" style="margin-bottom: 1rem;">
+                    <div class="greeting" id="greeting-job"></div>
+                    <div class="personel-info" id="personel-info-job"></div>
+                </div>
+                
+                <div class="control__group__header">
+                    <div class="control__group__icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 20h9"></path>
+                            <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                        </svg>
+                    </div>
+                    <div class="control__group__title">
+                        <h4>Aktif İşlem</h4>
+                    </div>
+                </div>
+                
+                <div id="active-job-card"></div>
+                <div id="history-job-section"></div>
+                
+                <div style="padding: 1rem;">
+                    <button class="btn btn-secondary" onclick="logout()">
+                        ← Çıkış Yap
+                    </button>
+                </div>
+            </section>
+            
         </div>
-
-        <!-- Sayfa 5: İşlem Yönetimi -->
-        <div id="page-job" class="page hidden">
-            <div style="text-align: center; padding: 10px 0 20px;">
-                <h3 id="greeting-job" style="color: var(--primary-dark); font-size: 1.3rem; margin-bottom: 6px; font-weight: 800;"></h3>
-                <p style="color: var(--text-gray); font-size: 0.9rem;" id="personel-info-job"></p>
-            </div>
-            
-            <div id="active-job-card"></div>
-            <div id="history-job-section"></div>
-            
-            <button class="btn btn-secondary" onclick="logout()" style="margin-top: 10px;">
-                <span class="material-icons" style="font-size: 18px;">power_settings_new</span>
-                Oturumu Kapat
-            </button>
+        
+        <!-- Footer Navigation -->
+        <div class="window__footer">
+            <nav class="navigation__list">
+                <div class="navigation__item active" id="nav-login">
+                    <label class="navigation__item__link" for="group-login" onclick="switchTab('login')">
+                        Giriş
+                    </label>
+                </div>
+                <div class="navigation__item" id="nav-qr">
+                    <label class="navigation__item__link" for="group-qr" onclick="switchTab('qr')">
+                        QR
+                    </label>
+                </div>
+                <div class="navigation__item" id="nav-job">
+                    <label class="navigation__item__link" for="group-job" onclick="switchTab('job')">
+                        İşlem
+                    </label>
+                </div>
+            </nav>
         </div>
     </div>
-
-    <!-- Doğrulama Modal -->
+    
+    <!-- QR Doğrulama Modal -->
     <div class="modal" id="verification-modal">
         <div class="modal-content verification-content">
-            <div class="verification-header">
-                <span class="material-icons" style="font-size: 40px; margin-bottom: 8px; display: block;">security</span>
-                Güvenlik Doğrulama
-            </div>
-            <div style="color: var(--text-gray); margin-bottom: 16px; font-size: 14px; text-align: center;">
+            <div class="verification-header">🔐 GÜVENLİK DOĞRULAMA</div>
+            <div style="color: var(--text-secondary); margin-bottom: 10px; font-size: 0.85em; text-align: center;">
                 İşlem yapabilmek için doğru birimi okutun
             </div>
             
             <div class="verification-info">
-                <div style="color: var(--text-gray); font-size: 11px; margin-bottom: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Beklenen Birim:</div>
+                <div style="color: var(--text-secondary); font-size: 0.75em; margin-bottom: 5px;">BEKLENEN BİRİM:</div>
                 <div class="verification-birim" id="verification-birim-adi">Birim Adı</div>
                 <div class="verification-kod" id="verification-birim-kod">Kod: XXX</div>
             </div>
@@ -839,25 +1001,24 @@
                 Kamerayı QR koda doğru tutun...
             </div>
             
-            <button class="btn btn-secondary" onclick="closeVerification()" style="color: var(--error);">
-                <span class="material-icons" style="font-size: 18px;">cancel</span>
-                İptal
+            <button class="btn btn-danger" onclick="closeVerification()">
+                ✗ İPTAL
             </button>
         </div>
     </div>
-
+    
     <!-- Bilgi Modal -->
     <div class="modal" id="info-modal">
         <div class="modal-content">
-            <div class="modal-title" id="info-modal-title"></div>
-            <div class="modal-text" id="info-modal-text"></div>
-            <button class="btn btn-primary" onclick="closeInfoModal()">Tamam</button>
+            <div style="font-size: 1.3em; margin-bottom: 15px; color: var(--accent-blue); font-weight: bold; text-align: center;" id="info-modal-title"></div>
+            <div style="color: var(--text-secondary); margin-bottom: 20px; line-height: 1.6; text-align: center;" id="info-modal-text"></div>
+            <button class="btn btn-primary" onclick="closeInfoModal()">TAMAM</button>
         </div>
     </div>
 
     <script>
-        // ==================== KONFİGÜRASYON v4.2 ====================
-        const APP_VERSION = '4.2';
+        // ==================== KONFİGÜRASYON v4.1 ====================
+        const APP_VERSION = '4.1';
         const MQTT_CONFIG = {
             protocol: 'wss',
             hostname: 'broker.emqx.io',
@@ -876,7 +1037,7 @@
         let responseTimeout = null;
         
         let state = {
-            tcNo: localStorage.getItem('mgd_tc') || '',
+            tcNo: '',
             personelAd: '',
             personelSoyad: '',
             aktifIslem: null,
@@ -891,7 +1052,7 @@
         
         // ==================== MQTT BAĞLANTI ====================
         function connectMQTT() {
-            updateStatus('connecting', 'BAĞLANIYOR...', 'sync');
+            updateStatus('connecting', 'Bağlanıyor...');
             
             try {
                 const options = {
@@ -907,17 +1068,18 @@
                 mqttClient.on('connect', () => {
                     console.log('[MQTT] Bağlandı');
                     isConnected = true;
-                    updateStatus('online', 'SİSTEM AKTİF', 'check_circle');
+                    updateStatus('online', 'Sistem Aktif');
+                    mqttClient.subscribe(`${TOPIC_CEVAP_BASE}${DEV_ID}`);
                 });
                 
                 mqttClient.on('disconnect', () => {
                     isConnected = false;
-                    updateStatus('offline', 'BAĞLANTI KESİLDİ', 'error');
+                    updateStatus('offline', 'Bağlantı Kesildi');
                 });
                 
                 mqttClient.on('error', (err) => {
                     console.error('[MQTT] Hata:', err);
-                    updateStatus('error', 'BAĞLANTI HATASI', 'error');
+                    updateStatus('error', 'Bağlantı Hatası');
                 });
                 
                 mqttClient.on('message', (topic, message) => {
@@ -931,16 +1093,20 @@
                 
             } catch(e) {
                 console.error('[MQTT] Bağlantı hatası:', e);
-                updateStatus('error', 'BAĞLANTI KURULAMADI', 'error');
+                updateStatus('error', 'Bağlantı Kurulamadı');
             }
         }
         
-        function updateStatus(type, text, icon) {
-            const el = document.getElementById('status-indicator');
-            const textEl = document.getElementById('status-text');
-            el.className = 'status-indicator ' + type;
-            textEl.textContent = text;
-            el.querySelector('.material-icons').textContent = icon || (type === 'online' ? 'check_circle' : type === 'connecting' ? 'sync' : 'error');
+        function updateStatus(type, text) {
+            const el = document.getElementById('status-chip');
+            el.className = 'status-chip ' + type;
+            if (type === 'connecting') {
+                el.innerHTML = '<span class="loading"></span> ' + text;
+            } else if (type === 'online') {
+                el.innerHTML = '🟢 ' + text;
+            } else {
+                el.innerHTML = '🔴 ' + text;
+            }
         }
         
         async function sendMQTT(tip, birim = '', tc = '') {
@@ -968,9 +1134,7 @@
                     if (currentResponse) {
                         clearTimeout(responseTimeout);
                         clearInterval(checkInterval);
-                        const resp = currentResponse;
-                        currentResponse = null;
-                        resolve(resp);
+                        resolve(currentResponse);
                     }
                 }, 100);
                 
@@ -985,19 +1149,27 @@
         }
         
         // ==================== SAYFA YÖNETİMİ ====================
+        function switchTab(tabName) {
+            // Nav aktif durumunu güncelle
+            document.querySelectorAll('.navigation__item').forEach(el => el.classList.remove('active'));
+            document.getElementById('nav-' + tabName).classList.add('active');
+            
+            // Content scroll reset
+            document.getElementById('main-content').scrollTop = 0;
+        }
+        
         function showPage(pageId) {
-            document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
-            document.getElementById('page-' + pageId).classList.remove('hidden');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            document.getElementById('group-' + pageId).checked = true;
+            switchTab(pageId === 'login' ? 'login' : (pageId === 'qr' ? 'qr' : 'job'));
         }
         
         function getGreeting() {
             const hour = new Date().getHours();
             const ad = state.personelAd || '';
-            if (hour >= 5 && hour < 12) return `🌅 Günaydın ${ad}`;
-            if (hour >= 12 && hour < 17) return `☀️ Tünaydın ${ad}`;
-            if (hour >= 17 && hour < 21) return `🌆 İyi akşamlar ${ad}`;
-            return `🌙 İyi geceler ${ad}`;
+            if (hour >= 5 && hour < 12) return `Günaydın ${ad}`;
+            if (hour >= 12 && hour < 17) return `Tünaydın ${ad}`;
+            if (hour >= 17 && hour < 21) return `İyi akşamlar ${ad}`;
+            return `İyi geceler ${ad}`;
         }
         
         // ==================== GİRİŞ İŞLEMLERİ ====================
@@ -1007,12 +1179,12 @@
             const errorDiv = document.getElementById('login-error');
             
             if (!tc || tc.length !== 11 || !/^\d+$/.test(tc)) {
-                errorDiv.textContent = '❌ Geçersiz TC No (11 haneli olmalı)';
+                errorDiv.innerHTML = '<div class="alert alert-error">Geçersiz TC No (11 haneli olmalı)</div>';
                 return;
             }
             
             if (!isConnected) {
-                errorDiv.textContent = '❌ Bağlantı yok';
+                errorDiv.innerHTML = '<div class="alert alert-error">Bağlantı yok</div>';
                 return;
             }
             
@@ -1024,11 +1196,11 @@
                 
                 if (yanit?.status === 'OK') {
                     state.tcNo = tc;
-                    localStorage.setItem('mgd_tc', tc);
                     state.personelAd = yanit.personel?.ad || '';
                     state.personelSoyad = yanit.personel?.soyad || '';
                     
                     if (yanit.aktif_islem) {
+                        console.log('[Login] Aktif işlem bulundu:', yanit.aktif_islem);
                         state.aktifIslem = {
                             birim_kodu: yanit.aktif_islem.birim_kodu,
                             birim_adi: yanit.aktif_islem.birim_adi,
@@ -1046,19 +1218,20 @@
                         
                         showJobPage();
                     } else {
+                        console.log('[Login] Aktif işlem yok, QR sayfasına yönlendiriliyor');
                         state.aktifIslem = null;
                         showQRPage();
                     }
                 } else {
-                    errorDiv.textContent = `❌ ${yanit?.message || 'Personel bulunamadı'}`;
+                    errorDiv.innerHTML = `<div class="alert alert-error">${yanit?.message || 'Personel bulunamadı'}</div>`;
                 }
             } catch (err) {
                 console.error('[Login] Hata:', err);
-                errorDiv.textContent = `❌ ${err.message}`;
+                errorDiv.innerHTML = `<div class="alert alert-error">${err.message}</div>`;
             }
             
             btn.disabled = false;
-            btn.innerHTML = '<span class="material-icons" style="font-size: 18px;">login</span> SİSTEME GİRİŞ YAP';
+            btn.textContent = 'GİRİŞ YAP →';
         }
         
         // ==================== KAMERA YÖNETİMİ ====================
@@ -1074,25 +1247,23 @@
             }
         }
         
-        async function startScanner(elementId, callback) {
+        async function startMainScanner() {
             await stopScanner();
             
-            qrScanner = new Html5Qrcode(elementId);
+            qrScanner = new Html5Qrcode("main-qr-container");
             
             try {
                 await qrScanner.start(
                     { facingMode: "environment" },
                     { fps: 10, qrbox: { width: 250, height: 250 } },
-                    callback,
+                    onMainQRDetected,
                     () => {}
                 );
-                console.log('[Kamera] Başlatıldı:', elementId);
+                console.log('[Kamera] Ana kamera başlatıldı');
             } catch (err) {
                 console.error('[Kamera] Başlatma hatası:', err);
-                const container = document.getElementById(elementId);
-                if (container) {
-                    container.innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #f44336; text-align: center; padding: 20px; font-size: 14px; flex-direction: column; gap: 10px;"><span class="material-icons" style="font-size: 48px;">error</span><div>Kamera erişimi reddedildi.<br>Lütfen tarayıcı izinlerini kontrol edin.</div></div>';
-                }
+                document.getElementById('main-qr-container').innerHTML = 
+                    '<div style="display: flex; align-items: center; justify-content: center; height: 100%; color: var(--accent-orange); text-align: center; padding: 20px; font-size: 0.85em;">📷 Kamera erişimi reddedildi.<br>Lütfen tarayıcı izinlerini kontrol edin.</div>';
             }
         }
         
@@ -1126,10 +1297,11 @@
             document.getElementById('greeting-qr').textContent = getGreeting();
             document.getElementById('personel-info-qr').textContent = `${state.personelAd} ${state.personelSoyad}`;
             showPage('qr');
-            startScanner('main-qr-container', onMainQRDetected);
+            startMainScanner();
         }
         
         function showConfirmPage() {
+            document.getElementById('greeting-confirm').textContent = getGreeting();
             document.getElementById('confirm-birim-adi').textContent = state.seciliBirimAdi;
             document.getElementById('confirm-birim-kod').textContent = `Kod: ${state.seciliBirimKodu}`;
             
@@ -1156,13 +1328,13 @@
                 const satirlar = state.seciliBirimTalimatlar.split('\n').filter(s => s.trim());
                 satirlar.forEach((satir, i) => {
                     const madde = document.createElement('div');
-                    madde.className = 'talimat-item';
+                    madde.className = 'talimat-madde';
                     const icerik = /^\d+[\.\-]\s|^[\-\*]\s/.test(satir) ? satir : `${i + 1}. ${satir}`;
                     madde.textContent = icerik;
                     liste.appendChild(madde);
                 });
             } else {
-                liste.innerHTML = '<div style="text-align: center; color: var(--text-gray); padding: 20px;">Bu birim için talimat bulunmamaktadır.</div>';
+                liste.innerHTML = '<div style="text-align: center; color: var(--text-secondary); padding: 20px; font-size: 0.9em;">Bu birim için talimat bulunmamaktadır.</div>';
             }
             
             showPage('talimatlar');
@@ -1193,7 +1365,7 @@
             } else if (mode === 'bitir') {
                 if (!state.aktifIslem) {
                     console.error('[Doğrulama] HATA: aktifIslem null!');
-                    showInfoModal('Hata', 'Aktif temizlik işlemi bulunamadı.');
+                    showInfoModal('Hata', 'Aktif temizlik işlemi bulunamadı. Sayfayı yenileyin.');
                     return;
                 }
                 beklenenKod = state.aktifIslem.birim_kodu;
@@ -1201,6 +1373,7 @@
             }
             
             if (!beklenenKod) {
+                console.error('[Doğrulama] HATA: beklenenKod boş!');
                 showInfoModal('Hata', 'Birim kodu bulunamadı.');
                 return;
             }
@@ -1218,63 +1391,50 @@
             await stopScanner();
             
             setTimeout(() => {
-                startScanner('verification-reader', onVerificationQRDetected);
+                startVerificationCamera();
             }, 300);
         }
         
-        async function onVerificationQRDetected(code) {
-            console.log('[Doğrulama] QR Okundu:', code);
-            
+        async function startVerificationCamera() {
             if (!state.verificationMode) return;
             
-            let beklenenKod = '';
+            qrScanner = new Html5Qrcode("verification-reader");
             
-            if (state.verificationMode === 'baslat') {
-                beklenenKod = state.seciliBirimKodu;
-            } else if (state.verificationMode === 'bitir') {
-                if (!state.aktifIslem || !state.aktifIslem.birim_kodu) {
-                    showInfoModal('Hata', 'Aktif işlem bilgisi kaybolmuş.');
-                    closeVerification();
-                    return;
-                }
-                beklenenKod = state.aktifIslem.birim_kodu;
+            try {
+                await qrScanner.start(
+                    { facingMode: "environment" },
+                    { fps: 10, qrbox: { width: 200, height: 200 } },
+                    onVerificationQRDetected,
+                    () => {}
+                );
+            } catch (err) {
+                document.getElementById('verification-status').textContent = 'Kamera hatası! İzinleri kontrol edin.';
+                document.getElementById('verification-status').className = 'verification-status error';
             }
+        }
+        
+        async function onVerificationQRDetected(code) {
+            let beklenenKod = state.verificationMode === 'baslat' ? state.seciliBirimKodu : (state.aktifIslem?.birim_kodu || '');
             
             const box = document.getElementById('verification-camera-box');
             const statusEl = document.getElementById('verification-status');
             
             if (code === beklenenKod) {
-                console.log('[Doğrulama] Doğrulama başarılı!');
                 await stopScanner();
-                
                 box.classList.add('success');
                 statusEl.className = 'verification-status success';
-                statusEl.innerHTML = '✓ Doğrulama başarılı!<br>İşlem yapılıyor...';
+                statusEl.innerHTML = 'Doğrulama başarılı!<br>İşlem yapılıyor...';
                 
                 setTimeout(() => {
                     const currentMode = state.verificationMode;
                     closeVerification();
-                    
-                    if (currentMode === 'baslat') {
-                        executeStart();
-                    } else if (currentMode === 'bitir') {
-                        executeEnd();
-                    }
+                    if (currentMode === 'baslat') executeStart();
+                    else if (currentMode === 'bitir') executeEnd();
                 }, 1500);
             } else {
-                console.log('[Doğrulama] Yanlış QR:', code, 'Beklenen:', beklenenKod);
                 box.classList.add('error');
                 statusEl.className = 'verification-status error';
-                
-                try {
-                    const yanit = await sendMQTT('BIRIM_DETAY', code, state.tcNo);
-                    const yanlisAd = yanit?.status === 'OK' ? yanit.birim?.adi : code;
-                    const beklenenAd = state.verificationMode === 'baslat' ? state.seciliBirimAdi : (state.aktifIslem?.birim_adi || 'Bilinmiyor');
-                    
-                    statusEl.innerHTML = `⚠️ YANLIŞ BİRİM!<br>Okunan: ${yanlisAd}<br>Beklenen: ${beklenenAd}`;
-                } catch (e) {
-                    statusEl.textContent = '⚠️ YANLIŞ BİRİM! Tekrar deneyin.';
-                }
+                statusEl.textContent = 'Yanlış birim! Tekrar deneyin.';
                 
                 setTimeout(() => {
                     box.classList.remove('error');
@@ -1285,7 +1445,6 @@
         }
         
         function closeVerification() {
-            console.log('[Doğrulama] Modal kapatılıyor');
             stopScanner();
             document.getElementById('verification-modal').classList.remove('active');
             state.verificationMode = null;
@@ -1293,7 +1452,6 @@
         
         // ==================== TEMİZLİK İŞLEMLERİ ====================
         async function executeStart() {
-            console.log('[İşlem] Başlatma başlıyor...');
             const btn = document.getElementById('btn-start');
             btn.disabled = true;
             btn.innerHTML = '<span class="loading"></span> Gönderiliyor...';
@@ -1302,7 +1460,6 @@
                 const yanit = await sendMQTT('START', state.seciliBirimKodu, state.tcNo);
                 
                 if (yanit?.status === 'OK') {
-                    console.log('[İşlem] Başlatma başarılı');
                     state.islemGecmisi.push({
                         saat: new Date().toLocaleTimeString('tr-TR', {hour: '2-digit', minute: '2-digit'}),
                         birim: state.seciliBirimAdi,
@@ -1315,28 +1472,23 @@
                         baslama_zamani: new Date().toISOString()
                     };
                     
-                    showInfoModal('✓ Başarılı', 
-                        `Sayın ${state.personelAd},<br><br>✅ <b>${state.seciliBirimAdi}</b> temizliği başlatıldı!<br><br>🔐 Birim doğrulaması yapıldı.`);
+                    showInfoModal('Başarılı', 
+                        `Sayın ${state.personelAd},<br><br>${state.seciliBirimAdi} temizliği başlatıldı!<br><br>Birim doğrulaması yapıldı.`);
                     showJobPage();
                 } else {
-                    console.error('[İşlem] Başlatma başarısız:', yanit);
-                    showInfoModal('✗ Hata', yanit?.message || 'Başlatma başarısız');
+                    showInfoModal('Hata', yanit?.message || 'Başlatma başarısız');
                     btn.disabled = false;
-                    btn.innerHTML = '<span class="material-icons" style="font-size: 20px;">qr_code_scanner</span> QR Doğrula ve Başlat';
+                    btn.textContent = '🔐 QR DOĞRULAMA - BAŞLA';
                 }
             } catch (err) {
-                console.error('[İşlem] Başlatma hatası:', err);
-                showInfoModal('✗ Hata', err.message);
+                showInfoModal('Hata', err.message);
                 btn.disabled = false;
-                btn.innerHTML = '<span class="material-icons" style="font-size: 20px;">qr_code_scanner</span> QR Doğrula ve Başlat';
+                btn.textContent = '🔐 QR DOĞRULAMA - BAŞLA';
             }
         }
         
         async function executeEnd() {
-            console.log('[İşlem] Bitirme başlıyor...');
-            
-            if (!state.aktifIslem || !state.aktifIslem.birim_kodu) {
-                console.error('[İşlem] HATA: aktifIslem null veya birim_kodu yok!');
+            if (!state.aktifIslem) {
                 showInfoModal('Hata', 'Aktif işlem bilgisi bulunamadı.');
                 return;
             }
@@ -1345,7 +1497,6 @@
                 const yanit = await sendMQTT('END', state.aktifIslem.birim_kodu, state.tcNo);
                 
                 if (yanit?.status === 'OK') {
-                    console.log('[İşlem] Bitirme başarılı');
                     const birimAdi = state.aktifIslem.birim_adi || state.aktifIslem.birim_kodu;
                     
                     state.islemGecmisi.push({
@@ -1357,16 +1508,14 @@
                     state.aktifIslem = null;
                     state.seciliBirimTalimatlar = '';
                     
-                    showInfoModal('✓ Tamamlandı', 
-                        `Sayın ${state.personelAd},<br><br>✅ <b>${birimAdi}</b> temizliği tamamlandı!<br><br>🔐 Birim doğrulaması yapıldı.<br>⏰ Bitiş: ${new Date().toLocaleTimeString('tr-TR')}`);
+                    showInfoModal('Tamamlandı', 
+                        `Sayın ${state.personelAd},<br><br>${birimAdi} temizliği tamamlandı!<br><br>Bitiş: ${new Date().toLocaleTimeString('tr-TR')}`);
                     showJobPage();
                 } else {
-                    console.error('[İşlem] Bitirme başarısız:', yanit);
-                    showInfoModal('✗ Hata', yanit?.message || 'Bitirme başarısız');
+                    showInfoModal('Hata', yanit?.message || 'Bitirme başarısız');
                 }
             } catch (err) {
-                console.error('[İşlem] Bitirme hatası:', err);
-                showInfoModal('✗ Hata', err.message);
+                showInfoModal('Hata', err.message);
             }
         }
         
@@ -1384,18 +1533,12 @@
         function renderActiveJob() {
             const container = document.getElementById('active-job-card');
             
-            console.log('[Render] Aktif işlem:', state.aktifIslem);
-            
             if (!state.aktifIslem) {
                 container.innerHTML = `
-                    <div class="card" style="text-align: center; border: 2px dashed var(--border); background: transparent;">
-                        <div style="color: var(--text-gray); padding: 40px; font-size: 16px;">
-                            <span class="material-icons" style="font-size: 56px; opacity: 0.3; margin-bottom: 16px; display: block;">inbox</span>
-                            Aktif Temizlik Yok
-                        </div>
+                    <div class="control__item" style="padding: 1.5rem; text-align: center;">
+                        <div style="color: var(--text-secondary); margin-bottom: 1rem;">Aktif Temizlik Yok</div>
                         <button class="btn btn-blue" onclick="showQRPage()">
-                            <span class="material-icons" style="font-size: 20px;">add_circle</span>
-                            YENİ TEMİZLİK BAŞLAT
+                            + YENİ TEMİZLİK BAŞLAT
                         </button>
                     </div>
                 `;
@@ -1413,26 +1556,22 @@
                     const dakika = Math.floor((simdi - baslama) / 60000);
                     sureText = `${dakika} dk`;
                 }
-            } catch(e) {
-                console.error('[Render] Süre hesaplama hatası:', e);
-            }
+            } catch(e) {}
             
             container.innerHTML = `
-                <div class="card active-job-card">
-                    <div style="color: var(--primary-dark); font-weight: 800; margin-bottom: 12px; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; display: flex; align-items: center; gap: 6px;">
-                        <span class="material-icons" style="font-size: 16px;">sync</span>
-                        DEVAM EDEN TEMİZLİK
+                <div class="control__item" style="padding: 1.5rem; border: 2px solid rgba(0, 255, 171, 0.3); background: linear-gradient(135deg, rgba(0, 255, 171, 0.05) 0%, rgba(70, 121, 246, 0.05) 100%);">
+                    <div style="color: var(--accent-green); font-weight: bold; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 0.5em;">
+                        <span class="active-job-indicator"></span> DEVAM EDEN TEMİZLİK
                     </div>
-                    <div style="font-size: 1.6rem; font-weight: 800; margin: 16px 0; color: var(--text-dark);">
-                        🏢 ${birimAdi}
+                    <div style="font-size: 1.3em; font-weight: bold; margin: 10px 0; color: var(--text-primary);">
+                        ${birimAdi}
                     </div>
-                    <div style="color: var(--text-gray); margin-bottom: 24px; font-family: monospace; font-size: 14px;">
+                    <div style="color: var(--text-secondary); margin-bottom: 15px; font-size: 0.9em;">
                         Kod: ${birimKod}
                     </div>
-                    <div class="timer">⏱️ ${sureText}</div>
-                    <button class="btn btn-primary" onclick="openVerification('bitir')" style="height: 56px; font-size: 15px;">
-                        <span class="material-icons" style="font-size: 20px;">qr_code_scanner</span>
-                        QR Doğrula ve Bitir
+                    <div class="timer">${sureText}</div>
+                    <button class="btn btn-primary" onclick="openVerification('bitir')" style="height: 60px; font-size: 1em;">
+                        🔐 QR DOĞRULAMA - BİTİR
                     </button>
                 </div>
             `;
@@ -1445,18 +1584,14 @@
                 return;
             }
             
-            let html = '<div class="card"><div class="input-label" style="margin-bottom: 16px;">Son İşlemler</div>';
+            let html = '<div class="control__item" style="padding: 1rem;"><div style="font-weight: bold; margin-bottom: 0.5rem; color: var(--text-secondary); font-size: 0.9em;">Son İşlemler</div>';
             [...state.islemGecmisi].reverse().slice(0, 5).forEach(islem => {
                 const durumClass = islem.durum === 'Tamamlandı' ? 'history-status-completed' : 'history-status-active';
-                const durumIcon = islem.durum === 'Tamamlandı' ? 'check_circle' : 'play_circle';
                 html += `
-                    <div class="history-row">
-                        <span style="color: var(--text-gray); font-size: 13px; font-weight: 600;">${islem.saat}</span>
-                        <span style="flex: 1; margin: 0 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600;">${islem.birim}</span>
-                        <span class="${durumClass}" style="font-size: 13px; display: flex; align-items: center; gap: 4px;">
-                            <span class="material-icons" style="font-size: 16px;">${durumIcon}</span>
-                            ${islem.durum}
-                        </span>
+                    <div class="history-item">
+                        <span class="history-time">${islem.saat}</span>
+                        <span style="flex: 1; margin-left: 1rem; font-size: 0.9em;">${islem.birim}</span>
+                        <span class="${durumClass}">${islem.durum}</span>
                     </div>
                 `;
             });
@@ -1477,7 +1612,6 @@
         
         // ==================== ÇIKIŞ ====================
         function logout() {
-            console.log('[Sistem] Çıkış yapılıyor...');
             stopScanner();
             state.tcNo = '';
             state.personelAd = '';
@@ -1487,7 +1621,6 @@
             state.seciliBirimAdi = '';
             state.seciliBirimTalimatlar = '';
             document.getElementById('tc-input').value = '';
-            document.getElementById('login-error').textContent = '';
             showPage('login');
         }
         
@@ -1496,11 +1629,10 @@
             this.value = this.value.replace(/[^0-9]/g, '');
         });
         
+        document.getElementById('device-id').textContent = DEV_ID;
+        
         window.addEventListener('load', () => {
             connectMQTT();
-            if (state.tcNo) {
-                document.getElementById('tc-input').value = state.tcNo;
-            }
         });
         
         if ('serviceWorker' in navigator) {

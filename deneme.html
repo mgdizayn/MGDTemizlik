@@ -3,110 +3,206 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#0d1117">
-    <title>MGD CleanOS v4.1</title>
+    <meta name="theme-color" content="#FFC107">
+    <title>MGD CleanOS v4.2</title>
     
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon-192.png">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <script src="https://unpkg.com/mqtt@5.0.3/dist/mqtt.min.js"></script>
     
     <style>
+        /* Örnek2 Temel Renkleri */
         :root {
-            --bg: #0d1117;
-            --bg-glass: rgba(22, 27, 34, 0.85);
-            --card: #161b22;
-            --blue: #58a6ff;
-            --blue-glow: rgba(88, 166, 255, 0.2);
-            --green: #238636;
-            --green-glow: rgba(35, 134, 54, 0.3);
-            --red: #da3633;
-            --red-glow: rgba(218, 54, 51, 0.3);
-            --orange: #ffa657;
-            --orange-glow: rgba(255, 166, 87, 0.2);
-            --border: #30363d;
-            --text-main: #f0f6fc;
-            --text-dim: #8b949e;
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --primary: #FFC107;
+            --primary-dark: #FFA000;
+            --primary-light: #FFD54F;
+            --accent: #FF6F00;
+            --text-dark: #212121;
+            --text-gray: #757575;
+            --text-light: #9E9E9E;
+            --bg-light: #f5f5f5;
+            --bg-white: #ffffff;
+            --border: #e0e0e0;
+            --success: #4CAF50;
+            --error: #f44336;
+            --online: #00c853;
+            --shadow: 0 3px 5px rgba(0,0,0,0.1);
+            --shadow-glow: 0 0 15px rgba(255, 193, 7, 0.5);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+            -webkit-tap-highlight-color: transparent;
+            font-family: 'Open Sans', sans-serif;
+        }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: var(--bg);
-            color: var(--text-main);
+            background: var(--bg-light);
+            color: var(--text-dark);
             min-height: 100vh;
-            display: flex;
-            flex-direction: column;
             overflow-x: hidden;
         }
 
-        /* Header - örnek.txt stili */
-        header {
+        /* HEADER - Örnek2 Stili (Sarı Arka Plan) */
+        .header-wrapp {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             position: sticky;
             top: 0;
             z-index: 100;
-            background: var(--bg-glass);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--border);
-            padding: 15px 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding-bottom: 30px;
+            position: relative;
+        }
+
+        /* FOOTER BİLGİLERİ - ÜSTTE STICKY */
+        .footer-info {
+            background: rgba(0,0,0,0.15);
+            padding: 8px;
             text-align: center;
-        }
-
-        header h1 { 
-            font-size: 1.1rem; 
-            letter-spacing: 1px; 
-            color: var(--blue); 
-            font-weight: 800; 
-        }
-        
-        .header-sub { 
-            color: var(--text-dim); 
-            font-size: 0.7rem; 
-            margin-top: 4px; 
-            font-weight: 500; 
-            text-transform: uppercase; 
-            letter-spacing: 0.5px;
-        }
-
-        /* Status */
-        .status {
-            padding: 10px;
             font-size: 11px;
+            color: rgba(255,255,255,0.95);
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(5px);
+        }
+
+        .footer-info .label {
+            opacity: 0.8;
+            font-weight: 400;
+        }
+
+        .footer-info .name {
+            font-weight: 700;
+        }
+
+        .footer-info span {
+            margin: 0 8px;
+        }
+
+        /* App Detail */
+        .app-detail {
             text-align: center;
+            padding: 20px 10px 10px;
+            color: #fff;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .app-detail h1 {
+            font-size: 1.6rem;
             font-weight: 800;
-            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+            letter-spacing: -0.5px;
+        }
+
+        .app-detail .subtitle {
+            font-size: 0.75rem;
+            opacity: 0.9;
+            margin-bottom: 8px;
+            font-weight: 600;
             text-transform: uppercase;
-            border-bottom: 1px solid var(--border);
+            letter-spacing: 1px;
         }
-        
-        .status.online { color: #3fb950; background: rgba(63, 185, 80, 0.1); }
-        .status.connecting { color: var(--orange); background: rgba(255, 166, 87, 0.1); }
-        .status.error { color: var(--red); background: rgba(218, 54, 51, 0.1); }
-        .status.offline { color: var(--red); background: rgba(218, 54, 51, 0.1); }
 
-        /* Container */
-        .container { 
-            flex: 1; 
-            padding: 15px; 
-            max-width: 500px; 
-            margin: 0 auto; 
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255,255,255,0.2);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-top: 8px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .status-indicator.online { 
+            background: rgba(0, 200, 83, 0.2); 
+            color: #fff;
+            border-color: rgba(0, 200, 83, 0.4);
+        }
+        .status-indicator.connecting { 
+            background: rgba(255, 111, 0, 0.2);
+            color: #fff;
+        }
+        .status-indicator.error { 
+            background: rgba(244, 67, 54, 0.2);
+            color: #fff;
+        }
+
+        /* DALGA ANİMASYONU - Örnek2'den */
+        .wave-wrapp {
             width: 100%;
+            height: 40px;
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            overflow: hidden;
         }
 
-        /* Cards - örnek.txt stili */
+        .wave {
+            display: block;
+            width: 100%;
+            margin: 0;
+            height: 40px;
+        }
+
+        .wave .parallax > use {
+            animation: move-forever 12s linear infinite;
+        }
+
+        .wave .parallax > use:nth-child(1) {
+            animation-delay: -2s;
+            transform: translate(-110px, 0%);
+            opacity: 0.6;
+        }
+
+        .wave .parallax > use:nth-child(2) {
+            animation-delay: -2s;
+            animation-duration: 7s;
+            opacity: 0.8;
+        }
+
+        .wave .parallax > use:nth-child(3) {
+            animation-delay: -4s;
+            animation-duration: 4s;
+            transform: translate(-65px, 0%);
+            opacity: 1;
+        }
+
+        @keyframes move-forever {
+            0% { transform: translate(-90px, 0%); }
+            100% { transform: translate(85px, 0%); }
+        }
+
+        /* CONTENT - Örnek2 Stili */
+        .content-wrapp {
+            width: 100%;
+            min-height: calc(100vh - 160px);
+            position: relative;
+            padding: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Cards - Beyaz/Zemin */
         .card {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 24px;
-            padding: 25px;
-            margin-bottom: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            background: var(--bg-white);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow);
             animation: slideUp 0.4s ease-out;
+            border: 1px solid var(--border);
         }
 
         @keyframes slideUp {
@@ -116,199 +212,224 @@
 
         .input-label { 
             display: block; 
-            color: var(--text-dim); 
+            color: var(--text-gray); 
             font-size: 0.75rem; 
-            margin-bottom: 12px; 
+            margin-bottom: 10px; 
             text-align: center; 
-            font-weight: 600; 
+            font-weight: 700; 
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        /* Input */
-        .form-input {
-            width: 100%;
-            padding: 20px;
-            background: #000;
-            border: 2px solid var(--border);
-            border-radius: 18px;
-            color: var(--blue);
-            font-size: 26px;
-            text-align: center;
-            letter-spacing: 4px;
-            font-weight: 800;
-            margin-bottom: 20px;
-            font-family: 'Inter', monospace;
-            transition: var(--transition);
-        }
-        
-        .form-input:focus {
-            border-color: var(--blue);
-            box-shadow: 0 0 0 3px var(--blue-glow);
+            letter-spacing: 1px;
         }
 
-        /* Buttons */
-        .btn {
+        /* Inputs - Örnek2 Stili */
+        .form-input {
             width: 100%;
             padding: 18px;
-            border-radius: 18px;
+            background: var(--bg-light);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-dark);
+            font-size: 22px;
+            text-align: center;
+            letter-spacing: 4px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            transition: all 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: var(--shadow-glow);
+            background: #fff;
+        }
+
+        /* Buttons - Örnek2 Material Stili */
+        .btn {
+            width: 100%;
+            padding: 16px;
+            border-radius: 50px;
             border: none;
             font-weight: 700;
             font-size: 14px;
             cursor: pointer;
-            transition: var(--transition);
+            transition: all 0.3s;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 8px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            position: relative;
+            overflow: hidden;
         }
-        
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
         .btn-primary { 
-            background: var(--green); 
-            color: white; 
-            box-shadow: 0 4px 15px rgba(35, 134, 54, 0.3); 
+            background: var(--primary);
+            color: var(--text-dark);
+            box-shadow: 0 4px 15px rgba(255, 193, 7, 0.4);
         }
         .btn-primary:hover { 
-            transform: translateY(-2px); 
-            box-shadow: 0 6px 20px rgba(35, 134, 54, 0.4); 
+            background: var(--primary-dark);
+            box-shadow: 0 6px 20px rgba(255, 193, 7, 0.5);
         }
-        .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+        .btn-primary:disabled { 
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
 
         .btn-secondary { 
-            background: var(--border); 
-            color: var(--text-main); 
-            margin-top: 10px; 
+            background: #fff;
+            color: var(--text-gray);
+            border: 1px solid var(--border);
         }
-        .btn-secondary:hover { background: #3d444d; }
-
-        .btn-blue { 
-            background: var(--blue); 
-            color: white; 
-            box-shadow: 0 4px 15px rgba(88, 166, 255, 0.3);
-        }
-        .btn-blue:hover { 
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(88, 166, 255, 0.4); 
+        .btn-secondary:hover {
+            background: var(--bg-light);
+            color: var(--text-dark);
         }
 
         .btn-danger { 
-            background: var(--red); 
-            color: white; 
-            box-shadow: 0 4px 15px rgba(218, 54, 51, 0.3);
+            background: var(--error);
+            color: white;
+            box-shadow: 0 4px 15px rgba(244, 67, 54, 0.3);
         }
-        .btn-danger:hover { 
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(218, 54, 51, 0.4); 
+        .btn-danger:hover {
+            background: #d32f2f;
         }
 
-        /* QR Wrapper */
+        .btn-blue { 
+            background: #2196F3;
+            color: white;
+            box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
+        }
+
+        /* QR Container - Örnek2 Shadow Stili */
         .qr-wrapper {
-            border-radius: 24px;
+            border-radius: 20px;
             overflow: hidden;
-            border: 2px solid var(--border);
+            border: 3px solid var(--primary);
             background: #000;
             position: relative;
-            margin: 15px 0;
-            min-height: 250px;
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+            margin: 20px 0;
+            min-height: 280px;
+            box-shadow: var(--shadow-glow);
+        }
+
+        .qr-wrapper::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 220px;
+            height: 220px;
+            border: 2px dashed rgba(255, 193, 7, 0.5);
+            border-radius: 16px;
+            pointer-events: none;
         }
 
         /* Timer */
         .timer { 
             font-size: 42px; 
-            font-weight: 900; 
-            color: var(--green); 
+            font-weight: 800; 
+            color: var(--primary-dark); 
             text-align: center; 
-            margin: 15px 0; 
+            margin: 20px 0; 
             font-variant-numeric: tabular-nums;
-            text-shadow: 0 0 20px var(--green-glow);
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
-        /* Talimat Container */
+        /* Talimatlar - Örnek2 Message Stili */
         .talimat-container { 
-            background: rgba(0,0,0,0.2); 
-            border-radius: 20px; 
-            padding: 15px; 
-            margin: 15px 0; 
+            background: var(--bg-light); 
+            border-radius: 16px; 
+            padding: 16px; 
+            margin: 16px 0; 
             max-height: 40vh; 
-            overflow-y: auto; 
+            overflow-y: auto;
             border: 1px solid var(--border);
         }
         
         .talimat-item { 
-            background: var(--card); 
+            background: #fff; 
             border-radius: 12px; 
-            padding: 14px; 
+            padding: 16px; 
             margin-bottom: 10px; 
-            border-left: 4px solid var(--blue); 
+            border-left: 4px solid var(--primary);
             font-size: 14px; 
-            color: var(--text-dim);
+            color: var(--text-gray);
             line-height: 1.5;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            transition: all 0.2s;
+        }
+        
+        .talimat-item:hover {
+            transform: translateX(4px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
 
-        /* Bottom Sheet Modal - örnek.txt stili */
+        /* Modal - Bottom Sheet Örnek2 Stili */
         .modal {
             position: fixed;
             bottom: -100%; 
             left: 0; 
             width: 100%; 
             height: 100%;
-            background: rgba(0,0,0,0.85); 
-            backdrop-filter: blur(12px);
+            background: rgba(0,0,0,0.6); 
             z-index: 1000; 
             display: flex; 
             align-items: flex-end;
-            transition: bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: bottom 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
         .modal.active { bottom: 0; }
         
         .modal-content {
-            background: var(--card); 
+            background: #fff; 
             width: 100%; 
-            border-radius: 36px 36px 0 0;
-            padding: 30px; 
-            border-top: 1px solid var(--border); 
-            max-height: 90vh; 
+            border-radius: 24px 24px 0 0;
+            padding: 28px; 
+            border-top: 4px solid var(--primary);
+            max-height: 85vh; 
             overflow-y: auto;
-            box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.3);
         }
 
-        /* Verification specific */
         .verification-content {
-            border: 2px solid var(--red);
-            background: linear-gradient(180deg, var(--card) 0%, rgba(218, 54, 51, 0.05) 100%);
+            border-top: 4px solid var(--error);
         }
 
         .verification-header {
-            color: var(--red);
+            color: var(--error);
             font-size: 1.2rem;
             font-weight: 800;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             text-align: center;
-            letter-spacing: 0.5px;
         }
 
         .verification-info {
-            background: rgba(0,0,0,0.3);
+            background: var(--bg-light);
             border-radius: 16px;
             padding: 20px;
-            margin: 20px 0;
+            margin: 16px 0;
             border: 1px solid var(--border);
             text-align: center;
         }
 
         .verification-birim {
-            color: var(--blue);
-            font-size: 1.2rem;
+            color: var(--primary-dark);
+            font-size: 1.3rem;
             font-weight: 800;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
         }
 
         .verification-kod {
-            color: var(--gray);
+            color: var(--text-gray);
             font-size: 0.9rem;
             font-family: monospace;
         }
@@ -317,7 +438,7 @@
             width: 100%;
             height: 280px;
             background: #000;
-            border-radius: 20px;
+            border-radius: 16px;
             border: 3px solid var(--border);
             overflow: hidden;
             margin: 20px 0;
@@ -325,14 +446,13 @@
         }
 
         .verification-camera-box.success {
-            border-color: var(--green);
-            box-shadow: 0 0 30px var(--green-glow);
+            border-color: var(--success);
+            box-shadow: 0 0 30px rgba(76, 175, 80, 0.4);
         }
 
         .verification-camera-box.error {
-            border-color: var(--red);
+            border-color: var(--error);
             animation: shake 0.5s;
-            box-shadow: 0 0 30px var(--red-glow);
         }
 
         @keyframes shake {
@@ -342,86 +462,70 @@
         }
 
         .verification-status {
-            margin: 20px 0;
-            padding: 16px;
+            margin: 16px 0;
+            padding: 14px;
             border-radius: 12px;
             font-weight: 700;
             font-size: 14px;
-            min-height: 60px;
+            min-height: 50px;
             display: flex;
             align-items: center;
             justify-content: center;
             flex-direction: column;
-            gap: 5px;
             text-align: center;
         }
 
         .verification-status.success {
-            background: rgba(35, 134, 54, 0.2);
-            color: var(--green);
-            border: 2px solid var(--green);
+            background: rgba(76, 175, 80, 0.1);
+            color: var(--success);
+            border: 2px solid var(--success);
         }
 
         .verification-status.error {
-            background: rgba(218, 54, 51, 0.1);
-            color: var(--red);
-            border: 2px solid var(--red);
+            background: rgba(244, 67, 54, 0.1);
+            color: var(--error);
+            border: 2px solid var(--error);
         }
 
         .verification-status.waiting {
-            background: rgba(255, 166, 87, 0.1);
-            color: var(--orange);
-            border: 2px solid var(--orange);
+            background: rgba(255, 111, 0, 0.1);
+            color: #ef6c00;
+            border: 2px solid #ef6c00;
         }
 
-        /* Info Modal */
         .modal-title {
             font-size: 1.3rem;
-            margin-bottom: 15px;
-            color: var(--blue);
+            margin-bottom: 12px;
+            color: var(--primary-dark);
             font-weight: 800;
             text-align: center;
         }
 
         .modal-text {
-            color: var(--text-dim);
-            margin-bottom: 25px;
-            line-height: 1.6;
+            color: var(--text-gray);
+            margin-bottom: 20px;
+            line-height: 1.5;
             text-align: center;
             font-size: 15px;
         }
 
-        /* History */
+        /* History - Örnek2 Mesaj Stili */
         .history-row { 
             display: flex; 
             justify-content: space-between; 
             align-items: center;
-            padding: 14px 12px; 
-            border-bottom: 1px solid var(--border); 
-            font-size: 14px; 
+            padding: 14px; 
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+        .history-row:hover {
+            background: var(--bg-light);
+            border-radius: 8px;
         }
         .history-row:last-child { border-bottom: none; }
-        .history-status-completed { color: var(--green); font-weight: 700; }
-        .history-status-active { color: var(--blue); font-weight: 700; }
-
-        /* Utility */
-        .hidden { display: none !important; }
-        .page { animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255,255,255,.3);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 1s ease-in-out infinite;
-            margin-right: 10px;
-            vertical-align: middle;
-        }
-
-        @keyframes spin { to { transform: rotate(360deg); } }
+        .history-status-completed { color: var(--success); font-weight: 700; }
+        .history-status-active { color: #2196F3; font-weight: 700; }
 
         /* Navigation Header */
         .nav-header {
@@ -429,235 +533,300 @@
             align-items: center;
             justify-content: space-between;
             margin-bottom: 20px;
+            padding: 0 4px;
         }
 
         .nav-title {
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             font-weight: 800;
-            color: var(--blue);
-            letter-spacing: 0.5px;
+            color: var(--text-dark);
         }
 
         .nav-back {
-            background: var(--card);
+            background: var(--bg-light);
             border: 1px solid var(--border);
-            color: var(--text-dim);
-            font-size: 20px;
+            color: var(--text-gray);
+            font-size: 24px;
             cursor: pointer;
-            padding: 10px 16px;
-            border-radius: 12px;
-            transition: var(--transition);
+            padding: 8px;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
         }
         .nav-back:hover {
-            background: var(--border);
-            color: var(--text-main);
+            background: var(--primary);
+            color: var(--text-dark);
+            border-color: var(--primary);
         }
 
-        /* Birim info box */
+        /* Birim Info Box */
         .birim-info-box {
             text-align: center; 
-            margin: 15px 0; 
-            background: rgba(0,0,0,0.3); 
-            padding: 25px; 
-            border-radius: 20px; 
-            border: 1px solid var(--border);
+            margin: 20px 0; 
+            background: var(--bg-light); 
+            padding: 24px; 
+            border-radius: 16px; 
+            border: 2px solid var(--primary);
+            box-shadow: var(--shadow-glow);
         }
 
         .birim-info-box .title {
             font-size: 1.5rem; 
             font-weight: 800; 
-            color: var(--blue); 
-            margin-bottom: 8px;
+            color: var(--primary-dark);
+            margin-bottom: 6px;
         }
 
         .birim-info-box .kod {
-            color: var(--text-dim); 
+            color: var(--text-gray); 
             font-family: monospace; 
             font-size: 0.9rem;
         }
 
-        /* Footer - Sadece altta, 2 satır */
-        .footer {
-            text-align: center;
-            padding: 25px 20px;
-            background: rgba(22, 27, 34, 0.5);
-            border-top: 1px solid var(--border);
-            margin-top: auto;
-        }
-
-        .footer-content {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            margin-bottom: 10px;
-        }
-
-        .footer-line {
-            color: var(--text-dim);
-            font-size: 13px;
-            font-weight: 600;
-        }
-
-        .footer-line .label {
-            color: var(--blue);
-            font-weight: 700;
-        }
-
-        .footer-line .name {
-            color: var(--text-main);
-            font-weight: 700;
-        }
-
-        .footer-line .title {
-            color: var(--text-dim);
-            font-size: 12px;
-            font-weight: 500;
-        }
-
-        .footer-tech {
-            color: var(--text-dim);
-            font-size: 11px;
-            font-family: monospace;
-            opacity: 0.7;
-            margin-top: 5px;
-        }
-
-        /* Active Job */
-        .active-job-card {
-            border-left: 6px solid var(--blue);
-            background: linear-gradient(90deg, rgba(88, 166, 255, 0.1) 0%, var(--card) 100%);
+        /* Security Card */
+        .security-card {
+            border: 2px solid #ff9800;
+            background: linear-gradient(180deg, rgba(255, 152, 0, 0.05) 0%, transparent 100%);
         }
 
         .security-warning {
-            color: var(--orange);
-            font-weight: 700;
+            color: #ef6c00;
+            font-weight: 800;
             font-size: 14px;
             text-align: center;
-            margin-bottom: 10px;
-            letter-spacing: 0.5px;
+            margin-bottom: 8px;
         }
 
         .security-subtext {
-            color: var(--text-dim);
+            color: var(--text-gray);
             font-size: 13px;
             text-align: center;
             margin-bottom: 20px;
         }
+
+        /* Active Job - Örnek2 Chat Bubble Stili */
+        .active-job-card {
+            border-left: 5px solid var(--primary);
+            background: linear-gradient(90deg, rgba(255, 193, 7, 0.1) 0%, transparent 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .active-job-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary) 0%, transparent 100%);
+        }
+
+        /* Utility */
+        .hidden { display: none !important; }
+        .page { animation: fadeIn 0.4s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(0,0,0,0.1);
+            border-radius: 50%;
+            border-top-color: var(--primary-dark);
+            animation: spin 1s linear infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .content-wrapp { padding: 16px; }
+            .card { padding: 20px; border-radius: 14px; }
+            .timer { font-size: 36px; }
+            .app-detail h1 { font-size: 1.4rem; }
+            .footer-info { font-size: 10px; }
+            .footer-info span { margin: 0 4px; }
+        }
     </style>
 </head>
 <body>
-    <!-- Header - örnek.txt stili (tek ve sade) -->
-    <header>
-        <h1>MGD CleanOS v4.1</h1>
-        <div class="header-sub">Nazilli Devlet Hastanesi Dijital Sistem</div>
-    </header>
+    <!-- HEADER - ÜSTTE STICKY (Örnek2 Stili) -->
+    <div class="header-wrapp">
+        <!-- FOOTER BİLGİLERİ - ÜSTTE -->
+        <div class="footer-info">
+            <span><span class="label">Kodlayan:</span> <span class="name">Mustafa GÜNEŞDOĞDU</span></span> | 
+            <span><span class="label">Destek:</span> <span class="name">Ahmet KAHREMAN</span></span>
+        </div>
+        
+        <div class="app-detail">
+            <h1>MGD CleanOS v4.2</h1>
+            <div class="subtitle">Nazilli Devlet Hastanesi</div>
+            <div class="status-indicator connecting" id="status-indicator">
+                <span class="material-icons" style="font-size: 14px;">sync</span>
+                <span id="status-text">BAĞLANIYOR...</span>
+            </div>
+        </div>
+        
+        <!-- DALGA ANİMASYONU -->
+        <div class="wave-wrapp">
+            <svg class="wave" xmlns="http://www.w3.org/2000/svg" viewBox="0 24 150 28" preserveAspectRatio="none">
+                <defs>
+                    <path id="gentle-wave" d="m -160,44.4 c 30,0 58,-18 87.7,-18 30.3,0 58.3,18 87.3,18 30,0 58,-18 88,-18 30,0 58,18 88,18 l 0,34.5 -351,0 z" />
+                </defs>
+                <g class="parallax">
+                    <use xlink:href="#gentle-wave" x="50" y="0" fill="rgba(255, 255, 255, 0.7)"/>
+                    <use xlink:href="#gentle-wave" x="50" y="3" fill="rgba(255, 255, 255, 0.5)"/>
+                    <use xlink:href="#gentle-wave" x="50" y="6" fill="#f5f5f5"/>  
+                </g>
+            </svg>
+        </div>
+    </div>
 
-    <!-- Status -->
-    <div id="status" class="status connecting">🟡 BAĞLANILIYOR...</div>
-
-    <!-- Container -->
-    <div class="container">
+    <!-- CONTENT -->
+    <div class="content-wrapp">
         
         <!-- Sayfa 1: Login -->
         <div id="page-login" class="page">
             <div class="card">
-                <div class="input-label">PERSONEL TC KİMLİK</div>
+                <div class="input-label">Personel TC Kimlik</div>
                 <input type="text" class="form-input" id="tc-input" maxlength="11" placeholder="00000000000" inputmode="numeric">
-                <button class="btn btn-primary" id="btn-login" onclick="login()">SİSTEME GİRİŞ YAP</button>
-                <div id="login-error" style="color: var(--red); text-align: center; margin-top: 15px; font-size: 13px; font-weight: 600;"></div>
+                <button class="btn btn-primary" id="btn-login" onclick="login()">
+                    <span class="material-icons" style="font-size: 18px;">login</span>
+                    SİSTEME GİRİŞ YAP
+                </button>
+                <div id="login-error" style="color: var(--error); text-align: center; margin-top: 16px; font-size: 13px; font-weight: 700;"></div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 30px; color: var(--text-light); font-size: 12px;">
+                <span class="material-icons" style="font-size: 40px; opacity: 0.3;">cleaning_services</span>
+                <p style="margin-top: 10px; opacity: 0.7;">Dijital Temizlik Yönetim Sistemi</p>
             </div>
         </div>
 
         <!-- Sayfa 2: QR Okuma -->
         <div id="page-qr" class="page hidden">
             <div class="card">
-                <h3 id="greeting-qr" style="color: var(--blue); margin-bottom: 5px; text-align: center; font-size: 1.2rem;"></h3>
-                <p style="color: var(--text-dim); font-size: 0.85rem; text-align: center; margin-bottom: 20px;" id="personel-info-qr"></p>
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <h3 id="greeting-qr" style="color: var(--primary-dark); margin-bottom: 6px; font-size: 1.3rem; font-weight: 800;"></h3>
+                    <p style="color: var(--text-gray); font-size: 0.9rem;" id="personel-info-qr"></p>
+                </div>
                 
-                <div class="input-label">BİRİM QR KODU OKUTUN</div>
+                <div class="input-label">Birim QR Kodu Okutun</div>
                 <div class="qr-wrapper" id="main-qr-container"></div>
                 
-                <button class="btn btn-secondary" onclick="logout()">← ÇIKIŞ YAP</button>
+                <button class="btn btn-secondary" onclick="logout()">
+                    <span class="material-icons" style="font-size: 18px;">logout</span>
+                    Çıkış Yap
+                </button>
             </div>
         </div>
 
         <!-- Sayfa 3: Onay -->
         <div id="page-confirm" class="page hidden">
             <div class="card">
-                <div class="input-label">SEÇİLİ BİRİM</div>
+                <div class="input-label">Seçili Birim</div>
                 <div class="birim-info-box">
                     <div id="confirm-birim-adi" class="title">Birim Adı</div>
                     <div id="confirm-birim-kod" class="kod">Kod: XXX</div>
                     
-                    <div id="talimat-info" class="hidden" style="margin-top: 15px;">
-                        <span style="display: inline-flex; align-items: center; gap: 6px; background: rgba(88, 166, 255, 0.1); color: var(--blue); padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 700; border: 1px solid var(--blue);">
-                            📋 <span id="talimat-sayisi">0</span> Talimat
+                    <div id="talimat-info" class="hidden" style="margin-top: 12px;">
+                        <span style="display: inline-flex; align-items: center; gap: 6px; background: var(--primary); color: var(--text-dark); padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 700;">
+                            <span class="material-icons" style="font-size: 16px;">assignment</span>
+                            <span id="talimat-sayisi">0</span> Talimat
                         </span>
                     </div>
                 </div>
                 
-                <button class="btn btn-blue" onclick="showTalimatlarPage()" style="margin-bottom: 12px;">📋 TALİMATLARI GÖR</button>
+                <button class="btn btn-blue" onclick="showTalimatlarPage()" style="margin-bottom: 12px;">
+                    <span class="material-icons" style="font-size: 18px;">visibility</span>
+                    Talimatları Gör
+                </button>
             </div>
             
-            <div class="card" style="border: 2px solid var(--orange); background: linear-gradient(180deg, var(--card) 0%, rgba(255, 166, 87, 0.05) 100%);">
-                <div class="security-warning">🔐 GÜVENLİK DOĞRULAMASI</div>
+            <div class="card security-card">
+                <div class="security-warning">
+                    <span class="material-icons" style="font-size: 20px; vertical-align: middle; margin-right: 4px;">security</span>
+                    Güvenlik Doğrulaması
+                </div>
                 <div class="security-subtext">Temizliğe başlamak için birim QR kodunu tekrar okutun</div>
                 
-                <button class="btn btn-primary" id="btn-start" onclick="openVerification('baslat')" style="height: 55px; font-size: 15px; margin-bottom: 12px;">
-                    🔐 QR DOĞRULA ve BAŞLAT
+                <button class="btn btn-primary" id="btn-start" onclick="openVerification('baslat')" style="height: 56px; font-size: 15px; margin-bottom: 12px;">
+                    <span class="material-icons" style="font-size: 20px;">qr_code_scanner</span>
+                    QR Doğrula ve Başlat
                 </button>
-                <button class="btn btn-danger" onclick="cancelCleaning()">✗ İPTAL</button>
+                <button class="btn btn-secondary" onclick="cancelCleaning()" style="color: var(--error); border-color: rgba(244,67,54,0.3);">
+                    <span class="material-icons" style="font-size: 18px;">cancel</span>
+                    İptal
+                </button>
             </div>
         </div>
 
         <!-- Sayfa 4: Talimatlar -->
         <div id="page-talimatlar" class="page hidden">
             <div class="nav-header">
-                <button class="nav-back" onclick="backToConfirm()">←</button>
-                <div class="nav-title">📋 Talimatlar</div>
+                <button class="nav-back" onclick="backToConfirm()">
+                    <span class="material-icons">arrow_back</span>
+                </button>
+                <div class="nav-title">Talimatlar</div>
                 <div style="width: 40px;"></div>
             </div>
             
-            <div style="background: var(--card); border-radius: 20px; padding: 20px; margin-bottom: 20px; border: 1px solid var(--border); text-align: center;">
-                <div id="talimat-birim-adi" style="font-size: 1.3rem; font-weight: 800; color: var(--blue); margin-bottom: 5px;"></div>
-                <div id="talimat-birim-kod" style="color: var(--text-dim); font-family: monospace; font-size: 0.85rem;"></div>
+            <div style="background: var(--bg-white); border-radius: 16px; padding: 20px; margin-bottom: 16px; border: 1px solid var(--border); text-align: center; box-shadow: var(--shadow);">
+                <div id="talimat-birim-adi" style="font-size: 1.3rem; font-weight: 800; color: var(--primary-dark); margin-bottom: 4px;"></div>
+                <div id="talimat-birim-kod" style="color: var(--text-gray); font-family: monospace; font-size: 0.85rem;"></div>
             </div>
 
             <div class="card" style="margin-top: 0;">
-                <div style="background: rgba(218, 54, 51, 0.1); border: 1px solid var(--red); border-radius: 12px; padding: 15px; margin-bottom: 20px; color: var(--red); font-size: 13px; line-height: 1.5; font-weight: 600;">
-                    ⚠️ Bu talimatları dikkatlice okuyunuz. Temizliğe başlamadan önce tüm maddeleri uyguladığınızdan emin olunuz.
+                <div style="background: rgba(255, 152, 0, 0.1); border: 1px solid rgba(255, 152, 0, 0.3); border-radius: 12px; padding: 14px; margin-bottom: 20px; color: #ef6c00; font-size: 13px; line-height: 1.4; font-weight: 600; display: flex; align-items: center; gap: 8px;">
+                    <span class="material-icons" style="font-size: 20px;">warning</span>
+                    <span>Bu talimatları dikkatlice okuyunuz. Temizliğe başlamadan önce tüm maddeleri uyguladığınızdan emin olunuz.</span>
                 </div>
                 
                 <div class="talimat-container" id="talimat-liste"></div>
                 
-                <button class="btn btn-primary" onclick="backToConfirm()">✓ ANLADIM, GERİ DÖN</button>
+                <button class="btn btn-primary" onclick="backToConfirm()">
+                    <span class="material-icons" style="font-size: 18px;">check_circle</span>
+                    Anladım, Geri Dön
+                </button>
             </div>
         </div>
 
         <!-- Sayfa 5: İşlem Yönetimi -->
         <div id="page-job" class="page hidden">
             <div style="text-align: center; padding: 10px 0 20px;">
-                <h3 id="greeting-job" style="color: var(--blue); font-size: 1.2rem; margin-bottom: 5px;"></h3>
-                <p style="color: var(--text-dim); font-size: 0.85rem;" id="personel-info-job"></p>
+                <h3 id="greeting-job" style="color: var(--primary-dark); font-size: 1.3rem; margin-bottom: 6px; font-weight: 800;"></h3>
+                <p style="color: var(--text-gray); font-size: 0.9rem;" id="personel-info-job"></p>
             </div>
             
             <div id="active-job-card"></div>
             <div id="history-job-section"></div>
             
-            <button class="btn btn-secondary" onclick="logout()" style="margin-top: 10px;">OTURUMU KAPAT</button>
+            <button class="btn btn-secondary" onclick="logout()" style="margin-top: 10px;">
+                <span class="material-icons" style="font-size: 18px;">power_settings_new</span>
+                Oturumu Kapat
+            </button>
         </div>
     </div>
 
-    <!-- QR Doğrulama Modal (Bottom Sheet) -->
+    <!-- Doğrulama Modal -->
     <div class="modal" id="verification-modal">
         <div class="modal-content verification-content">
-            <div class="verification-header">🔐 GÜVENLİK DOĞRULAMA</div>
-            <div style="color: var(--text-dim); margin-bottom: 15px; font-size: 14px; text-align: center;">
+            <div class="verification-header">
+                <span class="material-icons" style="font-size: 40px; margin-bottom: 8px; display: block;">security</span>
+                Güvenlik Doğrulama
+            </div>
+            <div style="color: var(--text-gray); margin-bottom: 16px; font-size: 14px; text-align: center;">
                 İşlem yapabilmek için doğru birimi okutun
             </div>
             
             <div class="verification-info">
-                <div style="color: var(--text-dim); font-size: 11px; margin-bottom: 8px; font-weight: 700; text-transform: uppercase;">BEKLENEN BİRİM:</div>
+                <div style="color: var(--text-gray); font-size: 11px; margin-bottom: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Beklenen Birim:</div>
                 <div class="verification-birim" id="verification-birim-adi">Birim Adı</div>
                 <div class="verification-kod" id="verification-birim-kod">Kod: XXX</div>
             </div>
@@ -670,41 +839,25 @@
                 Kamerayı QR koda doğru tutun...
             </div>
             
-            <button class="btn btn-danger" onclick="closeVerification()">✗ İPTAL</button>
+            <button class="btn btn-secondary" onclick="closeVerification()" style="color: var(--error);">
+                <span class="material-icons" style="font-size: 18px;">cancel</span>
+                İptal
+            </button>
         </div>
     </div>
 
-    <!-- Bilgi Modal (Bottom Sheet) -->
+    <!-- Bilgi Modal -->
     <div class="modal" id="info-modal">
         <div class="modal-content">
             <div class="modal-title" id="info-modal-title"></div>
             <div class="modal-text" id="info-modal-text"></div>
-            <button class="btn btn-primary" onclick="closeInfoModal()">TAMAM</button>
-        </div>
-    </div>
-
-    <!-- Footer - Tek ve Altta, 2 Satırlık -->
-    <div class="footer">
-        <div class="footer-content">
-            <div class="footer-line">
-                <span class="label">Kodlayan:</span>
-                <span class="name">Mustafa GÜNEŞDOĞDU</span>
-                <span class="title">- Bilgisayar Programcısı</span>
-            </div>
-            <div class="footer-line">
-                <span class="label">Destek:</span>
-                <span class="name">Ahmet KAHREMAN</span>
-                <span class="title">- Bilgi İşlem Sorumlusu</span>
-            </div>
-        </div>
-        <div class="footer-tech">
-            Cihaz: <span id="device-id"></span> | v4.1 Qr_Control | MGD CleanOS © 2026
+            <button class="btn btn-primary" onclick="closeInfoModal()">Tamam</button>
         </div>
     </div>
 
     <script>
-        // ==================== KONFİGÜRASYON v4.1 ====================
-        const APP_VERSION = '4.1';
+        // ==================== KONFİGÜRASYON v4.2 ====================
+        const APP_VERSION = '4.2';
         const MQTT_CONFIG = {
             protocol: 'wss',
             hostname: 'broker.emqx.io',
@@ -738,7 +891,7 @@
         
         // ==================== MQTT BAĞLANTI ====================
         function connectMQTT() {
-            updateStatus('connecting', '🟡 BAĞLANILIYOR...');
+            updateStatus('connecting', 'BAĞLANIYOR...', 'sync');
             
             try {
                 const options = {
@@ -754,18 +907,17 @@
                 mqttClient.on('connect', () => {
                     console.log('[MQTT] Bağlandı');
                     isConnected = true;
-                    updateStatus('online', '🟢 SİSTEM AKTİF');
-                    mqttClient.subscribe(`${TOPIC_CEVAP_BASE}${DEV_ID}`);
+                    updateStatus('online', 'SİSTEM AKTİF', 'check_circle');
                 });
                 
                 mqttClient.on('disconnect', () => {
                     isConnected = false;
-                    updateStatus('offline', '🔴 BAĞLANTI KESİLDİ');
+                    updateStatus('offline', 'BAĞLANTI KESİLDİ', 'error');
                 });
                 
                 mqttClient.on('error', (err) => {
                     console.error('[MQTT] Hata:', err);
-                    updateStatus('error', '🔴 BAĞLANTI HATASI');
+                    updateStatus('error', 'BAĞLANTI HATASI', 'error');
                 });
                 
                 mqttClient.on('message', (topic, message) => {
@@ -779,14 +931,16 @@
                 
             } catch(e) {
                 console.error('[MQTT] Bağlantı hatası:', e);
-                updateStatus('error', '🔴 BAĞLANTI KURULAMADI');
+                updateStatus('error', 'BAĞLANTI KURULAMADI', 'error');
             }
         }
         
-        function updateStatus(type, text) {
-            const el = document.getElementById('status');
-            el.className = 'status ' + type;
-            el.textContent = text;
+        function updateStatus(type, text, icon) {
+            const el = document.getElementById('status-indicator');
+            const textEl = document.getElementById('status-text');
+            el.className = 'status-indicator ' + type;
+            textEl.textContent = text;
+            el.querySelector('.material-icons').textContent = icon || (type === 'online' ? 'check_circle' : type === 'connecting' ? 'sync' : 'error');
         }
         
         async function sendMQTT(tip, birim = '', tc = '') {
@@ -881,7 +1035,6 @@
                             baslama_zamani: yanit.aktif_islem.baslama_zamani || new Date().toISOString()
                         };
                         
-                        // Talimatları al
                         try {
                             const detay = await sendMQTT('BIRIM_DETAY', yanit.aktif_islem.birim_kodu, tc);
                             if (detay?.status === 'OK') {
@@ -905,7 +1058,7 @@
             }
             
             btn.disabled = false;
-            btn.textContent = 'SİSTEME GİRİŞ YAP';
+            btn.innerHTML = '<span class="material-icons" style="font-size: 18px;">login</span> SİSTEME GİRİŞ YAP';
         }
         
         // ==================== KAMERA YÖNETİMİ ====================
@@ -938,7 +1091,7 @@
                 console.error('[Kamera] Başlatma hatası:', err);
                 const container = document.getElementById(elementId);
                 if (container) {
-                    container.innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 100%; color: var(--red); text-align: center; padding: 20px; font-size: 14px; flex-direction: column; gap: 10px;"><div style="font-size: 40px;">📷</div><div>Kamera erişimi reddedildi.<br>Lütfen tarayıcı izinlerini kontrol edin.</div></div>';
+                    container.innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #f44336; text-align: center; padding: 20px; font-size: 14px; flex-direction: column; gap: 10px;"><span class="material-icons" style="font-size: 48px;">error</span><div>Kamera erişimi reddedildi.<br>Lütfen tarayıcı izinlerini kontrol edin.</div></div>';
                 }
             }
         }
@@ -1009,7 +1162,7 @@
                     liste.appendChild(madde);
                 });
             } else {
-                liste.innerHTML = '<div style="text-align: center; color: var(--text-dim); padding: 20px;">Bu birim için talimat bulunmamaktadır.</div>';
+                liste.innerHTML = '<div style="text-align: center; color: var(--text-gray); padding: 20px;">Bu birim için talimat bulunmamaktadır.</div>';
             }
             
             showPage('talimatlar');
@@ -1169,13 +1322,13 @@
                     console.error('[İşlem] Başlatma başarısız:', yanit);
                     showInfoModal('✗ Hata', yanit?.message || 'Başlatma başarısız');
                     btn.disabled = false;
-                    btn.innerHTML = '🔐 QR DOĞRULA ve BAŞLAT';
+                    btn.innerHTML = '<span class="material-icons" style="font-size: 20px;">qr_code_scanner</span> QR Doğrula ve Başlat';
                 }
             } catch (err) {
                 console.error('[İşlem] Başlatma hatası:', err);
                 showInfoModal('✗ Hata', err.message);
                 btn.disabled = false;
-                btn.innerHTML = '🔐 QR DOĞRULA ve BAŞLAT';
+                btn.innerHTML = '<span class="material-icons" style="font-size: 20px;">qr_code_scanner</span> QR Doğrula ve Başlat';
             }
         }
         
@@ -1236,12 +1389,13 @@
             if (!state.aktifIslem) {
                 container.innerHTML = `
                     <div class="card" style="text-align: center; border: 2px dashed var(--border); background: transparent;">
-                        <div style="color: var(--text-dim); padding: 30px; font-size: 16px;">
-                            <div style="font-size: 40px; margin-bottom: 15px;">⚪</div>
+                        <div style="color: var(--text-gray); padding: 40px; font-size: 16px;">
+                            <span class="material-icons" style="font-size: 56px; opacity: 0.3; margin-bottom: 16px; display: block;">inbox</span>
                             Aktif Temizlik Yok
                         </div>
                         <button class="btn btn-blue" onclick="showQRPage()">
-                            + YENİ TEMİZLİK BAŞLAT
+                            <span class="material-icons" style="font-size: 20px;">add_circle</span>
+                            YENİ TEMİZLİK BAŞLAT
                         </button>
                     </div>
                 `;
@@ -1265,18 +1419,20 @@
             
             container.innerHTML = `
                 <div class="card active-job-card">
-                    <div style="color: var(--blue); font-weight: 800; margin-bottom: 10px; font-size: 12px; letter-spacing: 0.5px; text-transform: uppercase;">
-                        🔵 DEVAM EDEN TEMİZLİK
+                    <div style="color: var(--primary-dark); font-weight: 800; margin-bottom: 12px; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; display: flex; align-items: center; gap: 6px;">
+                        <span class="material-icons" style="font-size: 16px;">sync</span>
+                        DEVAM EDEN TEMİZLİK
                     </div>
-                    <div style="font-size: 1.5rem; font-weight: 800; margin: 15px 0; color: var(--text-main);">
+                    <div style="font-size: 1.6rem; font-weight: 800; margin: 16px 0; color: var(--text-dark);">
                         🏢 ${birimAdi}
                     </div>
-                    <div style="color: var(--text-dim); margin-bottom: 20px; font-family: monospace; font-size: 14px;">
+                    <div style="color: var(--text-gray); margin-bottom: 24px; font-family: monospace; font-size: 14px;">
                         Kod: ${birimKod}
                     </div>
                     <div class="timer">⏱️ ${sureText}</div>
-                    <button class="btn btn-primary" onclick="openVerification('bitir')" style="height: 55px; font-size: 15px;">
-                        🔐 QR DOĞRULA ve BİTİR
+                    <button class="btn btn-primary" onclick="openVerification('bitir')" style="height: 56px; font-size: 15px;">
+                        <span class="material-icons" style="font-size: 20px;">qr_code_scanner</span>
+                        QR Doğrula ve Bitir
                     </button>
                 </div>
             `;
@@ -1289,15 +1445,18 @@
                 return;
             }
             
-            let html = '<div class="card"><div class="input-label" style="margin-bottom: 15px;">SON İŞLEMLER</div>';
+            let html = '<div class="card"><div class="input-label" style="margin-bottom: 16px;">Son İşlemler</div>';
             [...state.islemGecmisi].reverse().slice(0, 5).forEach(islem => {
                 const durumClass = islem.durum === 'Tamamlandı' ? 'history-status-completed' : 'history-status-active';
-                const durumIcon = islem.durum === 'Tamamlandı' ? '✓' : '▶';
+                const durumIcon = islem.durum === 'Tamamlandı' ? 'check_circle' : 'play_circle';
                 html += `
                     <div class="history-row">
-                        <span style="color: var(--text-dim); font-size: 13px;">${islem.saat}</span>
-                        <span style="flex: 1; margin: 0 10px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${islem.birim}</span>
-                        <span class="${durumClass}" style="font-size: 13px;">${durumIcon} ${islem.durum}</span>
+                        <span style="color: var(--text-gray); font-size: 13px; font-weight: 600;">${islem.saat}</span>
+                        <span style="flex: 1; margin: 0 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600;">${islem.birim}</span>
+                        <span class="${durumClass}" style="font-size: 13px; display: flex; align-items: center; gap: 4px;">
+                            <span class="material-icons" style="font-size: 16px;">${durumIcon}</span>
+                            ${islem.durum}
+                        </span>
                     </div>
                 `;
             });
@@ -1337,11 +1496,8 @@
             this.value = this.value.replace(/[^0-9]/g, '');
         });
         
-        document.getElementById('device-id').textContent = DEV_ID;
-        
         window.addEventListener('load', () => {
             connectMQTT();
-            // Kayıtlı TC varsa input'a yaz
             if (state.tcNo) {
                 document.getElementById('tc-input').value = state.tcNo;
             }

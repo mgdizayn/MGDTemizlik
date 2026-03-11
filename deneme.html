@@ -18,48 +18,34 @@
             --bg: #0d1117;
             --bg-glass: rgba(22, 27, 34, 0.85);
             --card: #161b22;
-            --card-hover: #1c2128;
             --blue: #58a6ff;
-            --blue-glow: rgba(88, 166, 255, 0.3);
-            --blue-soft: rgba(88, 166, 255, 0.1);
+            --blue-glow: rgba(88, 166, 255, 0.2);
             --green: #238636;
             --green-glow: rgba(35, 134, 54, 0.3);
-            --green-soft: rgba(35, 134, 54, 0.1);
             --red: #da3633;
             --red-glow: rgba(218, 54, 51, 0.3);
-            --red-soft: rgba(218, 54, 51, 0.1);
             --orange: #ffa657;
-            --orange-soft: rgba(255, 166, 87, 0.1);
-            --white: #f0f6fc;
-            --gray-light: #adbac7;
-            --gray: #8b949e;
-            --gray-dark: #484f58;
+            --orange-glow: rgba(255, 166, 87, 0.2);
             --border: #30363d;
-            --warning-bg: rgba(218, 54, 51, 0.1);
-            --warning-text: #f85149;
+            --text-main: #f0f6fc;
+            --text-dim: #8b949e;
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        * { 
-            margin: 0; 
-            padding: 0; 
-            box-sizing: border-box; 
-            -webkit-tap-highlight-color: transparent; 
-            outline: none;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: var(--bg);
-            color: var(--white);
+            color: var(--text-main);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             overflow-x: hidden;
         }
 
-        /* Header - Glassmorphism */
-        .header {
+        /* Header - örnek.txt stili */
+        header {
             position: sticky;
             top: 0;
             z-index: 100;
@@ -67,105 +53,60 @@
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--border);
-            padding: 20px;
+            padding: 15px 20px;
             text-align: center;
         }
 
-        .header-icon { 
-            font-size: 36px; 
-            margin-bottom: 8px;
-            filter: drop-shadow(0 0 10px var(--blue-glow));
+        header h1 { 
+            font-size: 1.1rem; 
+            letter-spacing: 1px; 
+            color: var(--blue); 
+            font-weight: 800; 
+        }
+        
+        .header-sub { 
+            color: var(--text-dim); 
+            font-size: 0.7rem; 
+            margin-top: 4px; 
+            font-weight: 500; 
+            text-transform: uppercase; 
+            letter-spacing: 0.5px;
         }
 
-        .header h1 {
-            color: var(--blue);
-            font-size: 1.3rem;
-            font-weight: 800;
-            letter-spacing: 1px;
-            margin-bottom: 6px;
-        }
-
-        .header-sub {
-            color: var(--gray-light);
-            font-size: 0.75rem;
-            font-weight: 500;
-            margin: 2px 0;
-            letter-spacing: 0.3px;
-        }
-
-        .header-sub2 {
-            color: var(--gray);
-            font-size: 0.7rem;
-            margin-top: 6px;
-            opacity: 0.8;
-        }
-
-        /* Status Bar */
+        /* Status */
         .status {
-            padding: 12px;
+            padding: 10px;
             font-size: 11px;
+            text-align: center;
             font-weight: 800;
             letter-spacing: 0.5px;
             text-transform: uppercase;
-            text-align: center;
-            backdrop-filter: blur(10px);
-            transition: var(--transition);
+            border-bottom: 1px solid var(--border);
         }
+        
+        .status.online { color: #3fb950; background: rgba(63, 185, 80, 0.1); }
+        .status.connecting { color: var(--orange); background: rgba(255, 166, 87, 0.1); }
+        .status.error { color: var(--red); background: rgba(218, 54, 51, 0.1); }
+        .status.offline { color: var(--red); background: rgba(218, 54, 51, 0.1); }
 
-        .status.online { 
-            color: #3fb950; 
-            background: rgba(63, 185, 80, 0.1);
-            border-bottom: 1px solid rgba(63, 185, 80, 0.2);
-        }
-        .status.offline { 
-            color: var(--red); 
-            background: var(--red-soft);
-            border-bottom: 1px solid var(--red-glow);
-        }
-        .status.connecting { 
-            color: var(--orange); 
-            background: var(--orange-soft);
-            border-bottom: 1px solid rgba(255, 166, 87, 0.2);
-        }
-        .status.error { 
-            color: var(--red); 
-            background: var(--red-soft);
-            border-bottom: 1px solid var(--red-glow);
-        }
-
-        /* Main Container */
+        /* Container */
         .container { 
             flex: 1; 
-            padding: 20px; 
+            padding: 15px; 
             max-width: 500px; 
             margin: 0 auto; 
             width: 100%;
         }
 
-        /* Cards - Modern Glassmorphism */
+        /* Cards - örnek.txt stili */
         .card {
             background: var(--card);
             border: 1px solid var(--border);
             border-radius: 24px;
             padding: 25px;
             margin-bottom: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 1px 3px rgba(0,0,0,0.3);
-            animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            transition: var(--transition);
-        }
-
-        .card:hover {
-            border-color: var(--gray-dark);
-            transform: translateY(-2px);
-        }
-
-        .card-title {
-            font-size: 1.1rem;
-            font-weight: 700;
-            margin-bottom: 20px;
-            text-align: center;
-            color: var(--white);
-            letter-spacing: 0.5px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            animation: slideUp 0.4s ease-out;
         }
 
         @keyframes slideUp {
@@ -173,53 +114,47 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        /* Form Elements */
-        .form-group { margin-bottom: 20px; }
-
-        .form-label {
-            display: block;
-            color: var(--gray-light);
-            font-size: 0.75rem;
-            margin-bottom: 10px;
-            font-weight: 600;
-            letter-spacing: 0.5px;
+        .input-label { 
+            display: block; 
+            color: var(--text-dim); 
+            font-size: 0.75rem; 
+            margin-bottom: 12px; 
+            text-align: center; 
+            font-weight: 600; 
             text-transform: uppercase;
-            text-align: center;
+            letter-spacing: 0.5px;
         }
-
+        
+        /* Input */
         .form-input {
             width: 100%;
             padding: 20px;
-            font-size: 24px;
-            font-weight: 700;
             background: #000;
             border: 2px solid var(--border);
             border-radius: 18px;
             color: var(--blue);
+            font-size: 26px;
             text-align: center;
             letter-spacing: 4px;
-            transition: var(--transition);
+            font-weight: 800;
+            margin-bottom: 20px;
             font-family: 'Inter', monospace;
+            transition: var(--transition);
         }
-
+        
         .form-input:focus {
             border-color: var(--blue);
-            box-shadow: 0 0 0 3px var(--blue-soft);
+            box-shadow: 0 0 0 3px var(--blue-glow);
         }
 
         /* Buttons */
         .btn {
             width: 100%;
             padding: 18px;
-            font-size: 14px;
-            font-weight: 700;
-            border: none;
             border-radius: 18px;
+            border: none;
+            font-weight: 700;
+            font-size: 14px;
             cursor: pointer;
             transition: var(--transition);
             display: flex;
@@ -228,223 +163,93 @@
             gap: 10px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            margin: 10px 0;
         }
-
-        .btn-primary {
-            background: var(--green);
-            color: white;
-            box-shadow: 0 4px 15px rgba(35, 134, 54, 0.3);
+        
+        .btn-primary { 
+            background: var(--green); 
+            color: white; 
+            box-shadow: 0 4px 15px rgba(35, 134, 54, 0.3); 
         }
-
         .btn-primary:hover { 
-            background: #2ea043; 
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(35, 134, 54, 0.4);
+            transform: translateY(-2px); 
+            box-shadow: 0 6px 20px rgba(35, 134, 54, 0.4); 
         }
-        .btn-primary:disabled { 
-            opacity: 0.6; 
-            cursor: not-allowed;
-            transform: none;
-        }
+        .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 
-        .btn-secondary {
-            background: var(--border);
-            color: var(--white);
+        .btn-secondary { 
+            background: var(--border); 
+            color: var(--text-main); 
+            margin-top: 10px; 
         }
-        .btn-secondary:hover {
-            background: var(--gray-dark);
-            transform: translateY(-2px);
-        }
+        .btn-secondary:hover { background: #3d444d; }
 
-        .btn-danger {
-            background: var(--red);
-            color: white;
-            box-shadow: 0 4px 15px rgba(218, 54, 51, 0.3);
-        }
-        .btn-danger:hover {
-            background: #f85149;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(218, 54, 51, 0.4);
-        }
-
-        .btn-blue {
-            background: var(--blue);
-            color: white;
+        .btn-blue { 
+            background: var(--blue); 
+            color: white; 
             box-shadow: 0 4px 15px rgba(88, 166, 255, 0.3);
         }
-        .btn-blue:hover {
-            background: #79b8ff;
+        .btn-blue:hover { 
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(88, 166, 255, 0.4);
+            box-shadow: 0 6px 20px rgba(88, 166, 255, 0.4); 
         }
 
-        /* QR Container */
-        .qr-container {
-            width: 100%;
-            height: 300px;
-            background: #000;
+        .btn-danger { 
+            background: var(--red); 
+            color: white; 
+            box-shadow: 0 4px 15px rgba(218, 54, 51, 0.3);
+        }
+        .btn-danger:hover { 
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(218, 54, 51, 0.4); 
+        }
+
+        /* QR Wrapper */
+        .qr-wrapper {
             border-radius: 24px;
             overflow: hidden;
-            margin: 15px 0;
-            position: relative;
             border: 2px solid var(--border);
+            background: #000;
+            position: relative;
+            margin: 15px 0;
+            min-height: 250px;
             box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
         }
 
-        .qr-container video {
-            width: 100% !important;
-            height: 100% !important;
-            object-fit: cover;
-        }
-
-        /* Active Job Card */
-        .active-job { 
-            border-left: 6px solid var(--blue);
-            background: linear-gradient(90deg, var(--blue-soft) 0%, var(--card) 100%);
-        }
-
-        .timer {
-            font-size: 42px;
-            font-weight: 900;
-            color: var(--green);
-            text-align: center;
-            margin: 20px 0;
+        /* Timer */
+        .timer { 
+            font-size: 42px; 
+            font-weight: 900; 
+            color: var(--green); 
+            text-align: center; 
+            margin: 15px 0; 
             font-variant-numeric: tabular-nums;
             text-shadow: 0 0 20px var(--green-glow);
-            letter-spacing: 2px;
         }
 
-        /* History */
-        .history-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 14px;
-            border-bottom: 1px solid var(--border);
-            font-size: 14px;
-            transition: var(--transition);
-        }
-        .history-item:hover {
-            background: rgba(255,255,255,0.03);
-            border-radius: 8px;
-        }
-        .history-item:last-child { border-bottom: none; }
-
-        .history-time { 
-            color: var(--gray); 
-            font-weight: 500;
-            font-size: 13px;
-        }
-        .history-status-completed { 
-            color: var(--green); 
-            font-weight: 700;
-        }
-        .history-status-active { 
-            color: var(--blue); 
-            font-weight: 700;
-        }
-
-        /* Talimatlar */
-        .talimatlar-header {
-            background: var(--card);
-            border-radius: 18px;
-            padding: 20px;
-            margin-bottom: 20px;
+        /* Talimat Container */
+        .talimat-container { 
+            background: rgba(0,0,0,0.2); 
+            border-radius: 20px; 
+            padding: 15px; 
+            margin: 15px 0; 
+            max-height: 40vh; 
+            overflow-y: auto; 
             border: 1px solid var(--border);
-            text-align: center;
         }
-
-        .talimatlar-birim-adi {
-            color: var(--blue);
-            font-size: 1.3rem;
-            font-weight: 800;
-            margin-bottom: 8px;
-        }
-
-        .talimatlar-birim-kod {
-            color: var(--gray);
-            font-size: 0.85rem;
-            font-family: monospace;
-        }
-
-        .talimat-liste {
-            background: rgba(0,0,0,0.2);
-            border-radius: 18px;
-            padding: 15px;
-            margin-bottom: 20px;
-            max-height: 50vh;
-            overflow-y: auto;
-        }
-
-        .talimat-madde {
-            background: var(--card);
-            border-radius: 12px;
-            padding: 14px;
-            margin-bottom: 10px;
-            border-left: 4px solid var(--blue);
-            text-align: left;
-            font-size: 14px;
-            line-height: 1.6;
-            color: var(--gray-light);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-            transition: var(--transition);
-        }
-        .talimat-madde:hover {
-            transform: translateX(5px);
-            border-left-width: 6px;
-        }
-
-        .talimat-uyari {
-            background: var(--warning-bg);
-            border: 1px solid var(--warning-text);
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 20px;
-            color: var(--warning-text);
-            font-size: 13px;
+        
+        .talimat-item { 
+            background: var(--card); 
+            border-radius: 12px; 
+            padding: 14px; 
+            margin-bottom: 10px; 
+            border-left: 4px solid var(--blue); 
+            font-size: 14px; 
+            color: var(--text-dim);
             line-height: 1.5;
-            font-weight: 600;
         }
 
-        /* Navigation Header */
-        .nav-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 15px 0;
-            margin-bottom: 15px;
-        }
-
-        .nav-title {
-            font-size: 1.1rem;
-            font-weight: 800;
-            color: var(--blue);
-            letter-spacing: 0.5px;
-        }
-
-        .nav-back {
-            background: var(--card);
-            border: 1px solid var(--border);
-            color: var(--gray-light);
-            font-size: 20px;
-            cursor: pointer;
-            padding: 10px 16px;
-            border-radius: 12px;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .nav-back:hover {
-            background: var(--border);
-            color: var(--white);
-            transform: translateX(-3px);
-        }
-
-        /* Bottom Sheet Modal (Modern) */
+        /* Bottom Sheet Modal - örnek.txt stili */
         .modal {
-            display: none;
             position: fixed;
             bottom: -100%; 
             left: 0; 
@@ -453,27 +258,25 @@
             background: rgba(0,0,0,0.85); 
             backdrop-filter: blur(12px);
             z-index: 1000; 
+            display: flex; 
+            align-items: flex-end;
             transition: bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-
-        .modal.active { 
-            display: flex; 
-            bottom: 0;
-        }
-
+        
+        .modal.active { bottom: 0; }
+        
         .modal-content {
-            background: var(--card);
-            width: 100%;
+            background: var(--card); 
+            width: 100%; 
             border-radius: 36px 36px 0 0;
-            padding: 30px;
-            border-top: 1px solid var(--border);
-            max-height: 90vh;
+            padding: 30px; 
+            border-top: 1px solid var(--border); 
+            max-height: 90vh; 
             overflow-y: auto;
-            margin-top: auto;
-            animation: slideUp 0.4s ease-out;
             box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
         }
 
+        /* Verification specific */
         .verification-content {
             border: 2px solid var(--red);
             background: linear-gradient(180deg, var(--card) 0%, rgba(218, 54, 51, 0.05) 100%);
@@ -481,9 +284,9 @@
 
         .verification-header {
             color: var(--red);
-            font-size: 1.4rem;
+            font-size: 1.2rem;
             font-weight: 800;
-            margin-bottom: 12px;
+            margin-bottom: 15px;
             text-align: center;
             letter-spacing: 0.5px;
         }
@@ -499,9 +302,9 @@
 
         .verification-birim {
             color: var(--blue);
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             font-weight: 800;
-            margin-bottom: 8px;
+            margin-bottom: 5px;
         }
 
         .verification-kod {
@@ -512,19 +315,18 @@
 
         .verification-camera-box {
             width: 100%;
-            height: 300px;
+            height: 280px;
             background: #000;
-            border-radius: 24px;
+            border-radius: 20px;
             border: 3px solid var(--border);
             overflow: hidden;
             margin: 20px 0;
             position: relative;
-            box-shadow: inset 0 0 30px rgba(0,0,0,0.5);
         }
 
         .verification-camera-box.success {
             border-color: var(--green);
-            box-shadow: 0 0 30px var(--green-glow), inset 0 0 30px rgba(0,0,0,0.5);
+            box-shadow: 0 0 30px var(--green-glow);
         }
 
         .verification-camera-box.error {
@@ -550,32 +352,31 @@
             align-items: center;
             justify-content: center;
             flex-direction: column;
-            gap: 8px;
+            gap: 5px;
             text-align: center;
-            line-height: 1.4;
         }
 
         .verification-status.success {
-            background: var(--green-soft);
+            background: rgba(35, 134, 54, 0.2);
             color: var(--green);
             border: 2px solid var(--green);
         }
 
         .verification-status.error {
-            background: var(--warning-bg);
-            color: var(--warning-text);
-            border: 2px solid var(--warning-text);
+            background: rgba(218, 54, 51, 0.1);
+            color: var(--red);
+            border: 2px solid var(--red);
         }
 
         .verification-status.waiting {
-            background: var(--orange-soft);
+            background: rgba(255, 166, 87, 0.1);
             color: var(--orange);
             border: 2px solid var(--orange);
         }
 
         /* Info Modal */
         .modal-title {
-            font-size: 1.4rem;
+            font-size: 1.3rem;
             margin-bottom: 15px;
             color: var(--blue);
             font-weight: 800;
@@ -583,93 +384,31 @@
         }
 
         .modal-text {
-            color: var(--gray-light);
+            color: var(--text-dim);
             margin-bottom: 25px;
             line-height: 1.6;
             text-align: center;
             font-size: 15px;
         }
 
-        .modal-buttons { 
+        /* History */
+        .history-row { 
             display: flex; 
-            gap: 12px; 
-            margin-top: 10px;
+            justify-content: space-between; 
+            align-items: center;
+            padding: 14px 12px; 
+            border-bottom: 1px solid var(--border); 
+            font-size: 14px; 
         }
-        .modal-buttons .btn { 
-            flex: 1; 
-            margin: 0; 
-        }
+        .history-row:last-child { border-bottom: none; }
+        .history-status-completed { color: var(--green); font-weight: 700; }
+        .history-status-active { color: var(--blue); font-weight: 700; }
 
-        /* Alerts */
-        .alert {
-            padding: 16px;
-            border-radius: 12px;
-            margin: 15px 0;
-            text-align: center;
-            font-weight: 600;
-            font-size: 14px;
-            animation: slideUp 0.3s ease;
-        }
+        /* Utility */
+        .hidden { display: none !important; }
+        .page { animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        .alert-error {
-            background: var(--red-soft);
-            border: 2px solid var(--red);
-            color: var(--red);
-        }
-
-        .alert-success {
-            background: var(--green-soft);
-            border: 2px solid var(--green);
-            color: var(--green);
-        }
-
-        /* Footer - Modern 2 Line */
-        .footer {
-            text-align: center;
-            padding: 30px 20px;
-            margin-top: auto;
-            background: linear-gradient(0deg, rgba(22,27,34,0.9) 0%, transparent 100%);
-            border-top: 1px solid var(--border);
-        }
-
-        .footer-content {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin-bottom: 15px;
-        }
-
-        .footer-line {
-            color: var(--gray-light);
-            font-size: 13px;
-            font-weight: 600;
-            letter-spacing: 0.3px;
-        }
-
-        .footer-line .label {
-            color: var(--blue);
-            font-weight: 700;
-        }
-
-        .footer-line .name {
-            color: var(--white);
-            font-weight: 700;
-        }
-
-        .footer-line .title {
-            color: var(--gray);
-            font-size: 12px;
-            font-weight: 500;
-        }
-
-        .footer-tech {
-            color: var(--gray-dark);
-            font-size: 11px;
-            margin-top: 10px;
-            font-family: monospace;
-        }
-
-        /* Loading */
         .loading {
             display: inline-block;
             width: 20px;
@@ -682,233 +421,247 @@
             vertical-align: middle;
         }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* Page Transitions */
-        .page { 
-            animation: fadeIn 0.3s ease; 
-        }
-
-        .hidden { display: none !important; }
-
-        /* Responsive */
-        @media (max-width: 480px) {
-            .container { padding: 15px; }
-            .card { padding: 20px; border-radius: 20px; }
-            .timer { font-size: 36px; }
-            .verification-camera-box { height: 250px; }
-        }
-
-        /* Talimat Info Badge */
-        #talimat-info {
-            margin-top: 15px;
-        }
-        #talimat-info span {
-            display: inline-flex;
+        /* Navigation Header */
+        .nav-header {
+            display: flex;
             align-items: center;
-            gap: 6px;
-            background: var(--blue-soft);
-            color: var(--blue);
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 700;
-            border: 1px solid var(--blue);
+            justify-content: space-between;
+            margin-bottom: 20px;
         }
 
-        /* Security Warning Text */
-        .security-warning {
-            text-align: center;
-            color: var(--orange);
-            margin-bottom: 15px;
-            font-weight: 700;
-            font-size: 14px;
+        .nav-title {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: var(--blue);
             letter-spacing: 0.5px;
         }
-        
-        .security-subtext {
+
+        .nav-back {
+            background: var(--card);
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+            font-size: 20px;
+            cursor: pointer;
+            padding: 10px 16px;
+            border-radius: 12px;
+            transition: var(--transition);
+        }
+        .nav-back:hover {
+            background: var(--border);
+            color: var(--text-main);
+        }
+
+        /* Birim info box */
+        .birim-info-box {
+            text-align: center; 
+            margin: 15px 0; 
+            background: rgba(0,0,0,0.3); 
+            padding: 25px; 
+            border-radius: 20px; 
+            border: 1px solid var(--border);
+        }
+
+        .birim-info-box .title {
+            font-size: 1.5rem; 
+            font-weight: 800; 
+            color: var(--blue); 
+            margin-bottom: 8px;
+        }
+
+        .birim-info-box .kod {
+            color: var(--text-dim); 
+            font-family: monospace; 
+            font-size: 0.9rem;
+        }
+
+        /* Footer - Sadece altta, 2 satır */
+        .footer {
             text-align: center;
-            color: var(--gray);
-            margin-bottom: 25px;
+            padding: 25px 20px;
+            background: rgba(22, 27, 34, 0.5);
+            border-top: 1px solid var(--border);
+            margin-top: auto;
+        }
+
+        .footer-content {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+
+        .footer-line {
+            color: var(--text-dim);
             font-size: 13px;
-            line-height: 1.5;
+            font-weight: 600;
+        }
+
+        .footer-line .label {
+            color: var(--blue);
+            font-weight: 700;
+        }
+
+        .footer-line .name {
+            color: var(--text-main);
+            font-weight: 700;
+        }
+
+        .footer-line .title {
+            color: var(--text-dim);
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .footer-tech {
+            color: var(--text-dim);
+            font-size: 11px;
+            font-family: monospace;
+            opacity: 0.7;
+            margin-top: 5px;
+        }
+
+        /* Active Job */
+        .active-job-card {
+            border-left: 6px solid var(--blue);
+            background: linear-gradient(90deg, rgba(88, 166, 255, 0.1) 0%, var(--card) 100%);
+        }
+
+        .security-warning {
+            color: var(--orange);
+            font-weight: 700;
+            font-size: 14px;
+            text-align: center;
+            margin-bottom: 10px;
+            letter-spacing: 0.5px;
+        }
+
+        .security-subtext {
+            color: var(--text-dim);
+            font-size: 13px;
+            text-align: center;
+            margin-bottom: 20px;
         }
     </style>
 </head>
 <body>
-    <!-- Header -->
-    <div class="header">
-        <div class="header-icon">✨</div>
+    <!-- Header - örnek.txt stili (tek ve sade) -->
+    <header>
         <h1>MGD CleanOS v4.1</h1>
-        <div class="header-sub">Mustafa GÜNEŞDOĞDU - Bilgisayar Programcısı</div>
-        <div class="header-sub">Ahmet KAHREMAN - Bilgi İşlem Sorumlusu</div>
-        <div class="header-sub2">Nazilli Devlet Hastanesi Bilgi İşlem 2026</div>
-    </div>
-    
+        <div class="header-sub">Nazilli Devlet Hastanesi Dijital Sistem</div>
+    </header>
+
     <!-- Status -->
-    <div class="status connecting" id="status">
-        🟡 Bağlanıyor...
-    </div>
-    
-    <!-- Sayfa 1: Login -->
-    <div id="page-login" class="page">
-        <div class="container">
+    <div id="status" class="status connecting">🟡 BAĞLANILIYOR...</div>
+
+    <!-- Container -->
+    <div class="container">
+        
+        <!-- Sayfa 1: Login -->
+        <div id="page-login" class="page">
             <div class="card">
-                <div class="card-title">👤 Personel Girişi</div>
-                
-                <div class="form-group">
-                    <label class="form-label">TC Kimlik Numarası</label>
-                    <input type="text" class="form-input" id="tc-input" 
-                           placeholder="00000000000" maxlength="11" inputmode="numeric">
-                </div>
-                
-                <button class="btn btn-primary" id="btn-login" onclick="login()">
-                    SİSTEME GİRİŞ YAP →
-                </button>
-                
-                <div id="login-error"></div>
+                <div class="input-label">PERSONEL TC KİMLİK</div>
+                <input type="text" class="form-input" id="tc-input" maxlength="11" placeholder="00000000000" inputmode="numeric">
+                <button class="btn btn-primary" id="btn-login" onclick="login()">SİSTEME GİRİŞ YAP</button>
+                <div id="login-error" style="color: var(--red); text-align: center; margin-top: 15px; font-size: 13px; font-weight: 600;"></div>
             </div>
         </div>
-    </div>
-    
-    <!-- Sayfa 2: QR Okuma (Birim Seçimi) -->
-    <div id="page-qr" class="page hidden">
-        <div class="container">
+
+        <!-- Sayfa 2: QR Okuma -->
+        <div id="page-qr" class="page hidden">
             <div class="card">
-                <div style="text-align: center; margin-bottom: 25px;">
-                    <h3 id="greeting-qr" style="color: var(--blue); font-size: 1.2rem; margin-bottom: 8px;"></h3>
-                    <p style="color: var(--gray); font-size: 0.9rem;" id="personel-info-qr"></p>
-                </div>
+                <h3 id="greeting-qr" style="color: var(--blue); margin-bottom: 5px; text-align: center; font-size: 1.2rem;"></h3>
+                <p style="color: var(--text-dim); font-size: 0.85rem; text-align: center; margin-bottom: 20px;" id="personel-info-qr"></p>
                 
-                <div class="card-title">📱 BİRİM SEÇİMİ</div>
-                <p style="color: var(--gray); text-align: center; margin-bottom: 20px; font-size: 14px;">
-                    Temizlenecek birimin QR kodunu okutun
-                </p>
+                <div class="input-label">BİRİM QR KODU OKUTUN</div>
+                <div class="qr-wrapper" id="main-qr-container"></div>
                 
-                <div class="qr-container" id="main-qr-container">
-                    <!-- Kamera buraya gelecek -->
-                </div>
-                
-                <button class="btn btn-secondary" onclick="logout()">
-                    ← Çıkış Yap
-                </button>
+                <button class="btn btn-secondary" onclick="logout()">← ÇIKIŞ YAP</button>
             </div>
         </div>
-    </div>
-    
-    <!-- Sayfa 3: Onay -->
-    <div id="page-confirm" class="page hidden">
-        <div class="container">
-            <div style="text-align: center; padding: 10px 0 20px;">
-                <h3 id="greeting-confirm" style="color: var(--blue); font-size: 1.1rem;"></h3>
-            </div>
-            
+
+        <!-- Sayfa 3: Onay -->
+        <div id="page-confirm" class="page hidden">
             <div class="card">
-                <div class="card-title">🏢 Birim Bilgisi</div>
-                <div style="text-align: center; margin: 20px 0; background: rgba(0,0,0,0.2); padding: 25px; border-radius: 18px; border: 1px solid var(--border);">
-                    <div id="confirm-birim-adi" style="font-size: 1.5rem; color: var(--blue); font-weight: 800; margin-bottom: 10px;"></div>
-                    <div id="confirm-birim-kod" style="color: var(--gray); font-family: monospace; font-size: 0.9rem;"></div>
+                <div class="input-label">SEÇİLİ BİRİM</div>
+                <div class="birim-info-box">
+                    <div id="confirm-birim-adi" class="title">Birim Adı</div>
+                    <div id="confirm-birim-kod" class="kod">Kod: XXX</div>
                     
-                    <div id="talimat-info" class="hidden">
-                        <span>
+                    <div id="talimat-info" class="hidden" style="margin-top: 15px;">
+                        <span style="display: inline-flex; align-items: center; gap: 6px; background: rgba(88, 166, 255, 0.1); color: var(--blue); padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 700; border: 1px solid var(--blue);">
                             📋 <span id="talimat-sayisi">0</span> Talimat
                         </span>
                     </div>
                 </div>
                 
-                <button class="btn btn-blue" onclick="showTalimatlarPage()" style="margin-bottom: 15px;">
-                    📋 Talimatları Gör
-                </button>
+                <button class="btn btn-blue" onclick="showTalimatlarPage()" style="margin-bottom: 12px;">📋 TALİMATLARI GÖR</button>
             </div>
             
-            <div class="card" style="border: 2px solid var(--orange); background: linear-gradient(180deg, var(--card) 0%, var(--orange-soft) 100%);">
-                <div class="security-warning">
-                    🔐 Güvenlik Doğrulaması Gereklidir
-                </div>
-                <div class="security-subtext">
-                    Temizliğe başlamak için birim QR kodunu tekrar okutun
-                </div>
+            <div class="card" style="border: 2px solid var(--orange); background: linear-gradient(180deg, var(--card) 0%, rgba(255, 166, 87, 0.05) 100%);">
+                <div class="security-warning">🔐 GÜVENLİK DOĞRULAMASI</div>
+                <div class="security-subtext">Temizliğe başlamak için birim QR kodunu tekrar okutun</div>
                 
-                <button class="btn btn-primary" id="btn-start" onclick="openVerification('baslat')" style="height: 60px; font-size: 16px; margin-bottom: 15px;">
+                <button class="btn btn-primary" id="btn-start" onclick="openVerification('baslat')" style="height: 55px; font-size: 15px; margin-bottom: 12px;">
                     🔐 QR DOĞRULA ve BAŞLAT
                 </button>
-                
-                <button class="btn btn-danger" onclick="cancelCleaning()">
-                    ✗ İptal
-                </button>
+                <button class="btn btn-danger" onclick="cancelCleaning()">✗ İPTAL</button>
             </div>
         </div>
-    </div>
-    
-    <!-- Sayfa 4: Talimatlar -->
-    <div id="page-talimatlar" class="page hidden">
-        <div class="container">
+
+        <!-- Sayfa 4: Talimatlar -->
+        <div id="page-talimatlar" class="page hidden">
             <div class="nav-header">
                 <button class="nav-back" onclick="backToConfirm()">←</button>
                 <div class="nav-title">📋 Talimatlar</div>
-                <div style="width: 48px;"></div>
+                <div style="width: 40px;"></div>
             </div>
             
-            <div class="talimatlar-header">
-                <div class="talimatlar-birim-adi" id="talimat-birim-adi">Birim Adı</div>
-                <div class="talimatlar-birim-kod" id="talimat-birim-kod">Kod: XXX</div>
+            <div style="background: var(--card); border-radius: 20px; padding: 20px; margin-bottom: 20px; border: 1px solid var(--border); text-align: center;">
+                <div id="talimat-birim-adi" style="font-size: 1.3rem; font-weight: 800; color: var(--blue); margin-bottom: 5px;"></div>
+                <div id="talimat-birim-kod" style="color: var(--text-dim); font-family: monospace; font-size: 0.85rem;"></div>
             </div>
-            
+
             <div class="card" style="margin-top: 0;">
-                <div class="talimat-uyari">
+                <div style="background: rgba(218, 54, 51, 0.1); border: 1px solid var(--red); border-radius: 12px; padding: 15px; margin-bottom: 20px; color: var(--red); font-size: 13px; line-height: 1.5; font-weight: 600;">
                     ⚠️ Bu talimatları dikkatlice okuyunuz. Temizliğe başlamadan önce tüm maddeleri uyguladığınızdan emin olunuz.
                 </div>
                 
-                <div class="talimat-liste" id="talimat-liste">
-                    <!-- Talimatlar buraya -->
-                </div>
+                <div class="talimat-container" id="talimat-liste"></div>
                 
-                <button class="btn btn-primary" onclick="backToConfirm()">
-                    ✓ Anladım, Geri Dön
-                </button>
+                <button class="btn btn-primary" onclick="backToConfirm()">✓ ANLADIM, GERİ DÖN</button>
             </div>
         </div>
-    </div>
-    
-    <!-- Sayfa 5: İşlem Yönetimi -->
-    <div id="page-job" class="page hidden">
-        <div class="container">
+
+        <!-- Sayfa 5: İşlem Yönetimi -->
+        <div id="page-job" class="page hidden">
             <div style="text-align: center; padding: 10px 0 20px;">
-                <h3 id="greeting-job" style="color: var(--blue); font-size: 1.1rem; margin-bottom: 5px;"></h3>
-                <p style="color: var(--gray); font-size: 0.85rem;" id="personel-info-job"></p>
+                <h3 id="greeting-job" style="color: var(--blue); font-size: 1.2rem; margin-bottom: 5px;"></h3>
+                <p style="color: var(--text-dim); font-size: 0.85rem;" id="personel-info-job"></p>
             </div>
-            
-            <div class="card-title" style="text-align: center; margin: 20px 0; font-size: 1.2rem;">🧹 AKTİF İŞLEM</div>
             
             <div id="active-job-card"></div>
-            
             <div id="history-job-section"></div>
             
-            <div style="margin-top: 20px;">
-                <button class="btn btn-secondary" onclick="logout()">
-                    ← Oturumu Kapat
-                </button>
-            </div>
+            <button class="btn btn-secondary" onclick="logout()" style="margin-top: 10px;">OTURUMU KAPAT</button>
         </div>
     </div>
-    
+
     <!-- QR Doğrulama Modal (Bottom Sheet) -->
     <div class="modal" id="verification-modal">
         <div class="modal-content verification-content">
             <div class="verification-header">🔐 GÜVENLİK DOĞRULAMA</div>
-            <div style="color: var(--gray-light); margin-bottom: 15px; font-size: 14px; text-align: center;">
+            <div style="color: var(--text-dim); margin-bottom: 15px; font-size: 14px; text-align: center;">
                 İşlem yapabilmek için doğru birimi okutun
             </div>
             
             <div class="verification-info">
-                <div style="color: var(--gray); font-size: 11px; margin-bottom: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">BEKLENEN BİRİM:</div>
+                <div style="color: var(--text-dim); font-size: 11px; margin-bottom: 8px; font-weight: 700; text-transform: uppercase;">BEKLENEN BİRİM:</div>
                 <div class="verification-birim" id="verification-birim-adi">Birim Adı</div>
                 <div class="verification-kod" id="verification-birim-kod">Kod: XXX</div>
             </div>
             
-            <!-- Kamera Container -->
             <div class="verification-camera-box" id="verification-camera-box">
                 <div id="verification-reader" style="width: 100%; height: 100%;"></div>
             </div>
@@ -917,12 +670,10 @@
                 Kamerayı QR koda doğru tutun...
             </div>
             
-            <button class="btn btn-danger" onclick="closeVerification()">
-                ✗ İPTAL
-            </button>
+            <button class="btn btn-danger" onclick="closeVerification()">✗ İPTAL</button>
         </div>
     </div>
-    
+
     <!-- Bilgi Modal (Bottom Sheet) -->
     <div class="modal" id="info-modal">
         <div class="modal-content">
@@ -932,7 +683,7 @@
         </div>
     </div>
 
-    <!-- Modern Footer -->
+    <!-- Footer - Tek ve Altta, 2 Satırlık -->
     <div class="footer">
         <div class="footer-content">
             <div class="footer-line">
@@ -947,7 +698,7 @@
             </div>
         </div>
         <div class="footer-tech">
-            🔌 Cihaz: <span id="device-id"></span> | v4.1 Qr_Control | MGD CleanOS © 2026
+            Cihaz: <span id="device-id"></span> | v4.1 Qr_Control | MGD CleanOS © 2026
         </div>
     </div>
 
@@ -967,27 +718,27 @@
         // ==================== DURUM YÖNETİMİ ====================
         let mqttClient = null;
         let isConnected = false;
-        let qrScanner = null; // TEK KAMERA INSTANCE
+        let qrScanner = null;
         let currentResponse = null;
         let responseTimeout = null;
         
         let state = {
-            tcNo: '',
+            tcNo: localStorage.getItem('mgd_tc') || '',
             personelAd: '',
             personelSoyad: '',
-            aktifIslem: null, // {birim_kodu, birim_adi, baslama_zamani} veya null
+            aktifIslem: null,
             islemGecmisi: [],
             seciliBirimKodu: '',
             seciliBirimAdi: '',
             seciliBirimTalimatlar: '',
-            verificationMode: null // 'baslat' veya 'bitir'
+            verificationMode: null
         };
         
         console.log(`[v${APP_VERSION}] Sistem başlatılıyor...`);
         
         // ==================== MQTT BAĞLANTI ====================
         function connectMQTT() {
-            updateStatus('connecting', '🟡 Bağlanıyor...');
+            updateStatus('connecting', '🟡 BAĞLANILIYOR...');
             
             try {
                 const options = {
@@ -1003,18 +754,18 @@
                 mqttClient.on('connect', () => {
                     console.log('[MQTT] Bağlandı');
                     isConnected = true;
-                    updateStatus('online', '🟢 Sistem Aktif');
+                    updateStatus('online', '🟢 SİSTEM AKTİF');
                     mqttClient.subscribe(`${TOPIC_CEVAP_BASE}${DEV_ID}`);
                 });
                 
                 mqttClient.on('disconnect', () => {
                     isConnected = false;
-                    updateStatus('offline', '🔴 Bağlantı Kesildi');
+                    updateStatus('offline', '🔴 BAĞLANTI KESİLDİ');
                 });
                 
                 mqttClient.on('error', (err) => {
                     console.error('[MQTT] Hata:', err);
-                    updateStatus('error', '🔴 Bağlantı Hatası');
+                    updateStatus('error', '🔴 BAĞLANTI HATASI');
                 });
                 
                 mqttClient.on('message', (topic, message) => {
@@ -1028,7 +779,7 @@
                 
             } catch(e) {
                 console.error('[MQTT] Bağlantı hatası:', e);
-                updateStatus('error', '🔴 Bağlantı Kurulamadı');
+                updateStatus('error', '🔴 BAĞLANTI KURULAMADI');
             }
         }
         
@@ -1063,7 +814,9 @@
                     if (currentResponse) {
                         clearTimeout(responseTimeout);
                         clearInterval(checkInterval);
-                        resolve(currentResponse);
+                        const resp = currentResponse;
+                        currentResponse = null;
+                        resolve(resp);
                     }
                 }, 100);
                 
@@ -1081,7 +834,6 @@
         function showPage(pageId) {
             document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
             document.getElementById('page-' + pageId).classList.remove('hidden');
-            // Scroll to top
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
         
@@ -1101,12 +853,12 @@
             const errorDiv = document.getElementById('login-error');
             
             if (!tc || tc.length !== 11 || !/^\d+$/.test(tc)) {
-                errorDiv.innerHTML = '<div class="alert alert-error">❌ Geçersiz TC No (11 haneli olmalı)</div>';
+                errorDiv.textContent = '❌ Geçersiz TC No (11 haneli olmalı)';
                 return;
             }
             
             if (!isConnected) {
-                errorDiv.innerHTML = '<div class="alert alert-error">❌ Bağlantı yok</div>';
+                errorDiv.textContent = '❌ Bağlantı yok';
                 return;
             }
             
@@ -1118,11 +870,11 @@
                 
                 if (yanit?.status === 'OK') {
                     state.tcNo = tc;
+                    localStorage.setItem('mgd_tc', tc);
                     state.personelAd = yanit.personel?.ad || '';
                     state.personelSoyad = yanit.personel?.soyad || '';
                     
                     if (yanit.aktif_islem) {
-                        console.log('[Login] Aktif işlem bulundu:', yanit.aktif_islem);
                         state.aktifIslem = {
                             birim_kodu: yanit.aktif_islem.birim_kodu,
                             birim_adi: yanit.aktif_islem.birim_adi,
@@ -1141,23 +893,22 @@
                         
                         showJobPage();
                     } else {
-                        console.log('[Login] Aktif işlem yok, QR sayfasına yönlendiriliyor');
                         state.aktifIslem = null;
                         showQRPage();
                     }
                 } else {
-                    errorDiv.innerHTML = `<div class="alert alert-error">❌ ${yanit?.message || 'Personel bulunamadı'}</div>`;
+                    errorDiv.textContent = `❌ ${yanit?.message || 'Personel bulunamadı'}`;
                 }
             } catch (err) {
                 console.error('[Login] Hata:', err);
-                errorDiv.innerHTML = `<div class="alert alert-error">❌ ${err.message}</div>`;
+                errorDiv.textContent = `❌ ${err.message}`;
             }
             
             btn.disabled = false;
-            btn.textContent = 'SİSTEME GİRİŞ YAP →';
+            btn.textContent = 'SİSTEME GİRİŞ YAP';
         }
         
-        // ==================== KAMERA YÖNETİMİ (TEK INSTANCE) ====================
+        // ==================== KAMERA YÖNETİMİ ====================
         async function stopScanner() {
             if (qrScanner) {
                 try {
@@ -1170,24 +921,25 @@
             }
         }
         
-        // Ana sayfa kamera başlatma (Birim seçimi)
-        async function startMainScanner() {
+        async function startScanner(elementId, callback) {
             await stopScanner();
             
-            qrScanner = new Html5Qrcode("main-qr-container");
+            qrScanner = new Html5Qrcode(elementId);
             
             try {
                 await qrScanner.start(
                     { facingMode: "environment" },
                     { fps: 10, qrbox: { width: 250, height: 250 } },
-                    onMainQRDetected,
-                    () => {} // Boş hata callback (sürekli hata vermemesi için)
+                    callback,
+                    () => {}
                 );
-                console.log('[Kamera] Ana kamera başlatıldı');
+                console.log('[Kamera] Başlatıldı:', elementId);
             } catch (err) {
                 console.error('[Kamera] Başlatma hatası:', err);
-                document.getElementById('main-qr-container').innerHTML = 
-                    '<div style="display: flex; align-items: center; justify-content: center; height: 100%; color: var(--red); text-align: center; padding: 20px; font-size: 14px; flex-direction: column; gap: 10px;"><div style="font-size: 40px;">📷</div><div>Kamera erişimi reddedildi.<br>Lütfen tarayıcı izinlerini kontrol edin.</div></div>';
+                const container = document.getElementById(elementId);
+                if (container) {
+                    container.innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 100%; color: var(--red); text-align: center; padding: 20px; font-size: 14px; flex-direction: column; gap: 10px;"><div style="font-size: 40px;">📷</div><div>Kamera erişimi reddedildi.<br>Lütfen tarayıcı izinlerini kontrol edin.</div></div>';
+                }
             }
         }
         
@@ -1221,11 +973,10 @@
             document.getElementById('greeting-qr').textContent = getGreeting();
             document.getElementById('personel-info-qr').textContent = `${state.personelAd} ${state.personelSoyad}`;
             showPage('qr');
-            startMainScanner();
+            startScanner('main-qr-container', onMainQRDetected);
         }
         
         function showConfirmPage() {
-            document.getElementById('greeting-confirm').textContent = getGreeting();
             document.getElementById('confirm-birim-adi').textContent = state.seciliBirimAdi;
             document.getElementById('confirm-birim-kod').textContent = `Kod: ${state.seciliBirimKodu}`;
             
@@ -1252,13 +1003,13 @@
                 const satirlar = state.seciliBirimTalimatlar.split('\n').filter(s => s.trim());
                 satirlar.forEach((satir, i) => {
                     const madde = document.createElement('div');
-                    madde.className = 'talimat-madde';
+                    madde.className = 'talimat-item';
                     const icerik = /^\d+[\.\-]\s|^[\-\*]\s/.test(satir) ? satir : `${i + 1}. ${satir}`;
                     madde.textContent = icerik;
                     liste.appendChild(madde);
                 });
             } else {
-                liste.innerHTML = '<div style="text-align: center; color: var(--gray); padding: 20px;">Bu birim için talimat bulunmamaktadır.</div>';
+                liste.innerHTML = '<div style="text-align: center; color: var(--text-dim); padding: 20px;">Bu birim için talimat bulunmamaktadır.</div>';
             }
             
             showPage('talimatlar');
@@ -1275,12 +1026,11 @@
             showQRPage();
         }
         
-        // ==================== QR DOĞRULAMA (GÜVENLİK) ====================
+        // ==================== QR DOĞRULAMA ====================
         async function openVerification(mode) {
             console.log(`[Doğrulama] Mod: ${mode}`);
             state.verificationMode = mode;
             
-            // NULL KONTROLÜ - HATA BURADAN KAYNAKLANIYORDU
             let beklenenKod = '';
             let beklenenAd = '';
             
@@ -1288,10 +1038,9 @@
                 beklenenKod = state.seciliBirimKodu;
                 beklenenAd = state.seciliBirimAdi;
             } else if (mode === 'bitir') {
-                // KRİTİK KONTROL: aktifIslem null mı?
                 if (!state.aktifIslem) {
                     console.error('[Doğrulama] HATA: aktifIslem null!');
-                    showInfoModal('Hata', 'Aktif temizlik işlemi bulunamadı. Sayfayı yenileyin.');
+                    showInfoModal('Hata', 'Aktif temizlik işlemi bulunamadı.');
                     return;
                 }
                 beklenenKod = state.aktifIslem.birim_kodu;
@@ -1299,12 +1048,9 @@
             }
             
             if (!beklenenKod) {
-                console.error('[Doğrulama] HATA: beklenenKod boş!');
                 showInfoModal('Hata', 'Birim kodu bulunamadı.');
                 return;
             }
-            
-            console.log(`[Doğrulama] Beklenen: ${beklenenKod} (${beklenenAd})`);
             
             document.getElementById('verification-birim-adi').textContent = beklenenAd || 'Bilinmiyor';
             document.getElementById('verification-birim-kod').textContent = `Kod: ${beklenenKod}`;
@@ -1316,57 +1062,25 @@
             document.getElementById('verification-camera-box').className = 'verification-camera-box';
             document.getElementById('verification-modal').classList.add('active');
             
-            // Ana kamerayı durdur ve modal kamerayı başlat
             await stopScanner();
             
-            // Kamera başlatma
             setTimeout(() => {
-                startVerificationCamera();
+                startScanner('verification-reader', onVerificationQRDetected);
             }, 300);
-        }
-        
-        async function startVerificationCamera() {
-            // Tekrar null kontrolü
-            if (!state.verificationMode) {
-                console.error('[Doğrulama Kamera] verificationMode null!');
-                return;
-            }
-            
-            qrScanner = new Html5Qrcode("verification-reader");
-            
-            try {
-                await qrScanner.start(
-                    { facingMode: "environment" },
-                    { fps: 10, qrbox: { width: 200, height: 200 } },
-                    onVerificationQRDetected,
-                    () => {}
-                );
-                console.log('[Doğrulama Kamera] Başlatıldı');
-            } catch (err) {
-                console.error('[Doğrulama Kamera] Hata:', err);
-                document.getElementById('verification-status').textContent = 'Kamera hatası! İzinleri kontrol edin.';
-                document.getElementById('verification-status').className = 'verification-status error';
-            }
         }
         
         async function onVerificationQRDetected(code) {
             console.log('[Doğrulama] QR Okundu:', code);
             
-            // NULL GÜVENLİK KONTROLÜ
-            if (!state.verificationMode) {
-                console.warn('[Doğrulama] verificationMode null, işlem iptal');
-                return;
-            }
+            if (!state.verificationMode) return;
             
             let beklenenKod = '';
             
             if (state.verificationMode === 'baslat') {
                 beklenenKod = state.seciliBirimKodu;
             } else if (state.verificationMode === 'bitir') {
-                // Null kontrolü
                 if (!state.aktifIslem || !state.aktifIslem.birim_kodu) {
-                    console.error('[Doğrulama] aktifIslem veya birim_kodu null!');
-                    showInfoModal('Hata', 'Aktif işlem bilgisi kaybolmuş. Sayfayı yenileyin.');
+                    showInfoModal('Hata', 'Aktif işlem bilgisi kaybolmuş.');
                     closeVerification();
                     return;
                 }
@@ -1377,7 +1091,6 @@
             const statusEl = document.getElementById('verification-status');
             
             if (code === beklenenKod) {
-                // BAŞARILI
                 console.log('[Doğrulama] Doğrulama başarılı!');
                 await stopScanner();
                 
@@ -1386,7 +1099,7 @@
                 statusEl.innerHTML = '✓ Doğrulama başarılı!<br>İşlem yapılıyor...';
                 
                 setTimeout(() => {
-                    const currentMode = state.verificationMode; // Sakla
+                    const currentMode = state.verificationMode;
                     closeVerification();
                     
                     if (currentMode === 'baslat') {
@@ -1396,7 +1109,6 @@
                     }
                 }, 1500);
             } else {
-                // YANLIŞ - SPESİFİK UYARI (KRİTİK GÜVENLİK ÖZELLİĞİ)
                 console.log('[Doğrulama] Yanlış QR:', code, 'Beklenen:', beklenenKod);
                 box.classList.add('error');
                 statusEl.className = 'verification-status error';
@@ -1406,8 +1118,7 @@
                     const yanlisAd = yanit?.status === 'OK' ? yanit.birim?.adi : code;
                     const beklenenAd = state.verificationMode === 'baslat' ? state.seciliBirimAdi : (state.aktifIslem?.birim_adi || 'Bilinmiyor');
                     
-                    // SPESİFİK UYARI MESAJI (ORİJİNALDE OLDUĞU GİBİ)
-                    statusEl.innerHTML = `⚠️ YANLIŞ BİRİM!<br>Okunan: ${yanlisAd}<br>Beklenen: ${beklenenAd}<br><small style="font-size: 12px; opacity: 0.8;">Lütfen doğru birimin QR kodunu okutun</small>`;
+                    statusEl.innerHTML = `⚠️ YANLIŞ BİRİM!<br>Okunan: ${yanlisAd}<br>Beklenen: ${beklenenAd}`;
                 } catch (e) {
                     statusEl.textContent = '⚠️ YANLIŞ BİRİM! Tekrar deneyin.';
                 }
@@ -1471,10 +1182,9 @@
         async function executeEnd() {
             console.log('[İşlem] Bitirme başlıyor...');
             
-            // KRİTİK NULL KONTROLÜ
             if (!state.aktifIslem || !state.aktifIslem.birim_kodu) {
                 console.error('[İşlem] HATA: aktifIslem null veya birim_kodu yok!');
-                showInfoModal('Hata', 'Aktif işlem bilgisi bulunamadı. Sayfayı yenileyin.');
+                showInfoModal('Hata', 'Aktif işlem bilgisi bulunamadı.');
                 return;
             }
             
@@ -1525,8 +1235,8 @@
             
             if (!state.aktifIslem) {
                 container.innerHTML = `
-                    <div class="card" style="text-align: center; border: 2px dashed var(--border);">
-                        <div style="color: var(--gray); padding: 30px; font-size: 16px;">
+                    <div class="card" style="text-align: center; border: 2px dashed var(--border); background: transparent;">
+                        <div style="color: var(--text-dim); padding: 30px; font-size: 16px;">
                             <div style="font-size: 40px; margin-bottom: 15px;">⚪</div>
                             Aktif Temizlik Yok
                         </div>
@@ -1538,7 +1248,6 @@
                 return;
             }
             
-            // Null güvenliği
             const birimAdi = state.aktifIslem.birim_adi || 'Bilinmiyor';
             const birimKod = state.aktifIslem.birim_kodu || '---';
             
@@ -1555,18 +1264,18 @@
             }
             
             container.innerHTML = `
-                <div class="card active-job">
-                    <div style="color: var(--blue); font-weight: 800; margin-bottom: 12px; font-size: 13px; letter-spacing: 0.5px; text-transform: uppercase;">
+                <div class="card active-job-card">
+                    <div style="color: var(--blue); font-weight: 800; margin-bottom: 10px; font-size: 12px; letter-spacing: 0.5px; text-transform: uppercase;">
                         🔵 DEVAM EDEN TEMİZLİK
                     </div>
-                    <div style="font-size: 1.5rem; font-weight: 800; margin: 15px 0; color: var(--white);">
+                    <div style="font-size: 1.5rem; font-weight: 800; margin: 15px 0; color: var(--text-main);">
                         🏢 ${birimAdi}
                     </div>
-                    <div style="color: var(--gray); margin-bottom: 20px; font-family: monospace; font-size: 14px;">
+                    <div style="color: var(--text-dim); margin-bottom: 20px; font-family: monospace; font-size: 14px;">
                         Kod: ${birimKod}
                     </div>
                     <div class="timer">⏱️ ${sureText}</div>
-                    <button class="btn btn-primary" onclick="openVerification('bitir')" style="height: 60px; font-size: 16px; margin-top: 10px;">
+                    <button class="btn btn-primary" onclick="openVerification('bitir')" style="height: 55px; font-size: 15px;">
                         🔐 QR DOĞRULA ve BİTİR
                     </button>
                 </div>
@@ -1580,15 +1289,15 @@
                 return;
             }
             
-            let html = '<div class="card"><div class="card-title">🕐 Son İşlemler</div>';
+            let html = '<div class="card"><div class="input-label" style="margin-bottom: 15px;">SON İŞLEMLER</div>';
             [...state.islemGecmisi].reverse().slice(0, 5).forEach(islem => {
                 const durumClass = islem.durum === 'Tamamlandı' ? 'history-status-completed' : 'history-status-active';
                 const durumIcon = islem.durum === 'Tamamlandı' ? '✓' : '▶';
                 html += `
-                    <div class="history-item">
-                        <span class="history-time">${islem.saat}</span>
+                    <div class="history-row">
+                        <span style="color: var(--text-dim); font-size: 13px;">${islem.saat}</span>
                         <span style="flex: 1; margin: 0 10px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${islem.birim}</span>
-                        <span class="${durumClass}">${durumIcon} ${islem.durum}</span>
+                        <span class="${durumClass}" style="font-size: 13px;">${durumIcon} ${islem.durum}</span>
                     </div>
                 `;
             });
@@ -1619,6 +1328,7 @@
             state.seciliBirimAdi = '';
             state.seciliBirimTalimatlar = '';
             document.getElementById('tc-input').value = '';
+            document.getElementById('login-error').textContent = '';
             showPage('login');
         }
         
@@ -1631,6 +1341,10 @@
         
         window.addEventListener('load', () => {
             connectMQTT();
+            // Kayıtlı TC varsa input'a yaz
+            if (state.tcNo) {
+                document.getElementById('tc-input').value = state.tcNo;
+            }
         });
         
         if ('serviceWorker' in navigator) {

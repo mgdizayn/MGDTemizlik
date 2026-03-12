@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#0d1117">
-    <title>MGD CleanOS v4.1</title>
+    <title>MGD CleanOS v4.2 - Özellikli Birim</title>
     
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon-192.png">
@@ -30,6 +30,9 @@
             --border: #30363d;
             --warning-bg: #341a1a;
             --warning-text: #f85149;
+            --ozellikli-bg: #341a1a;  /* Koyu kırmızı arka plan */
+            --ozellikli-border: #dc3545;
+            --ozellikli-text: #ff6b6b;
         }
         
         body {
@@ -88,6 +91,35 @@
             border-radius: 15px;
             margin: 15px 20px;
             padding: 20px;
+        }
+        
+        /* ÖZELLİKLİ BİRİM STİLİ (Kırmızı Arka Plan) */
+        .card.ozellikli {
+            background: var(--ozellikli-bg) !important;
+            border: 2px solid var(--ozellikli-border) !important;
+            animation: pulse-red 2s infinite;
+        }
+        
+        @keyframes pulse-red {
+            0% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(220, 53, 69, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0); }
+        }
+        
+        .ozellikli-baslik {
+            color: var(--ozellikli-text) !important;
+            font-weight: bold;
+        }
+        
+        .ozellikli-uyari {
+            background: rgba(220, 53, 69, 0.2);
+            border: 1px solid var(--ozellikli-border);
+            color: var(--ozellikli-text);
+            padding: 12px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-size: 14px;
+            font-weight: bold;
         }
         
         .card-title {
@@ -157,6 +189,11 @@
             color: white;
         }
         
+        .btn-warning {
+            background: var(--orange);
+            color: #000;
+        }
+        
         .qr-container {
             width: 100%;
             height: 300px;
@@ -174,6 +211,7 @@
         }
         
         .active-job { border-left: 4px solid var(--blue); }
+        .active-job.ozellikli { border-left: 4px solid var(--ozellikli-border) !important; }
         
         .timer {
             font-size: 24px;
@@ -194,6 +232,7 @@
         .history-status-completed { color: var(--green); }
         .history-status-active { color: var(--blue); }
         
+        /* TALİMAT ONAY MODALI */
         .modal {
             display: none;
             position: fixed;
@@ -219,6 +258,11 @@
             max-height: 85vh;
             overflow-y: auto;
             text-align: center;
+        }
+        
+        .modal-content.ozellikli-modal {
+            background: var(--ozellikli-bg) !important;
+            border: 2px solid var(--ozellikli-border) !important;
         }
         
         .verification-content {
@@ -326,6 +370,35 @@
         .modal-buttons { display: flex; gap: 10px; }
         .modal-buttons .btn { flex: 1; margin: 0; }
         
+        /* TALİMAT ONAY CHECKBOX */
+        .onay-checkbox-container {
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            text-align: left;
+        }
+        
+        .onay-checkbox-container input[type="checkbox"] {
+            width: 24px;
+            height: 24px;
+            accent-color: var(--green);
+            margin-top: 2px;
+        }
+        
+        .onay-checkbox-container label {
+            font-size: 14px;
+            color: var(--gray-light);
+            line-height: 1.5;
+        }
+        
+        .onay-checkbox-container label strong {
+            color: var(--white);
+        }
+        
         .alert {
             padding: 15px;
             border-radius: 10px;
@@ -343,6 +416,12 @@
             background: rgba(35, 134, 54, 0.2);
             border: 1px solid var(--green);
             color: var(--green);
+        }
+        
+        .alert-warning {
+            background: var(--warning-bg);
+            border: 1px solid var(--warning-text);
+            color: var(--warning-text);
         }
         
         .footer {
@@ -387,10 +466,19 @@
             margin-bottom: 10px;
         }
         
+        .nav-header.ozellikli {
+            background: var(--ozellikli-bg) !important;
+            border-bottom-color: var(--ozellikli-border) !important;
+        }
+        
         .nav-title {
             font-size: 16px;
             font-weight: bold;
             color: var(--blue);
+        }
+        
+        .nav-title.ozellikli {
+            color: var(--ozellikli-text) !important;
         }
         
         .nav-back {
@@ -410,11 +498,20 @@
             border: 1px solid var(--border);
         }
         
+        .talimatlar-header.ozellikli {
+            background: rgba(220, 53, 69, 0.2) !important;
+            border-color: var(--ozellikli-border) !important;
+        }
+        
         .talimatlar-birim-adi {
             color: var(--blue);
             font-size: 18px;
             font-weight: bold;
             margin-bottom: 5px;
+        }
+        
+        .talimatlar-birim-adi.ozellikli {
+            color: var(--ozellikli-text) !important;
         }
         
         .talimatlar-birim-kod {
@@ -427,7 +524,7 @@
             border-radius: 12px;
             padding: 10px;
             margin-bottom: 15px;
-            max-height: 50vh;
+            max-height: 40vh;
             overflow-y: auto;
         }
         
@@ -441,6 +538,11 @@
             font-size: 15px;
             line-height: 1.5;
             color: var(--gray-light);
+        }
+        
+        .talimat-madde.ozellikli {
+            border-left-color: var(--ozellikli-border) !important;
+            background: rgba(220, 53, 69, 0.1) !important;
         }
         
         .talimat-uyari {
@@ -474,15 +576,8 @@
             
             <div class="form-group">
                 <label class="form-label">TC Kimlik Numarası:</label>
-                <input type="text" 
-                       class="form-input" 
-                       id="tc-input" 
-                       placeholder="11 haneli TC No" 
-                       maxlength="11"
-                       inputmode="numeric"
-                       pattern="[0-9]*"
-                       autocomplete="off"
-                       onpaste="return false;">
+                <input type="text" class="form-input" id="tc-input" 
+                       placeholder="11 haneli TC No" maxlength="11">
             </div>
             
             <button class="btn btn-primary" id="btn-login" onclick="login()">
@@ -493,7 +588,7 @@
         </div>
         
         <div class="footer">
-            🔌 Cihaz: <span id="device-id"></span> | v4.1 Qr_Control
+            🔌 Cihaz: <span id="device-id"></span> | v4.2 Özellikli Birim
         </div>
     </div>
     
@@ -504,7 +599,7 @@
             <p style="color: var(--gray);" id="personel-info-qr"></p>
         </div>
         
-        <div class="card">
+        <div class="card" id="qr-card">
             <div class="card-title">📱 BİRİM SEÇİMİ</div>
             <p style="color: var(--gray); text-align: center; margin-bottom: 15px;">
                 Temizlenecek birimin QR kodunu okutun
@@ -520,14 +615,20 @@
         </div>
     </div>
     
-    <!-- Sayfa 3: Onay -->
+    <!-- Sayfa 3: Onay (Özellikli birim için kırmızı olacak) -->
     <div id="page-confirm" class="page hidden">
         <div style="text-align: center; padding: 10px;">
             <h3 id="greeting-confirm"></h3>
         </div>
         
-        <div class="card">
-            <div class="card-title">🏢 Birim Bilgisi</div>
+        <div class="card" id="confirm-card">
+            <div class="card-title" id="confirm-title">🏢 Birim Bilgisi</div>
+            
+            <!-- Özellikli birim uyarısı -->
+            <div id="ozellikli-uyari" class="ozellikli-uyari hidden">
+                ⚠️ DİKKAT: BU BİR ÖZELLİKLİ BİRİMDİR! TALİMATLARI OKUMAK ZORUNLUDUR!
+            </div>
+            
             <div style="text-align: center; margin: 20px 0;">
                 <div id="confirm-birim-adi" style="font-size: 20px; color: var(--blue); font-weight: bold;"></div>
                 <div id="confirm-birim-kod" style="color: var(--gray); margin-top: 10px;"></div>
@@ -539,12 +640,17 @@
                 </div>
             </div>
             
+            <!-- Özellikli birimde onay durumu göster -->
+            <div id="onay-durumu" class="hidden" style="text-align: center; margin: 10px 0; padding: 10px; background: rgba(35, 134, 54, 0.2); border-radius: 8px; color: var(--green); font-size: 14px;">
+                ✅ Talimatlar bugün için onaylanmış
+            </div>
+            
             <button class="btn btn-blue" onclick="showTalimatlarPage()" style="margin-bottom: 15px;">
                 📋 Talimatları Gör
             </button>
         </div>
         
-        <div class="card">
+        <div class="card" id="action-card">
             <p style="text-align: center; color: var(--orange); margin-bottom: 10px; font-weight: bold;">
                 🔐 Güvenlik Doğrulaması Gereklidir
             </p>
@@ -562,29 +668,49 @@
         </div>
     </div>
     
-    <!-- Sayfa 4: Talimatlar -->
+    <!-- Sayfa 4: Talimatlar (Zorunlu Onaylı) -->
     <div id="page-talimatlar" class="page hidden">
-        <div class="nav-header">
+        <div class="nav-header" id="talimat-nav">
             <button class="nav-back" onclick="backToConfirm()">←</button>
-            <div class="nav-title">📋 Talimatlar</div>
+            <div class="nav-title" id="talimat-nav-title">📋 Talimatlar</div>
             <div style="width: 40px;"></div>
         </div>
         
-        <div class="talimatlar-header">
+        <div class="talimatlar-header" id="talimat-header">
             <div class="talimatlar-birim-adi" id="talimat-birim-adi">Birim Adı</div>
             <div class="talimatlar-birim-kod" id="talimat-birim-kod">Kod: XXX</div>
         </div>
         
         <div class="card" style="margin-top: 0;">
-            <div class="talimat-uyari">
+            <div class="talimat-uyari" id="talimat-uyari-box">
                 ⚠️ Bu talimatları dikkatlice okuyunuz. Temizliğe başlamadan önce tüm maddeleri uyguladığınızdan emin olunuz.
+            </div>
+            
+            <!-- Özellikli birim ek uyarı -->
+            <div id="ozellikli-talimat-uyari" class="hidden" style="background: rgba(220, 53, 69, 0.2); border: 1px solid #dc3545; color: #ff6b6b; padding: 12px; border-radius: 8px; margin-bottom: 15px; font-weight: bold; text-align: center;">
+                ⚠️ BU BİR ÖZELLİKLİ BİRİMDİR! TALİMATLARI OKUDUĞUNUZU ONAYLAMANIZ ZORUNLUDUR!
             </div>
             
             <div class="talimat-liste" id="talimat-liste">
                 <!-- Talimatlar buraya -->
             </div>
             
-            <button class="btn btn-primary" onclick="backToConfirm()">
+            <!-- Onay Checkbox (Sadece özellikli birimlerde ve onaylanmamışsa) -->
+            <div id="onay-section" class="hidden">
+                <div class="onay-checkbox-container">
+                    <input type="checkbox" id="talimat-onay-checkbox" onchange="onCheckboxChange()">
+                    <label for="talimat-onay-checkbox">
+                        <strong>✅ Talimatları okudum, anladım ve uygulayacağımı onaylıyorum.</strong><br>
+                        <small style="color: var(--gray);">Bu onay gün içinde bir kere yapılır.</small>
+                    </label>
+                </div>
+                <button class="btn btn-primary" id="btn-onay-tamam" onclick="talimatOnayla()" disabled>
+                    ✓ ONAYLA ve DEVAM ET
+                </button>
+            </div>
+            
+            <!-- Normal geri dön butonu (Onaylıysa veya özellikli değilse) -->
+            <button class="btn btn-secondary" id="btn-normal-tamam" onclick="backToConfirm()">
                 ✓ Anladım, Geri Dön
             </button>
         </div>
@@ -610,7 +736,7 @@
         </div>
     </div>
     
-    <!-- QR Doğrulama Modal (Tek Kamera) -->
+    <!-- QR Doğrulama Modal -->
     <div class="modal" id="verification-modal">
         <div class="modal-content verification-content">
             <div class="verification-header">🔐 GÜVENLİK DOĞRULAMA</div>
@@ -624,7 +750,6 @@
                 <div class="verification-kod" id="verification-birim-kod">Kod: XXX</div>
             </div>
             
-            <!-- Kamera Container -->
             <div class="verification-camera-box" id="verification-camera-box">
                 <div id="verification-reader" style="width: 100%; height: 100%;"></div>
             </div>
@@ -641,7 +766,7 @@
     
     <!-- Bilgi Modal -->
     <div class="modal" id="info-modal">
-        <div class="modal-content">
+        <div class="modal-content" id="info-modal-content">
             <div class="modal-title" id="info-modal-title"></div>
             <div class="modal-text" id="info-modal-text"></div>
             <button class="btn btn-primary" onclick="closeInfoModal()">TAMAM</button>
@@ -649,8 +774,8 @@
     </div>
 
     <script>
-        // ==================== KONFİGÜRASYON v4.1 ====================
-        const APP_VERSION = '4.1';
+        // ==================== KONFİGÜRASYON v4.2 ====================
+        const APP_VERSION = '4.2';
         const MQTT_CONFIG = {
             protocol: 'wss',
             hostname: 'broker.emqx.io',
@@ -664,7 +789,7 @@
         // ==================== DURUM YÖNETİMİ ====================
         let mqttClient = null;
         let isConnected = false;
-        let qrScanner = null; // TEK KAMERA INSTANCE
+        let qrScanner = null;
         let currentResponse = null;
         let responseTimeout = null;
         
@@ -672,58 +797,19 @@
             tcNo: '',
             personelAd: '',
             personelSoyad: '',
-            aktifIslem: null, // {birim_kodu, birim_adi, baslama_zamani} veya null
+            kullaniciId: null, // Sunucudan alınacak (şimdilik TC ile eşleştiriyoruz)
+            aktifIslem: null,
             islemGecmisi: [],
             seciliBirimKodu: '',
             seciliBirimAdi: '',
             seciliBirimTalimatlar: '',
-            verificationMode: null // 'baslat' veya 'bitir'
+            seciliBirimOzellikli: false, // YENİ
+            talimatOnayli: false, // YENİ: Bugün için onay durumu
+            talimatOnayBekleniyor: false, // YENİ: Onay modal açık mı
+            verificationMode: null
         };
         
         console.log(`[v${APP_VERSION}] Sistem başlatılıyor...`);
-        
-        // ==================== TC KONTROLÜ (SADECE RAKAM - 11 HANE) ====================
-        const tcInput = document.getElementById('tc-input');
-        
-        // Sadece rakam girişine izin ver (klavye kontrolü)
-        tcInput.addEventListener('keydown', function(e) {
-            // İzin verilen tuşlar: rakamlar, backspace, delete, tab, escape, enter, ok tuşları
-            if ([8, 46, 9, 27, 13].indexOf(e.keyCode) !== -1 ||
-                // Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X kontrolü (Ctrl+V engellendi ama diğerleri için)
-                (e.keyCode === 65 && e.ctrlKey === true) ||
-                (e.keyCode === 67 && e.ctrlKey === true) ||
-                (e.keyCode === 88 && e.ctrlKey === true) ||
-                // Home, End, ok tuşları
-                (e.keyCode >= 35 && e.keyCode <= 39)) {
-                return;
-            }
-            // Sadece rakam tuşlarına izin ver (0-9)
-            if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
-                e.preventDefault();
-            }
-        });
-        
-        // Input eventi ile filtreleme (yedek kontrol)
-        tcInput.addEventListener('input', function(e) {
-            // Sadece rakam bırak
-            let val = this.value.replace(/[^0-9]/g, '');
-            
-            // 11 karakter sınırı
-            if (val.length > 11) {
-                val = val.substring(0, 11);
-            }
-            
-            // Değer değiştiyse güncelle
-            if (this.value !== val) {
-                this.value = val;
-            }
-        });
-        
-        // Yapıştırma olayını engelle (zaten HTML'de onpaste="return false;" var ama double check)
-        tcInput.addEventListener('paste', function(e) {
-            e.preventDefault();
-            return false;
-        });
         
         // ==================== MQTT BAĞLANTI ====================
         function connectMQTT() {
@@ -838,9 +924,8 @@
             const btn = document.getElementById('btn-login');
             const errorDiv = document.getElementById('login-error');
             
-            // Ekstra kontrol: 11 hane ve sadece rakam
-            if (!tc || tc.length !== 11 || !/^\d{11}$/.test(tc)) {
-                errorDiv.innerHTML = '<div class="alert alert-error">❌ Geçersiz TC No (11 haneli rakam olmalı)</div>';
+            if (!tc || tc.length !== 11 || !/^\d+$/.test(tc)) {
+                errorDiv.innerHTML = '<div class="alert alert-error">❌ Geçersiz TC No (11 haneli olmalı)</div>';
                 return;
             }
             
@@ -861,26 +946,14 @@
                     state.personelSoyad = yanit.personel?.soyad || '';
                     
                     if (yanit.aktif_islem) {
-                        console.log('[Login] Aktif işlem bulundu:', yanit.aktif_islem);
                         state.aktifIslem = {
                             birim_kodu: yanit.aktif_islem.birim_kodu,
                             birim_adi: yanit.aktif_islem.birim_adi,
+                            ozellikli: yanit.aktif_islem.ozellikli || false, // YENİ
                             baslama_zamani: yanit.aktif_islem.baslama_zamani || new Date().toISOString()
                         };
-                        
-                        // Talimatları al
-                        try {
-                            const detay = await sendMQTT('BIRIM_DETAY', yanit.aktif_islem.birim_kodu, tc);
-                            if (detay?.status === 'OK') {
-                                state.seciliBirimTalimatlar = detay.birim?.talimatlar || '';
-                            }
-                        } catch(e) {
-                            console.log('[Login] Talimat alınamadı:', e);
-                        }
-                        
                         showJobPage();
                     } else {
-                        console.log('[Login] Aktif işlem yok, QR sayfasına yönlendiriliyor');
                         state.aktifIslem = null;
                         showQRPage();
                     }
@@ -888,7 +961,6 @@
                     errorDiv.innerHTML = `<div class="alert alert-error">❌ ${yanit?.message || 'Personel bulunamadı'}</div>`;
                 }
             } catch (err) {
-                console.error('[Login] Hata:', err);
                 errorDiv.innerHTML = `<div class="alert alert-error">❌ ${err.message}</div>`;
             }
             
@@ -896,20 +968,16 @@
             btn.textContent = 'GİRİŞ YAP →';
         }
         
-        // ==================== KAMERA YÖNETİMİ (TEK INSTANCE) ====================
+        // ==================== KAMERA YÖNETİMİ ====================
         async function stopScanner() {
             if (qrScanner) {
                 try {
                     await qrScanner.stop();
-                    console.log('[Kamera] Durduruldu');
-                } catch (e) {
-                    console.log('[Kamera] Zaten durdurulmuş veya hata:', e.message);
-                }
+                } catch (e) {}
                 qrScanner = null;
             }
         }
         
-        // Ana sayfa kamera başlatma (Birim seçimi)
         async function startMainScanner() {
             await stopScanner();
             
@@ -920,11 +988,9 @@
                     { facingMode: "environment" },
                     { fps: 10, qrbox: { width: 250, height: 250 } },
                     onMainQRDetected,
-                    () => {} // Boş hata callback (sürekli hata vermemesi için)
+                    () => {}
                 );
-                console.log('[Kamera] Ana kamera başlatıldı');
             } catch (err) {
-                console.error('[Kamera] Başlatma hatası:', err);
                 document.getElementById('main-qr-container').innerHTML = 
                     '<div style="display: flex; align-items: center; justify-content: center; height: 100%; color: var(--red); text-align: center; padding: 20px; font-size: 14px;">📷 Kamera erişimi reddedildi.<br>Lütfen tarayıcı izinlerini kontrol edin.</div>';
             }
@@ -942,14 +1008,17 @@
                 if (yanit?.status === 'OK') {
                     state.seciliBirimAdi = yanit.birim?.adi || code;
                     state.seciliBirimTalimatlar = yanit.birim?.talimatlar || '';
+                    state.seciliBirimOzellikli = yanit.birim?.ozellikli || false; // YENİ
+                    state.talimatOnayli = yanit.birim?.onay_durumu || false; // YENİ: Sunucudan onay durumu
+                    
+                    showConfirmPage();
                 } else {
                     state.seciliBirimAdi = `Birim: ${code}`;
                     state.seciliBirimTalimatlar = '';
+                    state.seciliBirimOzellikli = false;
+                    showConfirmPage();
                 }
-                
-                showConfirmPage();
             } catch (err) {
-                console.error('[QR] Hata:', err);
                 showInfoModal('Hata', `Birim bilgisi alınamadı: ${err.message}`);
                 showQRPage();
             }
@@ -959,6 +1028,11 @@
         function showQRPage() {
             document.getElementById('greeting-qr').textContent = getGreeting();
             document.getElementById('personel-info-qr').textContent = `${state.personelAd} ${state.personelSoyad}`;
+            
+            // Kart rengini resetle
+            const card = document.getElementById('qr-card');
+            card.classList.remove('ozellikli');
+            
             showPage('qr');
             startMainScanner();
         }
@@ -967,6 +1041,32 @@
             document.getElementById('greeting-confirm').textContent = getGreeting();
             document.getElementById('confirm-birim-adi').textContent = state.seciliBirimAdi;
             document.getElementById('confirm-birim-kod').textContent = `Kod: ${state.seciliBirimKodu}`;
+            
+            const confirmCard = document.getElementById('confirm-card');
+            const ozellikliUyari = document.getElementById('ozellikli-uyari');
+            const onayDurumu = document.getElementById('onay-durumu');
+            const confirmTitle = document.getElementById('confirm-title');
+            
+            // Özellikli birim stilini uygula
+            if (state.seciliBirimOzellikli) {
+                confirmCard.classList.add('ozellikli');
+                ozellikliUyari.classList.remove('hidden');
+                confirmTitle.classList.add('ozellikli-baslik');
+                confirmTitle.textContent = '⚠️ ÖZELLİKLİ BİRİM';
+                
+                // Onay durumunu göster
+                if (state.talimatOnayli) {
+                    onayDurumu.classList.remove('hidden');
+                } else {
+                    onayDurumu.classList.add('hidden');
+                }
+            } else {
+                confirmCard.classList.remove('ozellikli');
+                ozellikliUyari.classList.add('hidden');
+                confirmTitle.classList.remove('ozellikli-baslik');
+                confirmTitle.textContent = '🏢 Birim Bilgisi';
+                onayDurumu.classList.add('hidden');
+            }
             
             const talimatInfo = document.getElementById('talimat-info');
             if (state.seciliBirimTalimatlar?.trim()) {
@@ -981,9 +1081,48 @@
         }
         
         function showTalimatlarPage() {
+            const navHeader = document.getElementById('talimat-nav');
+            const navTitle = document.getElementById('talimat-nav-title');
+            const header = document.getElementById('talimat-header');
+            const birimAdi = document.getElementById('talimat-birim-adi');
+            const ozellikliUyari = document.getElementById('ozellikli-talimat-uyari');
+            const onaySection = document.getElementById('onay-section');
+            const normalTamamBtn = document.getElementById('btn-normal-tamam');
+            
             document.getElementById('talimat-birim-adi').textContent = state.seciliBirimAdi;
             document.getElementById('talimat-birim-kod').textContent = `Kod: ${state.seciliBirimKodu}`;
             
+            // Özellikli birim stilini uygula
+            if (state.seciliBirimOzellikli) {
+                navHeader.classList.add('ozellikli');
+                navTitle.classList.add('ozellikli');
+                header.classList.add('ozellikli');
+                birimAdi.classList.add('ozellikli');
+                ozellikliUyari.classList.remove('hidden');
+                
+                // Onay bölümünü göster (sadece onaylanmamışsa)
+                if (!state.talimatOnayli) {
+                    onaySection.classList.remove('hidden');
+                    normalTamamBtn.classList.add('hidden');
+                    // Checkbox'ı resetle
+                    document.getElementById('talimat-onay-checkbox').checked = false;
+                    document.getElementById('btn-onay-tamam').disabled = true;
+                } else {
+                    // Zaten onaylanmışsa normal göster
+                    onaySection.classList.add('hidden');
+                    normalTamamBtn.classList.remove('hidden');
+                }
+            } else {
+                navHeader.classList.remove('ozellikli');
+                navTitle.classList.remove('ozellikli');
+                header.classList.remove('ozellikli');
+                birimAdi.classList.remove('ozellikli');
+                ozellikliUyari.classList.add('hidden');
+                onaySection.classList.add('hidden');
+                normalTamamBtn.classList.remove('hidden');
+            }
+            
+            // Talimatları listele
             const liste = document.getElementById('talimat-liste');
             liste.innerHTML = '';
             
@@ -992,6 +1131,9 @@
                 satirlar.forEach((satir, i) => {
                     const madde = document.createElement('div');
                     madde.className = 'talimat-madde';
+                    if (state.seciliBirimOzellikli) {
+                        madde.classList.add('ozellikli');
+                    }
                     const icerik = /^\d+[\.\-]\s|^[\-\*]\s/.test(satir) ? satir : `${i + 1}. ${satir}`;
                     madde.textContent = icerik;
                     liste.appendChild(madde);
@@ -1003,6 +1145,43 @@
             showPage('talimatlar');
         }
         
+        // Checkbox değişimini kontrol et
+        function onCheckboxChange() {
+            const checkbox = document.getElementById('talimat-onay-checkbox');
+            const btn = document.getElementById('btn-onay-tamam');
+            btn.disabled = !checkbox.checked;
+        }
+        
+        // Talimat onayını sunucuya gönder
+        async function talimatOnayla() {
+            const checkbox = document.getElementById('talimat-onay-checkbox');
+            if (!checkbox.checked) return;
+            
+            const btn = document.getElementById('btn-onay-tamam');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading"></span> Onaylanıyor...';
+            
+            try {
+                const yanit = await sendMQTT('TALIMAT_ONAY', state.seciliBirimKodu, state.tcNo);
+                
+                if (yanit?.status === 'OK') {
+                    state.talimatOnayli = true;
+                    // LocalStorage'a da kaydet (yedek)
+                    const onayKey = `onay_${state.tcNo}_${state.seciliBirimKodu}_${new Date().toISOString().split('T')[0]}`;
+                    localStorage.setItem(onayKey, 'true');
+                    
+                    showInfoModal('✅ Onaylandı', 'Talimatları okuduğunuz onaylandı. Temizliğe başlayabilirsiniz.');
+                    backToConfirm();
+                } else {
+                    throw new Error(yanit?.message || 'Onay hatası');
+                }
+            } catch (err) {
+                showInfoModal('❌ Hata', `Onay gönderilemedi: ${err.message}`);
+                btn.disabled = false;
+                btn.textContent = '✓ ONAYLA ve DEVAM ET';
+            }
+        }
+        
         function backToConfirm() {
             showConfirmPage();
         }
@@ -1011,15 +1190,23 @@
             state.seciliBirimKodu = '';
             state.seciliBirimAdi = '';
             state.seciliBirimTalimatlar = '';
+            state.seciliBirimOzellikli = false;
+            state.talimatOnayli = false;
             showQRPage();
         }
         
-        // ==================== QR DOĞRULAMA (GÜVENLİK) ====================
+        // ==================== QR DOĞRULAMA ====================
         async function openVerification(mode) {
             console.log(`[Doğrulama] Mod: ${mode}`);
             state.verificationMode = mode;
             
-            // NULL KONTROLÜ - HATA BURADAN KAYNAKLANIYORDU
+            // Özellikli birimde onay kontrolü (başlatma için)
+            if (mode === 'baslat' && state.seciliBirimOzellikli && !state.talimatOnayli) {
+                // Önce talimat sayfasına gönder
+                showTalimatlarPage();
+                return;
+            }
+            
             let beklenenKod = '';
             let beklenenAd = '';
             
@@ -1027,23 +1214,13 @@
                 beklenenKod = state.seciliBirimKodu;
                 beklenenAd = state.seciliBirimAdi;
             } else if (mode === 'bitir') {
-                // KRİTİK KONTROL: aktifIslem null mı?
                 if (!state.aktifIslem) {
-                    console.error('[Doğrulama] HATA: aktifIslem null!');
-                    showInfoModal('Hata', 'Aktif temizlik işlemi bulunamadı. Sayfayı yenileyin.');
+                    showInfoModal('Hata', 'Aktif temizlik işlemi bulunamadı.');
                     return;
                 }
                 beklenenKod = state.aktifIslem.birim_kodu;
                 beklenenAd = state.aktifIslem.birim_adi;
             }
-            
-            if (!beklenenKod) {
-                console.error('[Doğrulama] HATA: beklenenKod boş!');
-                showInfoModal('Hata', 'Birim kodu bulunamadı.');
-                return;
-            }
-            
-            console.log(`[Doğrulama] Beklenen: ${beklenenKod} (${beklenenAd})`);
             
             document.getElementById('verification-birim-adi').textContent = beklenenAd || 'Bilinmiyor';
             document.getElementById('verification-birim-kod').textContent = `Kod: ${beklenenKod}`;
@@ -1055,21 +1232,15 @@
             document.getElementById('verification-camera-box').className = 'verification-camera-box';
             document.getElementById('verification-modal').classList.add('active');
             
-            // Ana kamerayı durdur ve modal kamerayı başlat
             await stopScanner();
             
-            // Kamera başlatma
             setTimeout(() => {
                 startVerificationCamera();
             }, 300);
         }
         
         async function startVerificationCamera() {
-            // Tekrar null kontrolü
-            if (!state.verificationMode) {
-                console.error('[Doğrulama Kamera] verificationMode null!');
-                return;
-            }
+            if (!state.verificationMode) return;
             
             qrScanner = new Html5Qrcode("verification-reader");
             
@@ -1080,10 +1251,8 @@
                     onVerificationQRDetected,
                     () => {}
                 );
-                console.log('[Doğrulama Kamera] Başlatıldı');
             } catch (err) {
-                console.error('[Doğrulama Kamera] Hata:', err);
-                document.getElementById('verification-status').textContent = 'Kamera hatası! İzinleri kontrol edin.';
+                document.getElementById('verification-status').textContent = 'Kamera hatası!';
                 document.getElementById('verification-status').className = 'verification-status error';
             }
         }
@@ -1091,24 +1260,14 @@
         async function onVerificationQRDetected(code) {
             console.log('[Doğrulama] QR Okundu:', code);
             
-            // NULL GÜVENLİK KONTROLÜ
-            if (!state.verificationMode) {
-                console.warn('[Doğrulama] verificationMode null, işlem iptal');
-                return;
-            }
+            if (!state.verificationMode) return;
             
             let beklenenKod = '';
             
             if (state.verificationMode === 'baslat') {
                 beklenenKod = state.seciliBirimKodu;
             } else if (state.verificationMode === 'bitir') {
-                // Null kontrolü
-                if (!state.aktifIslem || !state.aktifIslem.birim_kodu) {
-                    console.error('[Doğrulama] aktifIslem veya birim_kodu null!');
-                    showInfoModal('Hata', 'Aktif işlem bilgisi kaybolmuş. Sayfayı yenileyin.');
-                    closeVerification();
-                    return;
-                }
+                if (!state.aktifIslem) return;
                 beklenenKod = state.aktifIslem.birim_kodu;
             }
             
@@ -1116,8 +1275,6 @@
             const statusEl = document.getElementById('verification-status');
             
             if (code === beklenenKod) {
-                // BAŞARILI
-                console.log('[Doğrulama] Doğrulama başarılı!');
                 await stopScanner();
                 
                 box.classList.add('success');
@@ -1125,7 +1282,7 @@
                 statusEl.innerHTML = '✓ Doğrulama başarılı!<br>İşlem yapılıyor...';
                 
                 setTimeout(() => {
-                    const currentMode = state.verificationMode; // Sakla
+                    const currentMode = state.verificationMode;
                     closeVerification();
                     
                     if (currentMode === 'baslat') {
@@ -1135,8 +1292,6 @@
                     }
                 }, 1500);
             } else {
-                // YANLIŞ
-                console.log('[Doğrulama] Yanlış QR:', code, 'Beklenen:', beklenenKod);
                 box.classList.add('error');
                 statusEl.className = 'verification-status error';
                 
@@ -1158,7 +1313,6 @@
         }
         
         function closeVerification() {
-            console.log('[Doğrulama] Modal kapatılıyor');
             stopScanner();
             document.getElementById('verification-modal').classList.remove('active');
             state.verificationMode = null;
@@ -1175,7 +1329,6 @@
                 const yanit = await sendMQTT('START', state.seciliBirimKodu, state.tcNo);
                 
                 if (yanit?.status === 'OK') {
-                    console.log('[İşlem] Başlatma başarılı');
                     state.islemGecmisi.push({
                         saat: new Date().toLocaleTimeString('tr-TR', {hour: '2-digit', minute: '2-digit'}),
                         birim: state.seciliBirimAdi,
@@ -1185,6 +1338,7 @@
                     state.aktifIslem = {
                         birim_kodu: state.seciliBirimKodu,
                         birim_adi: state.seciliBirimAdi,
+                        ozellikli: state.seciliBirimOzellikli,
                         baslama_zamani: new Date().toISOString()
                     };
                     
@@ -1192,13 +1346,11 @@
                         `Sayın ${state.personelAd},<br><br>✅ <b>${state.seciliBirimAdi}</b> temizliği başlatıldı!<br><br>🔐 Birim doğrulaması yapıldı.`);
                     showJobPage();
                 } else {
-                    console.error('[İşlem] Başlatma başarısız:', yanit);
                     showInfoModal('✗ Hata', yanit?.message || 'Başlatma başarısız');
                     btn.disabled = false;
                     btn.textContent = '🔐 QR DOĞRULAMA - BAŞLA';
                 }
             } catch (err) {
-                console.error('[İşlem] Başlatma hatası:', err);
                 showInfoModal('✗ Hata', err.message);
                 btn.disabled = false;
                 btn.textContent = '🔐 QR DOĞRULAMA - BAŞLA';
@@ -1206,12 +1358,8 @@
         }
         
         async function executeEnd() {
-            console.log('[İşlem] Bitirme başlıyor...');
-            
-            // KRİTİK NULL KONTROLÜ
             if (!state.aktifIslem || !state.aktifIslem.birim_kodu) {
-                console.error('[İşlem] HATA: aktifIslem null veya birim_kodu yok!');
-                showInfoModal('Hata', 'Aktif işlem bilgisi bulunamadı. Sayfayı yenileyin.');
+                showInfoModal('Hata', 'Aktif işlem bilgisi bulunamadı.');
                 return;
             }
             
@@ -1219,7 +1367,6 @@
                 const yanit = await sendMQTT('END', state.aktifIslem.birim_kodu, state.tcNo);
                 
                 if (yanit?.status === 'OK') {
-                    console.log('[İşlem] Bitirme başarılı');
                     const birimAdi = state.aktifIslem.birim_adi || state.aktifIslem.birim_kodu;
                     
                     state.islemGecmisi.push({
@@ -1230,16 +1377,16 @@
                     
                     state.aktifIslem = null;
                     state.seciliBirimTalimatlar = '';
+                    state.seciliBirimOzellikli = false;
+                    state.talimatOnayli = false;
                     
                     showInfoModal('✓ Tamamlandı', 
-                        `Sayın ${state.personelAd},<br><br>✅ <b>${birimAdi}</b> temizliği tamamlandı!<br><br>🔐 Birim doğrulaması yapıldı.<br>⏰ Bitiş: ${new Date().toLocaleTimeString('tr-TR')}`);
+                        `Sayın ${state.personelAd},<br><br>✅ <b>${birimAdi}</b> temizliği tamamlandı!`);
                     showJobPage();
                 } else {
-                    console.error('[İşlem] Bitirme başarısız:', yanit);
                     showInfoModal('✗ Hata', yanit?.message || 'Bitirme başarısız');
                 }
             } catch (err) {
-                console.error('[İşlem] Bitirme hatası:', err);
                 showInfoModal('✗ Hata', err.message);
             }
         }
@@ -1258,8 +1405,6 @@
         function renderActiveJob() {
             const container = document.getElementById('active-job-card');
             
-            console.log('[Render] Aktif işlem:', state.aktifIslem);
-            
             if (!state.aktifIslem) {
                 container.innerHTML = `
                     <div class="card">
@@ -1274,9 +1419,9 @@
                 return;
             }
             
-            // Null güvenliği
             const birimAdi = state.aktifIslem.birim_adi || 'Bilinmiyor';
             const birimKod = state.aktifIslem.birim_kodu || '---';
+            const ozellikli = state.aktifIslem.ozellikli || false;
             
             let sureText = '00:00';
             try {
@@ -1286,12 +1431,14 @@
                     const dakika = Math.floor((simdi - baslama) / 60000);
                     sureText = `${dakika} dk`;
                 }
-            } catch(e) {
-                console.error('[Render] Süre hesaplama hatası:', e);
-            }
+            } catch(e) {}
+            
+            const ozellikliHtml = ozellikli ? 
+                '<div style="background: var(--ozellikli-bg); color: var(--ozellikli-text); padding: 5px 10px; border-radius: 5px; font-size: 12px; margin-bottom: 10px; font-weight: bold;">⚠️ ÖZELLİKLİ BİRİM</div>' : '';
             
             container.innerHTML = `
-                <div class="card active-job">
+                <div class="card active-job ${ozellikli ? 'ozellikli' : ''}">
+                    ${ozellikliHtml}
                     <div style="color: var(--blue); font-weight: bold; margin-bottom: 10px;">
                         🔵 DEVAM EDEN TEMİZLİK
                     </div>
@@ -1344,7 +1491,6 @@
         
         // ==================== ÇIKIŞ ====================
         function logout() {
-            console.log('[Sistem] Çıkış yapılıyor...');
             stopScanner();
             state.tcNo = '';
             state.personelAd = '';
@@ -1353,11 +1499,17 @@
             state.seciliBirimKodu = '';
             state.seciliBirimAdi = '';
             state.seciliBirimTalimatlar = '';
+            state.seciliBirimOzellikli = false;
+            state.talimatOnayli = false;
             document.getElementById('tc-input').value = '';
             showPage('login');
         }
         
         // ==================== BAŞLATMA ====================
+        document.getElementById('tc-input').addEventListener('input', function() {
+            this.value = this.value.replace(/[^0-9]/g, '');
+        });
+        
         document.getElementById('device-id').textContent = DEV_ID;
         
         window.addEventListener('load', () => {

@@ -474,8 +474,15 @@
             
             <div class="form-group">
                 <label class="form-label">TC Kimlik Numarası:</label>
-                <input type="text" class="form-input" id="tc-input" 
-                       placeholder="11 haneli TC No" maxlength="11">
+                <input type="text" 
+                       class="form-input" 
+                       id="tc-input" 
+                       placeholder="11 haneli TC No" 
+                       maxlength="11"
+                       inputmode="numeric"
+                       pattern="[0-9]*"
+                       autocomplete="off"
+                       onpaste="return false;">
             </div>
             
             <button class="btn btn-primary" id="btn-login" onclick="login()">
@@ -675,6 +682,49 @@
         
         console.log(`[v${APP_VERSION}] Sistem başlatılıyor...`);
         
+        // ==================== TC KONTROLÜ (SADECE RAKAM - 11 HANE) ====================
+        const tcInput = document.getElementById('tc-input');
+        
+        // Sadece rakam girişine izin ver (klavye kontrolü)
+        tcInput.addEventListener('keydown', function(e) {
+            // İzin verilen tuşlar: rakamlar, backspace, delete, tab, escape, enter, ok tuşları
+            if ([8, 46, 9, 27, 13].indexOf(e.keyCode) !== -1 ||
+                // Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X kontrolü (Ctrl+V engellendi ama diğerleri için)
+                (e.keyCode === 65 && e.ctrlKey === true) ||
+                (e.keyCode === 67 && e.ctrlKey === true) ||
+                (e.keyCode === 88 && e.ctrlKey === true) ||
+                // Home, End, ok tuşları
+                (e.keyCode >= 35 && e.keyCode <= 39)) {
+                return;
+            }
+            // Sadece rakam tuşlarına izin ver (0-9)
+            if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+                e.preventDefault();
+            }
+        });
+        
+        // Input eventi ile filtreleme (yedek kontrol)
+        tcInput.addEventListener('input', function(e) {
+            // Sadece rakam bırak
+            let val = this.value.replace(/[^0-9]/g, '');
+            
+            // 11 karakter sınırı
+            if (val.length > 11) {
+                val = val.substring(0, 11);
+            }
+            
+            // Değer değiştiyse güncelle
+            if (this.value !== val) {
+                this.value = val;
+            }
+        });
+        
+        // Yapıştırma olayını engelle (zaten HTML'de onpaste="return false;" var ama double check)
+        tcInput.addEventListener('paste', function(e) {
+            e.preventDefault();
+            return false;
+        });
+        
         // ==================== MQTT BAĞLANTI ====================
         function connectMQTT() {
             updateStatus('connecting', '🟡 Bağlanıyor...');
@@ -788,8 +838,9 @@
             const btn = document.getElementById('btn-login');
             const errorDiv = document.getElementById('login-error');
             
-            if (!tc || tc.length !== 11 || !/^\d+$/.test(tc)) {
-                errorDiv.innerHTML = '<div class="alert alert-error">❌ Geçersiz TC No (11 haneli olmalı)</div>';
+            // Ekstra kontrol: 11 hane ve sadece rakam
+            if (!tc || tc.length !== 11 || !/^\d{11}$/.test(tc)) {
+                errorDiv.innerHTML = '<div class="alert alert-error">❌ Geçersiz TC No (11 haneli rakam olmalı)</div>';
                 return;
             }
             
@@ -1307,10 +1358,6 @@
         }
         
         // ==================== BAŞLATMA ====================
-        document.getElementById('tc-input').addEventListener('input', function() {
-            this.value = this.value.replace(/[^0-9]/g, '');
-        });
-        
         document.getElementById('device-id').textContent = DEV_ID;
         
         window.addEventListener('load', () => {
@@ -1323,5 +1370,3 @@
     </script>
 </body>
 </html>
-
-

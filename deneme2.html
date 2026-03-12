@@ -65,7 +65,7 @@
 
         .app-main {
             flex: 1;
-            padding-bottom: 110px; /* footer için güvenli alan */
+            padding-bottom: 110px;
         }
         
         .header {
@@ -183,17 +183,41 @@
             -webkit-backdrop-filter: blur(16px);
         }
         
-        /* ÖZELLİKLİ BİRİM STİLİ */
         .card.ozellikli {
             background: var(--ozellikli-bg) !important;
             border: 2px solid var(--ozellikli-border) !important;
-            animation: pulse-red 2s infinite;
         }
-        
-        @keyframes pulse-red {
-            0% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.32); }
-            70% { box-shadow: 0 0 0 12px rgba(220, 53, 69, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0); }
+
+        .card.flash-warning {
+            animation: flash-red-attention 0.42s ease-in-out 4;
+        }
+
+        @keyframes flash-red-attention {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.00);
+                filter: brightness(1);
+            }
+            25% {
+                transform: scale(1.015);
+                box-shadow: 0 0 0 8px rgba(220, 53, 69, 0.18);
+                filter: brightness(1.12);
+            }
+            50% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.00);
+                filter: brightness(1);
+            }
+            75% {
+                transform: scale(1.01);
+                box-shadow: 0 0 18px 4px rgba(255, 80, 80, 0.28);
+                filter: brightness(1.18);
+            }
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.00);
+                filter: brightness(1);
+            }
         }
         
         .ozellikli-baslik {
@@ -336,7 +360,6 @@
         .history-status-completed { color: #7ee787; font-weight: 700; }
         .history-status-active { color: var(--blue); font-weight: 700; }
         
-        /* TALİMAT ONAY MODALI */
         .modal {
             display: none;
             position: fixed;
@@ -749,8 +772,18 @@
                     
                     <div class="form-group">
                         <label class="form-label">TC Kimlik Numarası:</label>
-                        <input type="text" class="form-input" id="tc-input" 
-                               placeholder="11 haneli TC No" maxlength="11">
+                        <input type="text"
+                               class="form-input"
+                               id="tc-input"
+                               placeholder="11 haneli TC No"
+                               maxlength="11"
+                               inputmode="numeric"
+                               pattern="[0-9]*"
+                               autocomplete="off"
+                               autocorrect="off"
+                               autocapitalize="off"
+                               spellcheck="false"
+                               onkeypress="return onlyNumberKey(event)">
                     </div>
                     
                     <button class="btn btn-primary" id="btn-login" onclick="login()">
@@ -988,6 +1021,21 @@
         };
         
         console.log(`[v${APP_VERSION}] Sistem başlatılıyor...`);
+
+        function onlyNumberKey(evt) {
+            const ch = evt.which || evt.keyCode;
+            if (
+                ch === 8 ||
+                ch === 9 ||
+                ch === 13 ||
+                ch === 37 ||
+                ch === 39 ||
+                ch === 46
+            ) {
+                return true;
+            }
+            return ch >= 48 && ch <= 57;
+        }
         
         // ==================== MQTT BAĞLANTI ====================
         function connectMQTT() {
@@ -1229,6 +1277,10 @@
                 ozellikliUyari.classList.remove('hidden');
                 confirmTitle.classList.add('ozellikli-baslik');
                 confirmTitle.textContent = '⚠️ ÖZELLİKLİ BİRİM';
+
+                confirmCard.classList.remove('flash-warning');
+                void confirmCard.offsetWidth;
+                confirmCard.classList.add('flash-warning');
                 
                 if (state.talimatOnayli) {
                     onayDurumu.classList.remove('hidden');
@@ -1237,6 +1289,7 @@
                 }
             } else {
                 confirmCard.classList.remove('ozellikli');
+                confirmCard.classList.remove('flash-warning');
                 ozellikliUyari.classList.add('hidden');
                 confirmTitle.classList.remove('ozellikli-baslik');
                 confirmTitle.textContent = '🏢 Birim Bilgisi';
@@ -1671,8 +1724,16 @@
         }
         
         // ==================== BAŞLATMA ====================
-        document.getElementById('tc-input').addEventListener('input', function() {
-            this.value = this.value.replace(/[^0-9]/g, '');
+        const tcInput = document.getElementById('tc-input');
+
+        tcInput.addEventListener('input', function() {
+            this.value = this.value.replace(/\D/g, '').slice(0, 11);
+        });
+
+        tcInput.addEventListener('paste', function(e) {
+            e.preventDefault();
+            const pasted = (e.clipboardData || window.clipboardData).getData('text') || '';
+            this.value = pasted.replace(/\D/g, '').slice(0, 11);
         });
         
         document.getElementById('device-id').textContent = DEV_ID;

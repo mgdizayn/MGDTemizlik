@@ -65,7 +65,7 @@
 
         .app-main {
             flex: 1;
-            padding-bottom: 110px;
+            padding-bottom: 165px;
         }
         
         .header {
@@ -135,32 +135,14 @@
         }
 
         @keyframes mgd-wave {
-            0%,
-            100% {
+            0%, 100% {
                 clip-path: polygon(
-                    0% 45%,
-                    15% 44%,
-                    32% 50%,
-                    50% 60%,
-                    68% 61%,
-                    84% 56%,
-                    100% 50%,
-                    100% 100%,
-                    0% 100%
+                    0% 45%, 15% 44%, 32% 50%, 50% 60%, 68% 61%, 84% 56%, 100% 50%, 100% 100%, 0% 100%
                 );
             }
-
             50% {
                 clip-path: polygon(
-                    0% 60%,
-                    16% 64%,
-                    34% 66%,
-                    51% 58%,
-                    67% 48%,
-                    84% 43%,
-                    100% 46%,
-                    100% 100%,
-                    0% 100%
+                    0% 60%, 16% 64%, 34% 66%, 51% 58%, 67% 48%, 84% 43%, 100% 46%, 100% 100%, 0% 100%
                 );
             }
         }
@@ -705,7 +687,7 @@
             right: 0;
             bottom: 0;
             z-index: 60;
-            background: rgba(11, 18, 32, 0.90);
+            background: rgba(11, 18, 32, 0.92);
             backdrop-filter: blur(14px);
             -webkit-backdrop-filter: blur(14px);
             border-top: 1px solid var(--border);
@@ -719,19 +701,78 @@
             text-align: center;
         }
 
-        .footer-meta {
-            color: var(--gray-light);
-            font-size: 12px;
-            line-height: 1.45;
+        .footer-people {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
 
-        .footer-meta strong {
+        .footer-person {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            min-height: 26px;
+        }
+
+        .footer-name {
             color: var(--white);
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 0.2px;
+        }
+
+        .footer-role-animation {
+            height: 22px;
+            overflow: hidden;
+            display: inline-flex;
+            align-items: flex-start;
+        }
+
+        .footer-role-track {
+            animation: footer-text-animation 9s infinite;
+        }
+
+        .footer-role-track > div {
+            height: 22px;
+            margin-bottom: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 10px;
+            border-radius: 999px;
+            color: #fff;
+            font-size: 11px;
             font-weight: 700;
+            line-height: 1;
+            white-space: nowrap;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.18);
+        }
+
+        .footer-role-track.mustafa > div:nth-child(1) { background: #20a7d8; }
+        .footer-role-track.mustafa > div:nth-child(2) { background: #CD921E; }
+        .footer-role-track.mustafa > div:nth-child(3) { background: #c10528; }
+
+        .footer-role-track.ahmet > div:nth-child(1) { background: #2b7fff; }
+        .footer-role-track.ahmet > div:nth-child(2) { background: #a86bff; }
+        .footer-role-track.ahmet > div:nth-child(3) { background: #17a673; }
+
+        @keyframes footer-text-animation {
+            0%   { transform: translateY(0); }
+            10%  { transform: translateY(0); }
+            20%  { transform: translateY(-44px); }
+            30%  { transform: translateY(-44px); }
+            40%  { transform: translateY(-88px); }
+            60%  { transform: translateY(-88px); }
+            70%  { transform: translateY(-44px); }
+            80%  { transform: translateY(-44px); }
+            90%  { transform: translateY(0); }
+            100% { transform: translateY(0); }
         }
 
         .footer-version {
-            margin-top: 6px;
+            margin-top: 8px;
             color: var(--gray);
             font-size: 11px;
             letter-spacing: 0.2px;
@@ -895,8 +936,10 @@
 
             .card { padding: 18px 14px; }
             .status { font-size: 13px; }
-            .footer-meta { font-size: 11px; }
+            .footer-name { font-size: 11px; }
+            .footer-role-track > div { font-size: 10px; padding: 0 8px; }
             .footer-version { font-size: 10px; }
+            .app-main { padding-bottom: 185px; }
         }
     </style>
 </head>
@@ -920,7 +963,6 @@
         </div>
 
         <main class="app-main">
-            <!-- Sayfa 1: Login -->
             <div id="page-login" class="page">
                 <div class="card">
                     <div class="card-title">👤 Personel Girişi</div>
@@ -949,7 +991,6 @@
                 </div>
             </div>
             
-            <!-- Sayfa 2: QR Okuma (Birim Seçimi) -->
             <div id="page-qr" class="page hidden">
                 <div class="top-info">
                     <h3 id="greeting-qr"></h3>
@@ -962,9 +1003,7 @@
                         Temizlenecek birimin QR kodunu okutun
                     </p>
                     
-                    <div class="qr-container" id="main-qr-container">
-                        <!-- Kamera buraya gelecek -->
-                    </div>
+                    <div class="qr-container" id="main-qr-container"></div>
                     
                     <button class="btn btn-secondary" onclick="logout()">
                         ← Çıkış
@@ -972,7 +1011,6 @@
                 </div>
             </div>
             
-            <!-- Sayfa 3: Onay -->
             <div id="page-confirm" class="page hidden">
                 <div class="top-info">
                     <h3 id="greeting-confirm"></h3>
@@ -1023,7 +1061,6 @@
                 </div>
             </div>
             
-            <!-- Sayfa 4: Talimatlar -->
             <div id="page-talimatlar" class="page hidden">
                 <div class="nav-header" id="talimat-nav">
                     <button class="nav-back" onclick="backToConfirm()">←</button>
@@ -1045,9 +1082,7 @@
                         ⚠️ BU BİR ÖZELLİKLİ BİRİMDİR! TALİMATLARI OKUDUĞUNUZU ONAYLAMANIZ ZORUNLUDUR!
                     </div>
                     
-                    <div class="talimat-liste" id="talimat-liste">
-                        <!-- Talimatlar buraya -->
-                    </div>
+                    <div class="talimat-liste" id="talimat-liste"></div>
                     
                     <div id="onay-section" class="hidden">
                         <div class="onay-checkbox-container">
@@ -1068,7 +1103,6 @@
                 </div>
             </div>
             
-            <!-- Sayfa 5: İşlem Yönetimi -->
             <div id="page-job" class="page hidden">
                 <div class="top-info">
                     <h3 id="greeting-job"></h3>
@@ -1091,10 +1125,30 @@
 
         <footer class="global-footer">
             <div class="global-footer-inner">
-                <div class="footer-meta">
-                    <strong>Mustafa GÜNEŞDOĞDU</strong> - Bilgisayar Programcısı<br>
-                    <strong>Ahmet KAHREMAN</strong> - Bilgi İşlem Sorumlusu
+                <div class="footer-people">
+                    <div class="footer-person">
+                        <span class="footer-name">Mustafa GÜNEŞDIĞDU</span>
+                        <div class="footer-role-animation" aria-label="Mustafa unvanları">
+                            <div class="footer-role-track mustafa">
+                                <div>Bilgisayar Programcısı</div>
+                                <div>Yazılım/Sistem Geliştirici</div>
+                                <div>MGDizayn | MGD</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="footer-person">
+                        <span class="footer-name">Ahmet KAHREMAN</span>
+                        <div class="footer-role-animation" aria-label="Ahmet unvanları">
+                            <div class="footer-role-track ahmet">
+                                <div>Bilgi İşlem Sorumlusu</div>
+                                <div>Destek/Hata Yönetim</div>
+                                <div>CMX</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+
                 <div class="footer-version">
                     Nazilli Devlet Hastanesi Bilgi İşlem 2026 • Cihaz: <span id="device-id"></span> • v4.2 Özellikli Birim
                 </div>
@@ -1102,7 +1156,6 @@
         </footer>
     </div>
     
-    <!-- QR Doğrulama Modal -->
     <div class="modal" id="verification-modal">
         <div class="modal-content verification-content">
             <div class="verification-header">🔐 GÜVENLİK DOĞRULAMA</div>
@@ -1130,7 +1183,6 @@
         </div>
     </div>
     
-    <!-- Bilgi Modal -->
     <div class="modal" id="info-modal">
         <div class="modal-content" id="info-modal-content">
             <div class="modal-title" id="info-modal-title"></div>
@@ -1140,7 +1192,6 @@
     </div>
 
     <script>
-        // ==================== KONFİGÜRASYON v4.2 ====================
         const APP_VERSION = '4.2';
         const MQTT_CONFIG = {
             protocol: 'wss',
@@ -1152,7 +1203,6 @@
         const TOPIC_CEVAP_BASE = 'MGD/Temizlik/Cevap/';
         const DEV_ID = 'WEB_' + Math.random().toString(36).substr(2, 6).toUpperCase();
         
-        // ==================== DURUM YÖNETİMİ ====================
         let mqttClient = null;
         let isConnected = false;
         let qrScanner = null;
@@ -1180,20 +1230,12 @@
 
         function onlyNumberKey(evt) {
             const ch = evt.which || evt.keyCode;
-            if (
-                ch === 8 ||
-                ch === 9 ||
-                ch === 13 ||
-                ch === 37 ||
-                ch === 39 ||
-                ch === 46
-            ) {
+            if (ch === 8 || ch === 9 || ch === 13 || ch === 37 || ch === 39 || ch === 46) {
                 return true;
             }
             return ch >= 48 && ch <= 57;
         }
         
-        // ==================== MQTT BAĞLANTI ====================
         function connectMQTT() {
             updateStatus('connecting', '🟡 Bağlanıyor...');
             
@@ -1285,7 +1327,6 @@
             });
         }
         
-        // ==================== SAYFA YÖNETİMİ ====================
         function showPage(pageId) {
             document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
             document.getElementById('page-' + pageId).classList.remove('hidden');
@@ -1300,7 +1341,6 @@
             return `🌙 İyi geceler ${ad}`;
         }
         
-        // ==================== GİRİŞ İŞLEMLERİ ====================
         async function login() {
             const tc = document.getElementById('tc-input').value.trim();
             const btn = document.getElementById('btn-login');
@@ -1350,7 +1390,6 @@
             btn.textContent = 'GİRİŞ YAP →';
         }
         
-        // ==================== KAMERA YÖNETİMİ ====================
         async function stopScanner() {
             if (qrScanner) {
                 try {
@@ -1392,7 +1431,6 @@
                     state.seciliBirimTalimatlar = yanit.birim?.talimatlar || '';
                     state.seciliBirimOzellikli = yanit.birim?.ozellikli || false;
                     state.talimatOnayli = yanit.birim?.onay_durumu || false;
-                    
                     showConfirmPage();
                 } else {
                     state.seciliBirimAdi = `Birim: ${code}`;
@@ -1406,7 +1444,6 @@
             }
         }
         
-        // ==================== SAYFA FONKSİYONLARI ====================
         function showQRPage() {
             document.getElementById('greeting-qr').textContent = getGreeting();
             document.getElementById('personel-info-qr').textContent = `${state.personelAd} ${state.personelSoyad}`;
@@ -1453,9 +1490,7 @@
                     onayDurumu.classList.add('hidden');
                 }
             } else {
-                confirmCard.classList.remove('ozellikli');
-                confirmCard.classList.remove('flash-warning');
-                confirmCard.classList.remove('sweep-attention');
+                confirmCard.classList.remove('ozellikli', 'flash-warning', 'sweep-attention');
                 ozellikliUyari.classList.add('hidden');
                 confirmTitle.classList.remove('ozellikli-baslik');
                 confirmTitle.textContent = '🏢 Birim Bilgisi';
@@ -1520,9 +1555,7 @@
                 satirlar.forEach((satir, i) => {
                     const madde = document.createElement('div');
                     madde.className = 'talimat-madde';
-                    if (state.seciliBirimOzellikli) {
-                        madde.classList.add('ozellikli');
-                    }
+                    if (state.seciliBirimOzellikli) madde.classList.add('ozellikli');
                     const icerik = /^\d+[\.\-]\s|^[\-\*]\s/.test(satir) ? satir : `${i + 1}. ${satir}`;
                     madde.textContent = icerik;
                     liste.appendChild(madde);
@@ -1581,7 +1614,6 @@
             showQRPage();
         }
         
-        // ==================== QR DOĞRULAMA ====================
         async function openVerification(mode) {
             console.log(`[Doğrulama] Mod: ${mode}`);
             state.verificationMode = mode;
@@ -1702,7 +1734,6 @@
             state.verificationMode = null;
         }
         
-        // ==================== TEMİZLİK İŞLEMLERİ ====================
         async function executeStart() {
             console.log('[İşlem] Başlatma başlıyor...');
             const btn = document.getElementById('btn-start');
@@ -1775,7 +1806,6 @@
             }
         }
         
-        // ==================== AKTİF İŞLEM SAYFASI ====================
         function showJobPage() {
             document.getElementById('greeting-job').textContent = getGreeting();
             document.getElementById('personel-info-job').textContent = 
@@ -1862,7 +1892,6 @@
             container.innerHTML = html;
         }
         
-        // ==================== MODALLAR ====================
         function showInfoModal(title, text) {
             document.getElementById('info-modal-title').textContent = title;
             document.getElementById('info-modal-text').innerHTML = text;
@@ -1873,7 +1902,6 @@
             document.getElementById('info-modal').classList.remove('active');
         }
         
-        // ==================== ÇIKIŞ ====================
         function logout() {
             stopScanner();
             state.tcNo = '';
@@ -1889,7 +1917,6 @@
             showPage('login');
         }
         
-        // ==================== BAŞLATMA ====================
         const tcInput = document.getElementById('tc-input');
 
         tcInput.addEventListener('input', function() {

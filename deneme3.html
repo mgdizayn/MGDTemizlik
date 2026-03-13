@@ -948,30 +948,42 @@
 
         /* DÜZELTİLDİ: Mobil uyumluluk için medya sorgusu güncellendi */
         @media (max-width: 420px) {
-            .logo-wave {
-                min-height: 60px;
-            }
+    .logo-wave {
+        min-height: 60px;
+    }
 
-            .logo-wave h1 {
-                font-size: clamp(1.8rem, 8vw, 2.8rem);
-                letter-spacing: 0.04em;
-            }
+    .logo-wave h1 {
+        font-size: clamp(1.8rem, 8vw, 2.8rem);
+        letter-spacing: 0.04em;
+    }
 
-            .card { padding: 18px 14px; }
-            .status { font-size: 12px; }
-            .footer-name { font-size: 11px; }
-            .footer-role-track > div { font-size: 10px; padding: 0 8px; }
-            .footer-version { font-size: 10px; }
-            .app-main { padding-bottom: 185px; }
-            
-            /* Mobilde form elemanları alt alta */
-            .form-row {
-                flex-direction: column;
-            }
-            .btn-inline {
-                width: 100%;
-            }
-        }
+    .card { padding: 18px 14px; }
+    .status { font-size: 12px; }
+    .footer-name { font-size: 11px; }
+    .footer-role-track > div { font-size: 10px; padding: 0 8px; }
+    .footer-version { font-size: 10px; }
+    .app-main { padding-bottom: 185px; }
+    
+    /* BU KISMI DEĞİŞTİR: */
+    .form-row {
+        flex-direction: row; /* column yerine row */
+        flex-wrap: nowrap;   /* asla alt satıra inme */
+    }
+    
+    .form-input {
+        font-size: 16px;     /* mobilde daha küçük font */
+        height: 44px;        /* daha kısa input */
+        padding: 12px;
+    }
+    
+    .btn-inline {
+        width: auto;         /* 100% yerine otomatik genişlik */
+        padding: 0 16px;     /* yanlardan daralt */
+        font-size: 14px;     /* daha küçük yazı */
+        height: 44px;        /* input ile aynı yükseklik */
+        margin: 0;           /* üstten boşluk kaldır */
+    }
+}
     </style>
 </head>
 <body>

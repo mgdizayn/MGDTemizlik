@@ -937,13 +937,14 @@
     <div class="app-shell">
         <header class="header">
             <div class="header-inner">
-               <div class="brand-block">
-    <div class="logo-image-wrap" aria-label="MGD CleanOS Logo">
-        <img src="logo_mgdcos.png" alt="MGD CleanOS Logo" class="header-logo">
-    </div>
-    <div class="header-sub">Dijital Temizlik Süreç Yönetimi</div>
-    <div class="divider"></div>
-</div>
+                <div class="brand-block">
+                    <div class="logo-wave" aria-label="MGD CleanOS">
+                        <h1>MGD CleanOS</h1>
+                        <h1>MGD CleanOS</h1>
+                    </div>
+                    <div class="header-sub">Dijital Temizlik Süreç Yönetimi</div>
+                    <div class="divider"></div>
+                </div>
             </div>
         </header>
 
@@ -1444,7 +1445,10 @@
             startMainScanner();
         }
         
-        function showConfirmPage() {
+        async function showConfirmPage() {
+            // Kamera güvenliği için her zaman durdur
+            await stopScanner();
+            
             document.getElementById('greeting-confirm').textContent = getGreeting();
             document.getElementById('confirm-birim-adi').textContent = state.seciliBirimAdi;
             document.getElementById('confirm-birim-kod').textContent = `Kod: ${state.seciliBirimKodu}`;
@@ -1454,6 +1458,7 @@
             const onayDurumu = document.getElementById('onay-durumu');
             const confirmTitle = document.getElementById('confirm-title');
             
+            // Önceki animasyonları temizle
             if (ozellikliSweepTimer) {
                 clearTimeout(ozellikliSweepTimer);
                 ozellikliSweepTimer = null;
@@ -1465,10 +1470,12 @@
                 confirmTitle.classList.add('ozellikli-baslik');
                 confirmTitle.textContent = '⚠️ ÖZELLİKLİ BİRİM';
 
+                // Animasyonları yeniden başlat
                 confirmCard.classList.remove('flash-warning', 'sweep-attention');
-                void confirmCard.offsetWidth;
+                void confirmCard.offsetWidth; // Reflow
                 confirmCard.classList.add('flash-warning', 'sweep-attention');
 
+                // 4.7 saniye sonra animasyonu durdur
                 ozellikliSweepTimer = setTimeout(() => {
                     confirmCard.classList.remove('sweep-attention');
                 }, 4700);
@@ -1498,7 +1505,10 @@
             showPage('confirm');
         }
         
-        function showTalimatlarPage() {
+        async function showTalimatlarPage() {
+            // Kamera açık kalmışsa durdur (güvenlik)
+            await stopScanner();
+            
             const navHeader = document.getElementById('talimat-nav');
             const navTitle = document.getElementById('talimat-nav-title');
             const header = document.getElementById('talimat-header');
@@ -1578,7 +1588,8 @@
                     const onayKey = `onay_${state.tcNo}_${state.seciliBirimKodu}_${new Date().toISOString().split('T')[0]}`;
                     localStorage.setItem(onayKey, 'true');
                     
-                    showInfoModal('✅ Onaylandı', 'Talimatları okuduğunuz onaylandı. Temizliğe başlayabilirsiniz.');
+                    // Düzeltme: Doğrudan geri dön, modal gösterme (veya kısa toast)
+                    // Kullanıcı deneyimi için kısa bir bildirim ile geri dön
                     backToConfirm();
                 } else {
                     throw new Error(yanit?.message || 'Onay hatası');
@@ -1650,9 +1661,10 @@
             qrScanner = new Html5Qrcode("verification-reader");
             
             try {
+                // Düzeltme: Ana kamera ile aynı boyutlar (250x250)
                 await qrScanner.start(
                     { facingMode: "environment" },
-                    { fps: 10, qrbox: { width: 200, height: 200 } },
+                    { fps: 10, qrbox: { width: 250, height: 250 } },
                     onVerificationQRDetected,
                     () => {}
                 );
@@ -1704,6 +1716,7 @@
                     const yanit = await sendMQTT('BIRIM_DETAY', code, state.tcNo);
                     const yanlisAd = yanit?.status === 'OK' ? yanit.birim?.adi : code;
                     const beklenenAd = state.verificationMode === 'baslat' ? state.seciliBirimAdi : (state.aktifIslem?.birim_adi || 'Bilinmiyor');
+                    
                     statusEl.innerHTML = `⚠️ YANLIŞ BİRİM!<br>Okunan: ${yanlisAd}<br>Beklenen: ${beklenenAd}`;
                 } catch (e) {
                     statusEl.textContent = '⚠️ YANLIŞ BİRİM! Tekrar deneyin.';

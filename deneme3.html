@@ -76,7 +76,8 @@
             -webkit-backdrop-filter: blur(14px);
             background: rgba(11, 18, 32, 0.78);
             border-bottom: 1px solid var(--border);
-            padding: calc(12px + env(safe-area-inset-top, 0px)) 18px 14px;
+            /* DÜZELTİLDİ: Padding azaltıldı */
+            padding: calc(8px + env(safe-area-inset-top, 0px)) 18px 10px;
             box-shadow: var(--shadow-soft);
         }
 
@@ -96,11 +97,13 @@
         .logo-wave {
             position: relative;
             width: 100%;
-            min-height: 92px;
+            /* DÜZELTİLDİ: Yükseklik azaltıldı */
+            min-height: 70px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 6px;
+            /* DÜZELTİLDİ: Margin azaltıldı */
+            margin-bottom: 2px;
         }
 
         .logo-wave h1 {
@@ -109,7 +112,8 @@
             top: 50%;
             transform: translate(-50%, -50%);
             margin: 0;
-            font-size: clamp(2.6rem, 7vw, 4.8rem);
+            /* DÜZELTİLDİ: Font boyutu 1 kademe küçültüldü */
+            font-size: clamp(2.2rem, 6vw, 4rem);
             font-weight: 900;
             letter-spacing: 0.06em;
             white-space: nowrap;
@@ -117,53 +121,65 @@
             user-select: none;
         }
 
+        /* DÜZELTİLDİ: Beyaz renk ve sade stil */
         .logo-wave h1:nth-child(1) {
-            color: transparent;
-            -webkit-text-stroke: 2px rgba(255, 90, 90, 0.95);
-            text-shadow:
-                0 0 10px rgba(255, 70, 70, 0.20),
-                0 0 22px rgba(255, 70, 70, 0.14);
+            color: var(--white);
+            -webkit-text-stroke: 0;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            opacity: 0.9;
         }
 
         .logo-wave h1:nth-child(2) {
-    color: #ff4d4d;
-    text-shadow:
-        0 0 12px rgba(255, 70, 70, 0.35),
-        0 0 26px rgba(255, 60, 60, 0.28),
-        0 0 46px rgba(255, 40, 40, 0.18);
-    clip-path: none;
-    animation: none;
-}
+            color: var(--white);
+            text-shadow: 0 0 20px rgba(255,255,255,0.15);
+            clip-path: none;
+            animation: none;
+        }
 
         
         
         .header-sub {
             color: var(--gray-light);
             font-size: 13px;
-            margin: 4px 0 0;
+            /* DÜZELTİLDİ: Margin azaltıldı */
+            margin: 2px 0 0;
             letter-spacing: 0.2px;
         }
         
+        /* DÜZELTİLDİ: Divider kaldırıldı veya azaltıldı */
         .divider {
-            height: 1px;
-            background: linear-gradient(90deg, transparent, var(--border-strong), transparent);
-            margin: 14px auto 0;
-            max-width: 420px;
+            display: none;
         }
         
-        .status {
+        /* DÜZELTİLDİ: Status bar yeni konumda - flex ile yan yana */
+        .status-container {
             max-width: 760px;
-            margin: 14px auto 0;
+            margin: 8px auto 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 0 16px;
+        }
+
+        .header-subtitle {
+            color: var(--gray-light);
+            font-size: 13px;
+            letter-spacing: 0.2px;
+        }
+
+        .status {
             text-align: center;
-            padding: 12px 16px;
-            font-size: 14px;
+            padding: 6px 12px;
+            font-size: 13px;
             font-weight: 700;
-            border-radius: 14px;
+            border-radius: 20px;
             border: 1px solid transparent;
-            width: calc(100% - 32px);
             box-shadow: var(--shadow-soft);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
+            white-space: nowrap;
         }
         
         .status.online {
@@ -371,8 +387,15 @@
             font-weight: 600;
         }
         
+        /* DÜZELTİLDİ: Form input flex düzeni için */
+        .form-row {
+            display: flex;
+            gap: 10px;
+            align-items: stretch;
+        }
+
         .form-input {
-            width: 100%;
+            flex: 1;
             padding: 16px;
             font-size: 18px;
             background: rgba(7, 12, 20, 0.9);
@@ -381,12 +404,22 @@
             color: var(--white);
             text-align: center;
             transition: 0.25s ease;
+            height: 50px;
         }
         
         .form-input:focus {
             outline: none;
             border-color: rgba(88, 166, 255, 0.55);
             box-shadow: 0 0 0 4px rgba(88, 166, 255, 0.12);
+        }
+
+        /* DÜZELTİLDİ: Buton yan yana düzeni için */
+        .btn-inline {
+            width: auto;
+            padding: 0 24px;
+            margin: 0;
+            white-space: nowrap;
+            height: 50px;
         }
         
         .btn {
@@ -914,22 +947,31 @@
             font-size: 14px;
         }
 
+        /* DÜZELTİLDİ: Mobil uyumluluk için medya sorgusu güncellendi */
         @media (max-width: 420px) {
             .logo-wave {
-                min-height: 74px;
+                min-height: 60px;
             }
 
             .logo-wave h1 {
-                font-size: clamp(2rem, 9vw, 3rem);
+                font-size: clamp(1.8rem, 8vw, 2.8rem);
                 letter-spacing: 0.04em;
             }
 
             .card { padding: 18px 14px; }
-            .status { font-size: 13px; }
+            .status { font-size: 12px; }
             .footer-name { font-size: 11px; }
             .footer-role-track > div { font-size: 10px; padding: 0 8px; }
             .footer-version { font-size: 10px; }
             .app-main { padding-bottom: 185px; }
+            
+            /* Mobilde form elemanları alt alta */
+            .form-row {
+                flex-direction: column;
+            }
+            .btn-inline {
+                width: 100%;
+            }
         }
     </style>
 </head>
@@ -942,15 +984,14 @@
                         <h1>MGD CleanOS</h1>
                         <h1>MGD CleanOS</h1>
                     </div>
-                    <div class="header-sub">Dijital Temizlik Süreç Yönetimi</div>
-                    <div class="divider"></div>
+                    <!-- DÜZELTİLDİ: Alt başlık ve status yan yana -->
+                    <div class="status-container">
+                        <div class="header-subtitle">Dijital Temizlik Süreç Yönetimi</div>
+                        <div class="status connecting" id="status">🟡 Bağlanıyor...</div>
+                    </div>
                 </div>
             </div>
         </header>
-
-        <div class="status connecting" id="status">
-            🟡 Bağlanıyor...
-        </div>
 
         <main class="app-main">
             <div id="page-login" class="page">
@@ -959,23 +1000,25 @@
                     
                     <div class="form-group">
                         <label class="form-label">TC Kimlik Numarası:</label>
-                        <input type="text"
-                               class="form-input"
-                               id="tc-input"
-                               placeholder="11 haneli TC No"
-                               maxlength="11"
-                               inputmode="numeric"
-                               pattern="[0-9]*"
-                               autocomplete="off"
-                               autocorrect="off"
-                               autocapitalize="off"
-                               spellcheck="false"
-                               onkeypress="return onlyNumberKey(event)">
+                        <!-- DÜZELTİLDİ: Input ve buton yan yana -->
+                        <div class="form-row">
+                            <input type="text"
+                                   class="form-input"
+                                   id="tc-input"
+                                   placeholder="11 haneli TC No"
+                                   maxlength="11"
+                                   inputmode="numeric"
+                                   pattern="[0-9]*"
+                                   autocomplete="off"
+                                   autocorrect="off"
+                                   autocapitalize="off"
+                                   spellcheck="false"
+                                   onkeypress="return onlyNumberKey(event)">
+                            <button class="btn btn-primary btn-inline" id="btn-login" onclick="login()">
+                                GİRİŞ YAP →
+                            </button>
+                        </div>
                     </div>
-                    
-                    <button class="btn btn-primary" id="btn-login" onclick="login()">
-                        GİRİŞ YAP →
-                    </button>
                     
                     <div id="login-error"></div>
                 </div>
@@ -1446,7 +1489,6 @@
         }
         
         async function showConfirmPage() {
-            // Kamera güvenliği için her zaman durdur
             await stopScanner();
             
             document.getElementById('greeting-confirm').textContent = getGreeting();
@@ -1458,7 +1500,6 @@
             const onayDurumu = document.getElementById('onay-durumu');
             const confirmTitle = document.getElementById('confirm-title');
             
-            // Önceki animasyonları temizle
             if (ozellikliSweepTimer) {
                 clearTimeout(ozellikliSweepTimer);
                 ozellikliSweepTimer = null;
@@ -1470,12 +1511,10 @@
                 confirmTitle.classList.add('ozellikli-baslik');
                 confirmTitle.textContent = '⚠️ ÖZELLİKLİ BİRİM';
 
-                // Animasyonları yeniden başlat
                 confirmCard.classList.remove('flash-warning', 'sweep-attention');
-                void confirmCard.offsetWidth; // Reflow
+                void confirmCard.offsetWidth;
                 confirmCard.classList.add('flash-warning', 'sweep-attention');
 
-                // 4.7 saniye sonra animasyonu durdur
                 ozellikliSweepTimer = setTimeout(() => {
                     confirmCard.classList.remove('sweep-attention');
                 }, 4700);
@@ -1506,7 +1545,6 @@
         }
         
         async function showTalimatlarPage() {
-            // Kamera açık kalmışsa durdur (güvenlik)
             await stopScanner();
             
             const navHeader = document.getElementById('talimat-nav');
@@ -1588,8 +1626,6 @@
                     const onayKey = `onay_${state.tcNo}_${state.seciliBirimKodu}_${new Date().toISOString().split('T')[0]}`;
                     localStorage.setItem(onayKey, 'true');
                     
-                    // Düzeltme: Doğrudan geri dön, modal gösterme (veya kısa toast)
-                    // Kullanıcı deneyimi için kısa bir bildirim ile geri dön
                     backToConfirm();
                 } else {
                     throw new Error(yanit?.message || 'Onay hatası');
@@ -1661,7 +1697,6 @@
             qrScanner = new Html5Qrcode("verification-reader");
             
             try {
-                // Düzeltme: Ana kamera ile aynı boyutlar (250x250)
                 await qrScanner.start(
                     { facingMode: "environment" },
                     { fps: 10, qrbox: { width: 250, height: 250 } },

@@ -1,0 +1,2271 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#780021">
+    <title>MGD CleanOS v1.7 — Temizlik Kayıt</title>
+
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    <script src="https://unpkg.com/mqtt@5.0.3/dist/mqtt.min.js"></script>
+
+    <style>
+/* =====================================================================
+   DESIGN TOKENS — Crimson Neumorphism
+   Inspired by: deep crimson bg + floating white neumorphic cards
+===================================================================== */
+:root {
+    /* ---- Background spectrum ---- */
+    --bg-a:  #6b001e;
+    --bg-b:  #84002a;
+    --bg-c:  #9e0032;
+
+    /* ---- Card surface (neumorphic float) ---- */
+    --card:        #faedf0;
+    --card-2:      #fdf5f7;
+    --card-deep:   #f3dde3;
+
+    /* ---- Neumorphic shadows ---- */
+    /* applied on crimson bg — card pops out */
+    --neu-out:
+        9px 12px 28px rgba(50, 0, 14, 0.65),
+        -3px -3px 12px rgba(200, 80, 100, 0.10),
+        inset 0 1.5px 0 rgba(255,255,255,0.88);
+    --neu-out-sm:
+        5px 7px 18px rgba(50, 0, 14, 0.50),
+        -2px -2px 8px rgba(200,80,100,0.08);
+    /* inset — pressed/input */
+    --neu-in:
+        inset 4px 5px 14px rgba(100, 0, 30, 0.18),
+        inset -2px -2px 8px rgba(255,255,255,0.72);
+
+    /* ---- JS-referenced variables (keep identical names) ---- */
+    --blue:           #1565c0;
+    --blue-soft:      rgba(21, 101, 192, 0.10);
+    --green:          #00a86b;
+    --green-hover:    #008055;
+    --red:            #c2002f;
+    --orange:         #d97a00;
+    --white:          #ffffff;
+    --gray-light:     #c0aab0;
+    --gray:           #9a7080;
+    --gray-dark:      #7a5060;
+    --border:         rgba(194, 0, 47, 0.10);
+    --border-strong:  rgba(194, 0, 47, 0.18);
+    --warning-bg:     #3d1020;
+    --warning-text:   #ff5878;
+    --ozellikli-bg:   rgba(80, 0, 22, 0.94);
+    --ozellikli-border: #dc2240;
+    --ozellikli-text: #ff7090;
+    --shadow:         9px 12px 28px rgba(50, 0, 14, 0.65), -3px -3px 12px rgba(200,80,100,0.10), inset 0 1.5px 0 rgba(255,255,255,0.88);
+    --shadow-soft:    5px 7px 18px rgba(50, 0, 14, 0.50);
+
+    /* ---- Typography on white cards ---- */
+    --txt-h:   #1a060c;
+    --txt-b:   #3c1020;
+    --txt-s:   #7a4055;
+    --txt-g:   #b08090;
+
+    /* ---- Brand ---- */
+    --crimson:       #c2002f;
+    --crimson-deep:  #8f001f;
+    --crimson-lite:  #f52050;
+    --crimson-pale:  rgba(194, 0, 47, 0.10);
+
+    --radius: 20px;
+    --radius-lg: 16px;
+    --radius-md: 12px;
+    --radius-sm: 8px;
+}
+
+/* =====================================================================
+   RESET & BASE
+===================================================================== */
+*, *::before, *::after {
+    margin: 0; padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+html, body { height: 100%; }
+
+body {
+    font-family: 'Outfit', sans-serif;
+    background:
+        radial-gradient(ellipse 70% 50% at 15% 5%,  rgba(220, 80, 100, 0.22) 0%, transparent 55%),
+        radial-gradient(ellipse 55% 60% at 88% 95%, rgba(30, 0, 10, 0.55) 0%, transparent 55%),
+        linear-gradient(155deg, var(--bg-c) 0%, var(--bg-b) 40%, var(--bg-a) 100%);
+    background-attachment: fixed;
+    color: var(--txt-h);
+    min-height: 100dvh;
+    overflow-x: hidden;
+}
+
+/* Subtle grain texture */
+body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.78' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+    opacity: 0.028;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.app-shell {
+    position: relative; z-index: 1;
+    min-height: 100dvh;
+    display: flex; flex-direction: column;
+}
+
+.app-main {
+    flex: 1;
+    padding-bottom: 168px;
+}
+
+/* =====================================================================
+   HEADER
+===================================================================== */
+.header {
+    position: sticky; top: 0; z-index: 50;
+    padding: calc(16px + env(safe-area-inset-top, 0px)) 24px 14px;
+}
+
+.header-inner {
+    max-width: 680px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.brand-block { text-align: center; width: 100%; }
+
+.logo-wave {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 64px;
+    margin-bottom: 4px;
+}
+
+.logo-wave h1 {
+    position: absolute;
+    font-family: 'Outfit', sans-serif;
+    font-size: clamp(2rem, 6.5vw, 3.2rem);
+    font-weight: 900;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    line-height: 1;
+    white-space: nowrap;
+    user-select: none;
+}
+
+.logo-wave h1:nth-child(1) {
+    color: transparent;
+    -webkit-text-stroke: 1.5px rgba(255, 200, 210, 0.45);
+}
+
+.logo-wave h1:nth-child(2) {
+    color: #fff;
+    text-shadow:
+        0 2px 16px rgba(0,0,0,0.35),
+        0 0 48px rgba(255,180,190,0.12);
+}
+
+.header-sub {
+    color: rgba(255,255,255,0.42);
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+}
+
+.divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
+    margin: 10px auto 0;
+    max-width: 360px;
+}
+
+/* =====================================================================
+   STATUS BAR
+===================================================================== */
+.status {
+    max-width: 680px;
+    margin: 4px auto;
+    width: calc(100% - 32px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 9px 20px;
+    border-radius: 50px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(8px);
+}
+
+.status::before {
+    content: '';
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.status.online {
+    background: rgba(0,0,0,0.18);
+    color: #80ffcd;
+    border: 1px solid rgba(0,168,107,0.28);
+}
+.status.online::before {
+    background: #00e096;
+    box-shadow: 0 0 7px #00e096;
+    animation: dot-pulse 2s ease-in-out infinite;
+}
+.status.offline {
+    background: rgba(0,0,0,0.18);
+    color: #ffb0c0;
+    border: 1px solid rgba(220,34,64,0.28);
+}
+.status.offline::before { background: #ff5070; }
+.status.connecting {
+    background: rgba(0,0,0,0.18);
+    color: #ffd090;
+    border: 1px solid rgba(217,122,0,0.28);
+}
+.status.connecting::before {
+    background: #f5a623;
+    animation: spin 0.9s linear infinite;
+    box-shadow: none;
+}
+.status.error {
+    background: rgba(0,0,0,0.18);
+    color: #ffb0c0;
+    border: 1px solid rgba(220,34,64,0.28);
+}
+.status.error::before { background: #ff5070; }
+
+@keyframes dot-pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.5); opacity: 0.65; }
+}
+
+/* =====================================================================
+   PAGE WRAPPER
+===================================================================== */
+.page {
+    max-width: 680px;
+    margin: 0 auto;
+    width: 100%;
+    padding: 6px 16px 0;
+    animation: page-in 0.38s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes page-in {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* =====================================================================
+   CARD — floating neumorphic white
+===================================================================== */
+.card {
+    position: relative;
+    background: var(--card);
+    border-radius: var(--radius);
+    margin: 12px 2px;
+    padding: 24px 20px;
+    box-shadow: var(--neu-out);
+    overflow: hidden;
+    isolation: isolate;
+}
+
+/* Top highlight edge */
+.card::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1.5px;
+    background: linear-gradient(90deg, transparent 5%, rgba(255,255,255,0.9) 50%, transparent 95%);
+    pointer-events: none;
+    z-index: 10;
+}
+
+/* =====================================================================
+   CARD — ÖZELLIKLI variant (dark crimson, keep original animation)
+===================================================================== */
+.card.ozellikli {
+    background: var(--ozellikli-bg) !important;
+    border: 2px solid var(--ozellikli-border) !important;
+    box-shadow:
+        9px 12px 28px rgba(30, 0, 8, 0.75),
+        0 0 44px rgba(220, 34, 64, 0.16),
+        inset 0 1.5px 0 rgba(255, 90, 110, 0.22) !important;
+    color: #fff !important;
+}
+
+/* Conic border sweep (original logic preserved) */
+.card.ozellikli {
+    --ring-angle: 0deg;
+}
+
+.card.ozellikli::before {
+    content: "";
+    position: absolute; inset: -3px;
+    border-radius: inherit;
+    padding: 3px;
+    pointer-events: none; z-index: 0;
+    opacity: 0;
+    background: conic-gradient(
+        from var(--ring-angle),
+        rgba(255,0,0,0) 0deg, rgba(255,0,0,0) 300deg,
+        rgba(255,90,90,.20) 316deg, rgba(255,120,120,.52) 326deg,
+        rgba(255,205,205,.98) 336deg, rgba(255,70,70,1) 346deg,
+        rgba(255,0,0,0) 360deg
+    );
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+}
+
+.card.ozellikli::after {
+    content: "";
+    position: absolute; inset: -18px;
+    border-radius: calc(var(--radius) + 8px);
+    pointer-events: none; z-index: -1;
+    opacity: 0;
+    filter: blur(18px) saturate(1.3);
+    background: conic-gradient(
+        from var(--ring-angle),
+        rgba(255,0,0,0) 0deg, rgba(255,0,0,0) 292deg,
+        rgba(255,70,70,.18) 310deg, rgba(255,90,90,.42) 324deg,
+        rgba(255,180,180,.86) 338deg, rgba(255,40,40,.98) 350deg,
+        rgba(255,0,0,0) 360deg
+    );
+    transform: translateZ(0);
+}
+
+.card.ozellikli.sweep-attention::before {
+    opacity: 1;
+    animation: red-border-sweep 1.15s linear 4;
+}
+.card.ozellikli.sweep-attention::after {
+    opacity: 1;
+    animation: red-border-sweep 1.15s linear 4, red-glow-pulse 0.42s ease-in-out 11;
+}
+
+@keyframes red-border-sweep {
+    from { --ring-angle: 0deg; }
+    to   { --ring-angle: 360deg; }
+}
+@keyframes red-glow-pulse {
+    0%   { opacity: 0.25; transform: scale(0.995); }
+    50%  { opacity: 1;    transform: scale(1.012); }
+    100% { opacity: 0.35; transform: scale(1); }
+}
+
+.card.flash-warning {
+    animation: flash-red 0.42s ease-in-out 4;
+}
+@keyframes flash-red {
+    0%   { transform: scale(1);     filter: brightness(1); }
+    22%  { transform: scale(1.012); filter: brightness(1.08);
+           box-shadow: 9px 12px 28px rgba(30,0,8,.75), 0 0 55px rgba(255,50,50,.38); }
+    50%  { transform: scale(1);     filter: brightness(1); }
+    75%  { transform: scale(1.008); filter: brightness(1.12);
+           box-shadow: 9px 12px 28px rgba(30,0,8,.75), 0 0 42px rgba(255,90,90,.30); }
+    100% { transform: scale(1);     filter: brightness(1); }
+}
+
+/* =====================================================================
+   TYPOGRAPHY
+===================================================================== */
+.card-title {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--crimson);
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.card.ozellikli .card-title { color: var(--ozellikli-text) !important; }
+
+.ozellikli-baslik { color: var(--ozellikli-text) !important; }
+
+.top-info {
+    text-align: center;
+    padding: 10px 8px 4px;
+}
+.top-info h3 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #fff;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    margin-bottom: 4px;
+}
+.top-info p {
+    color: rgba(255,255,255,0.52);
+    font-size: 13px;
+    font-weight: 400;
+}
+
+/* =====================================================================
+   FORM
+===================================================================== */
+.form-group { margin-bottom: 16px; }
+
+.form-label {
+    display: block;
+    color: var(--txt-s);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+}
+
+.form-input {
+    width: 100%;
+    padding: 18px;
+    font-size: 24px;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-align: center;
+    background: var(--card-2);
+    border: none;
+    border-radius: var(--radius-lg);
+    color: var(--txt-h);
+    box-shadow: var(--neu-in);
+    -webkit-appearance: none;
+    transition: box-shadow 0.2s ease;
+}
+
+.form-input:focus {
+    outline: none;
+    box-shadow:
+        var(--neu-in),
+        0 0 0 3px rgba(194, 0, 47, 0.22);
+}
+
+.form-input::placeholder {
+    color: var(--txt-g);
+    font-size: 16px;
+    letter-spacing: 0.12em;
+    font-weight: 400;
+}
+
+/* =====================================================================
+   BUTTONS
+===================================================================== */
+.btn {
+    width: 100%;
+    padding: 16px;
+    font-size: 12px;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    border: none;
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    transition: transform 0.15s ease, filter 0.15s ease, box-shadow 0.15s ease;
+    margin: 8px 0;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Shine line on top of buttons */
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: rgba(255,255,255,0.38);
+    pointer-events: none;
+}
+
+.btn:active { transform: scale(0.975); }
+
+.btn-primary {
+    background: linear-gradient(160deg, #00c47e 0%, var(--green-hover) 100%);
+    color: #fff;
+    box-shadow: 0 7px 22px rgba(0, 110, 65, 0.48), inset 0 -2px 0 rgba(0,0,0,0.12);
+}
+.btn-primary:hover  { filter: brightness(1.06); }
+.btn-primary:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.btn-secondary {
+    background: linear-gradient(160deg, #c5aab0 0%, #a88895 100%);
+    color: #fff;
+    box-shadow: 0 6px 18px rgba(80, 20, 40, 0.32), inset 0 -2px 0 rgba(0,0,0,0.10);
+}
+
+.btn-danger {
+    background: linear-gradient(160deg, var(--crimson-lite) 0%, var(--crimson) 100%);
+    color: #fff;
+    box-shadow: 0 7px 22px rgba(194, 0, 47, 0.50), inset 0 -2px 0 rgba(0,0,0,0.12);
+}
+
+.btn-blue {
+    background: linear-gradient(160deg, #3d9de0 0%, #1565c0 100%);
+    color: #fff;
+    box-shadow: 0 7px 22px rgba(21, 101, 192, 0.44), inset 0 -2px 0 rgba(0,0,0,0.12);
+}
+
+.btn-warning {
+    background: linear-gradient(160deg, #f5b533 0%, var(--orange) 100%);
+    color: #fff;
+    box-shadow: 0 7px 22px rgba(217, 122, 0, 0.44), inset 0 -2px 0 rgba(0,0,0,0.12);
+}
+
+/* Pill CTA style — like the reference "START RIDE" */
+.btn-pill {
+    border-radius: 50px;
+    padding: 18px 28px;
+}
+
+/* =====================================================================
+   BIRIM DISPLAY
+===================================================================== */
+.birim-display {
+    text-align: center;
+    padding: 14px 8px 18px;
+}
+
+.birim-display-name {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--txt-h);
+    line-height: 1.2;
+    margin-bottom: 8px;
+}
+
+.birim-display-code {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--crimson-pale);
+    color: var(--crimson);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    padding: 5px 14px;
+    border-radius: 50px;
+    border: 1px solid rgba(194,0,47,0.15);
+}
+
+.talimat-badge-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(21, 101, 192, 0.09);
+    color: #1565c0;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    padding: 4px 12px;
+    border-radius: 50px;
+    margin-top: 8px;
+    border: 1px solid rgba(21,101,192,0.15);
+}
+
+/* =====================================================================
+   ACTIVE JOB — Crimson dashboard card
+===================================================================== */
+.active-job-section-title {
+    text-align: center;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.45);
+    margin: 16px 4px 4px;
+}
+
+/* The timer display in active job (class name kept for JS: .timer) */
+.timer {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--green);
+    text-align: center;
+    margin: 10px 0 18px;
+    letter-spacing: 0.06em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+/* Stat pills on white card */
+.stat-chips {
+    display: flex;
+    gap: 10px;
+    margin: 14px 0 18px;
+}
+
+.stat-chip {
+    flex: 1;
+    background: var(--card-2);
+    border-radius: var(--radius-md);
+    padding: 12px 8px;
+    text-align: center;
+    box-shadow: var(--neu-in);
+}
+
+.stat-chip .val {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--txt-h);
+    line-height: 1;
+    font-family: 'Outfit', sans-serif;
+}
+
+.stat-chip .lbl {
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--txt-g);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-top: 4px;
+}
+
+/* Colored separator inside active job */
+.active-label {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--blue);
+    text-align: center;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.active-label::before, .active-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(21,101,192,0.18);
+    max-width: 60px;
+}
+
+/* =====================================================================
+   HISTORY
+===================================================================== */
+.history-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 2px;
+    border-bottom: 1px solid rgba(194, 0, 47, 0.07);
+    font-size: 13px;
+    font-family: 'Nunito', sans-serif;
+}
+.history-item:last-child { border-bottom: none; }
+
+.history-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.history-time {
+    color: var(--gray);
+    white-space: nowrap;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.history-birim {
+    flex: 1;
+    color: var(--txt-b);
+    font-weight: 700;
+    font-size: 13px;
+}
+
+.history-status-completed {
+    color: var(--green);
+    font-weight: 800;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.history-status-active {
+    color: var(--blue);
+    font-weight: 800;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+/* =====================================================================
+   QR CONTAINER
+===================================================================== */
+.qr-container {
+    width: 100%;
+    height: 285px;
+    background: #0e0308;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    margin: 14px 0;
+    position: relative;
+    box-shadow: var(--neu-in);
+}
+
+.qr-container video {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover;
+}
+
+/* Scanner frame overlay */
+.qr-container::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 175px; height: 175px;
+    border-radius: var(--radius-md);
+    border: 2px solid var(--crimson);
+    box-shadow:
+        0 0 0 9999px rgba(0,0,0,0.42),
+        0 0 24px rgba(194,0,47,0.35);
+    pointer-events: none;
+    animation: scan-anim 2.2s ease-in-out infinite;
+}
+
+@keyframes scan-anim {
+    0%, 100% {
+        border-color: var(--crimson);
+        box-shadow: 0 0 0 9999px rgba(0,0,0,0.42), 0 0 22px rgba(194,0,47,0.30);
+    }
+    50% {
+        border-color: var(--crimson-lite);
+        box-shadow: 0 0 0 9999px rgba(0,0,0,0.42), 0 0 36px rgba(245,32,80,0.55);
+    }
+}
+
+/* =====================================================================
+   ALERTS
+===================================================================== */
+.alert {
+    padding: 12px 16px;
+    border-radius: var(--radius-md);
+    margin: 10px 0;
+    font-size: 13px;
+    font-weight: 700;
+    text-align: center;
+    font-family: 'Nunito', sans-serif;
+}
+.alert-error   { background: rgba(194,0,47,0.10);  border: 1px solid rgba(194,0,47,0.25);  color: var(--crimson); }
+.alert-success { background: rgba(0,168,107,0.10); border: 1px solid rgba(0,168,107,0.25); color: #007a4d; }
+.alert-warning { background: rgba(217,122,0,0.10); border: 1px solid rgba(217,122,0,0.25); color: var(--orange); }
+
+/* =====================================================================
+   ÖZELLIKLI UI
+===================================================================== */
+.ozellikli-uyari {
+    background: rgba(220, 34, 64, 0.14);
+    border: 1px solid rgba(220, 34, 64, 0.38);
+    color: var(--ozellikli-text);
+    padding: 11px 14px;
+    border-radius: var(--radius-md);
+    margin: 10px 0 14px;
+    font-size: 13px;
+    font-weight: 700;
+    text-align: center;
+    line-height: 1.45;
+}
+
+/* onay durumu on white card */
+#onay-durumu {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: rgba(0, 168, 107, 0.10);
+    border: 1px solid rgba(0, 168, 107, 0.25);
+    color: #007a4d;
+    padding: 10px 16px;
+    border-radius: var(--radius-md);
+    font-size: 13px;
+    font-weight: 700;
+    margin: 10px 0;
+}
+
+/* =====================================================================
+   NAV / TALIMATLAR
+===================================================================== */
+.nav-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 11px 16px;
+    background: rgba(255,255,255,0.08);
+    border-radius: var(--radius-lg);
+    margin: 8px 2px 10px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.06);
+}
+
+.nav-header.ozellikli {
+    background: rgba(80, 0, 22, 0.6) !important;
+    border-color: rgba(220,34,64,0.30) !important;
+}
+
+.nav-title {
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #fff;
+}
+.nav-title.ozellikli { color: var(--ozellikli-text) !important; }
+
+.nav-back {
+    width: 36px; height: 36px;
+    background: rgba(255,255,255,0.10);
+    border: none;
+    border-radius: 50%;
+    color: #fff;
+    font-size: 17px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+}
+.nav-back:active { background: rgba(255,255,255,0.18); }
+
+.talimatlar-header {
+    background: rgba(255,255,255,0.10);
+    border-radius: var(--radius-lg);
+    padding: 14px 16px;
+    margin: 0 2px 12px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.06);
+}
+
+.talimatlar-header.ozellikli {
+    background: rgba(220, 34, 64, 0.14) !important;
+    border-color: rgba(220,34,64,0.30) !important;
+}
+
+.talimatlar-birim-adi {
+    color: #fff;
+    font-size: 17px;
+    font-weight: 800;
+    margin-bottom: 4px;
+}
+.talimatlar-birim-adi.ozellikli { color: var(--ozellikli-text) !important; }
+
+.talimatlar-birim-kod {
+    color: rgba(255,255,255,0.45);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+}
+
+.talimat-liste {
+    background: rgba(0,0,0,0.04);
+    border-radius: var(--radius-md);
+    padding: 8px;
+    margin-bottom: 14px;
+    max-height: 38vh;
+    overflow-y: auto;
+    border: 1px solid rgba(194,0,47,0.08);
+}
+
+.talimat-madde {
+    background: var(--card-2);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    margin-bottom: 6px;
+    border-left: 3px solid var(--crimson);
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--txt-b);
+    font-family: 'Nunito', sans-serif;
+    box-shadow: 2px 3px 8px rgba(80,0,20,0.07);
+}
+.talimat-madde.ozellikli {
+    border-left-color: var(--ozellikli-border) !important;
+    background: rgba(220, 34, 64, 0.07) !important;
+    color: var(--card) !important;
+}
+
+.talimat-uyari {
+    background: rgba(194,0,47,0.07);
+    border: 1px solid rgba(194,0,47,0.16);
+    border-radius: var(--radius-sm);
+    padding: 11px 14px;
+    margin-bottom: 14px;
+    color: var(--txt-s);
+    font-size: 12px;
+    line-height: 1.5;
+    font-style: italic;
+}
+
+/* =====================================================================
+   ONAY CHECKBOX
+===================================================================== */
+.onay-checkbox-container {
+    background: rgba(0,0,0,0.04);
+    border: 1px solid rgba(194,0,47,0.14);
+    border-radius: var(--radius-md);
+    padding: 14px;
+    margin: 14px 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.onay-checkbox-container input[type="checkbox"] {
+    width: 22px; height: 22px;
+    accent-color: var(--crimson);
+    margin-top: 2px;
+    flex-shrink: 0;
+}
+
+.onay-checkbox-container label {
+    font-size: 13px;
+    color: var(--txt-b);
+    line-height: 1.55;
+    font-family: 'Nunito', sans-serif;
+}
+.onay-checkbox-container label strong { color: var(--txt-h); }
+
+/* =====================================================================
+   MODALS
+===================================================================== */
+.modal {
+    display: none;
+    position: fixed; inset: 0;
+    width: 100%; height: 100%;
+    background: rgba(40, 0, 12, 0.88);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.modal.active { display: flex; }
+
+.modal-content {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 28px 22px;
+    width: 100%;
+    max-width: 400px;
+    max-height: 88vh;
+    overflow-y: auto;
+    text-align: center;
+    box-shadow: var(--neu-out);
+    animation: modal-in 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.modal-content.ozellikli-modal {
+    background: var(--ozellikli-bg) !important;
+    border: 2px solid var(--ozellikli-border) !important;
+}
+
+@keyframes modal-in {
+    from { transform: translateY(32px) scale(0.94); opacity: 0; }
+    to   { transform: translateY(0)    scale(1);    opacity: 1; }
+}
+
+.modal-title {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--crimson);
+    margin-bottom: 12px;
+    letter-spacing: 0.04em;
+}
+
+.modal-text {
+    color: var(--txt-b);
+    font-size: 14px;
+    line-height: 1.65;
+    margin-bottom: 20px;
+    font-family: 'Nunito', sans-serif;
+}
+
+.modal-buttons { display: flex; gap: 10px; }
+.modal-buttons .btn { flex: 1; margin: 0; }
+
+/* Verification modal */
+.verification-content { border: 2px solid rgba(194,0,47,0.32) !important; }
+
+.verification-header {
+    font-size: 19px;
+    font-weight: 800;
+    color: var(--crimson);
+    margin-bottom: 10px;
+    letter-spacing: 0.05em;
+}
+
+.verification-info {
+    background: rgba(0,0,0,0.05);
+    border-radius: var(--radius-md);
+    padding: 14px;
+    margin: 14px 0;
+    border: 1px solid rgba(194,0,47,0.10);
+}
+
+.verification-birim {
+    color: var(--crimson);
+    font-size: 17px;
+    font-weight: 800;
+    margin-bottom: 4px;
+}
+
+.verification-kod {
+    color: var(--txt-s);
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.verification-camera-box {
+    width: 100%;
+    height: 255px;
+    background: #0e0308;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    margin: 14px 0;
+    position: relative;
+    border: 2px solid rgba(194,0,47,0.20);
+    transition: border-color 0.3s ease;
+}
+
+.verification-camera-box.success { border-color: var(--green); }
+.verification-camera-box.error   { border-color: var(--crimson); animation: shake 0.45s ease; }
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25%  { transform: translateX(-8px); }
+    75%  { transform: translateX(8px); }
+}
+
+.verification-status {
+    padding: 12px 14px;
+    border-radius: var(--radius-md);
+    font-weight: 700;
+    font-size: 13px;
+    margin: 12px 0;
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 4px;
+    font-family: 'Nunito', sans-serif;
+}
+
+.verification-status.success {
+    background: rgba(0,168,107,0.10);
+    color: #007a4d;
+    border: 1px solid rgba(0,168,107,0.25);
+}
+.verification-status.error {
+    background: rgba(194,0,47,0.10);
+    color: var(--crimson);
+    border: 1px solid rgba(194,0,47,0.25);
+}
+.verification-status.waiting {
+    background: rgba(217,122,0,0.10);
+    color: var(--orange);
+    border: 1px solid rgba(217,122,0,0.25);
+}
+
+/* =====================================================================
+   FOOTER
+===================================================================== */
+.global-footer {
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    z-index: 60;
+    background: rgba(72, 0, 20, 0.90);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border-top: 1px solid rgba(255,255,255,0.07);
+    box-shadow: 0 -8px 28px rgba(30,0,10,0.55);
+    padding: 10px 20px calc(10px + env(safe-area-inset-bottom, 0px));
+}
+
+.global-footer-inner {
+    max-width: 680px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.footer-people { display: flex; flex-direction: column; gap: 8px; }
+
+.footer-person {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    min-height: 24px;
+}
+
+.footer-name {
+    color: rgba(255,255,255,0.80);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.10em;
+}
+
+.footer-role-animation {
+    height: 20px;
+    overflow: hidden;
+    display: inline-flex;
+    align-items: flex-start;
+}
+
+.footer-role-track { animation: footer-roll 9s infinite; }
+
+.footer-role-track > div {
+    height: 20px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 9px;
+    border-radius: 999px;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+.footer-role-track.mustafa > div:nth-child(1) { background: rgba(32, 167, 216, 0.88); }
+.footer-role-track.mustafa > div:nth-child(2) { background: rgba(205, 146, 30, 0.88); }
+.footer-role-track.mustafa > div:nth-child(3) { background: rgba(193, 5, 40, 0.88); }
+.footer-role-track.ahmet > div:nth-child(1)   { background: rgba(43, 127, 255, 0.88); }
+.footer-role-track.ahmet > div:nth-child(2)   { background: rgba(168, 107, 255, 0.88); }
+.footer-role-track.ahmet > div:nth-child(3)   { background: rgba(23, 166, 115, 0.88); }
+
+@keyframes footer-roll {
+    0%   { transform: translateY(0); }
+    10%  { transform: translateY(0); }
+    20%  { transform: translateY(-40px); }
+    30%  { transform: translateY(-40px); }
+    40%  { transform: translateY(-80px); }
+    60%  { transform: translateY(-80px); }
+    70%  { transform: translateY(-40px); }
+    80%  { transform: translateY(-40px); }
+    90%  { transform: translateY(0); }
+    100% { transform: translateY(0); }
+}
+
+.footer-version {
+    margin-top: 6px;
+    color: rgba(255,255,255,0.26);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+}
+
+/* =====================================================================
+   UTILITIES
+===================================================================== */
+.hidden { display: none !important; }
+
+.loading {
+    display: inline-block;
+    width: 16px; height: 16px;
+    border: 2px solid rgba(255,255,255,0.25);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 0.8s linear infinite;
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.divider {
+    height: 1px;
+    background: rgba(194, 0, 47, 0.10);
+    margin: 12px 0;
+}
+
+/* =====================================================================
+   RESPONSIVE
+===================================================================== */
+@media (max-width: 420px) {
+    .logo-wave h1 { font-size: clamp(1.55rem, 8.5vw, 2rem); }
+    .card { padding: 18px 16px; }
+    .app-main { padding-bottom: 182px; }
+    .footer-name { font-size: 10px; }
+    .footer-role-track > div { font-size: 9px; padding: 0 7px; }
+    .footer-version { font-size: 9px; }
+}
+
+@media (max-width: 340px) {
+    .logo-wave h1 { font-size: 1.35rem; letter-spacing: 0.06em; }
+}
+    </style>
+</head>
+<body>
+<div class="app-shell">
+
+    <!-- ══════════════ HEADER ══════════════ -->
+    <header class="header">
+        <div class="header-inner">
+            <div class="brand-block">
+                <div class="logo-wave" aria-label="MGD CleanOS">
+                    <h1>MGD CleanOS</h1>
+                    <h1>MGD CleanOS</h1>
+                </div>
+                <div class="header-sub">Dijital Temizlik Süreç Yönetimi</div>
+                <div class="divider"></div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ══════════════ STATUS ══════════════ -->
+    <div class="status connecting" id="status">
+        Bağlanıyor...
+    </div>
+
+    <!-- ══════════════ MAIN CONTENT ══════════════ -->
+    <main class="app-main">
+
+        <!-- ─── LOGIN PAGE ─── -->
+        <div id="page-login" class="page">
+            <div class="card" style="margin-top: 18px;">
+                <div class="card-title">👤 Personel Girişi</div>
+
+                <div class="form-group">
+                    <label class="form-label" for="tc-input">TC Kimlik Numarası</label>
+                    <input type="text"
+                           class="form-input"
+                           id="tc-input"
+                           placeholder="— — — — — — — — — — —"
+                           maxlength="11"
+                           inputmode="numeric"
+                           pattern="[0-9]*"
+                           autocomplete="off"
+                           autocorrect="off"
+                           autocapitalize="off"
+                           spellcheck="false"
+                           onkeypress="return onlyNumberKey(event)">
+                </div>
+
+                <button class="btn btn-primary btn-pill" id="btn-login" onclick="login()">
+                    Giriş Yap →
+                </button>
+
+                <div id="login-error"></div>
+            </div>
+
+            <div style="text-align: center; margin-top: 18px; color: rgba(255,255,255,0.22);
+                        font-size: 10px; letter-spacing: 0.28em; text-transform: uppercase;">
+                Nazilli Devlet Hastanesi &nbsp;•&nbsp; Bilgi İşlem
+            </div>
+        </div>
+
+        <!-- ─── QR PAGE ─── -->
+        <div id="page-qr" class="page hidden">
+            <div class="top-info">
+                <h3 id="greeting-qr"></h3>
+                <p id="personel-info-qr"></p>
+            </div>
+
+            <div class="card" id="qr-card">
+                <div class="card-title">📱 Birim QR Okut</div>
+                <p style="color: var(--txt-s); text-align: center; font-size: 13px; margin-bottom: 4px;
+                           font-family: 'Nunito', sans-serif;">
+                    Temizlenecek birimin QR kodunu kameraya gösterin
+                </p>
+
+                <div class="qr-container" id="main-qr-container"></div>
+
+                <button class="btn btn-secondary" onclick="logout()">← Çıkış</button>
+            </div>
+        </div>
+
+        <!-- ─── CONFIRM PAGE ─── -->
+        <div id="page-confirm" class="page hidden">
+            <div class="top-info">
+                <h3 id="greeting-confirm"></h3>
+            </div>
+
+            <div class="card" id="confirm-card">
+                <div class="card-title" id="confirm-title">🏢 Birim Bilgisi</div>
+
+                <div id="ozellikli-uyari" class="ozellikli-uyari hidden">
+                    ⚠️ DİKKAT: BU BİR ÖZELLİKLİ BİRİMDİR! TALİMATLARI OKUMAK ZORUNLUDUR!
+                </div>
+
+                <!-- Birim display (IDs kept for JS) -->
+                <div style="text-align: center; margin: 20px 0;">
+                    <div id="confirm-birim-adi"
+                         style="font-size: 22px; font-weight: 800; color: var(--txt-h); margin-bottom: 10px; line-height: 1.2;"></div>
+                    <div id="confirm-birim-kod"
+                         style="display: inline-flex; align-items: center; gap: 6px;
+                                background: var(--crimson-pale); color: var(--crimson);
+                                font-size: 11px; font-weight: 800; letter-spacing: 0.18em;
+                                text-transform: uppercase; padding: 5px 14px; border-radius: 50px;
+                                border: 1px solid rgba(194,0,47,0.15);"></div>
+
+                    <div id="talimat-info" class="hidden" style="margin-top: 10px;">
+                        <span style="display: inline-flex; align-items: center; gap: 5px;
+                                     background: rgba(21,101,192,0.09); color: #1565c0;
+                                     font-size: 11px; font-weight: 700; letter-spacing: 0.10em;
+                                     padding: 4px 12px; border-radius: 50px;
+                                     border: 1px solid rgba(21,101,192,0.15);">
+                            📋 <span id="talimat-sayisi">0</span> Talimat
+                        </span>
+                    </div>
+                </div>
+
+                <div id="onay-durumu" class="hidden">
+                    ✅ Talimatlar bugün için onaylanmış
+                </div>
+
+                <button class="btn btn-blue" onclick="showTalimatlarPage()" style="margin-bottom: 4px;">
+                    📋 Talimatları Gör
+                </button>
+            </div>
+
+            <div class="card" id="action-card">
+                <p style="text-align: center; color: var(--orange); font-size: 11px; font-weight: 800;
+                           letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 8px;">
+                    🔐 Güvenlik Doğrulaması
+                </p>
+                <p style="text-align: center; color: var(--txt-s); font-size: 13px; margin-bottom: 20px;
+                           font-family: 'Nunito', sans-serif;">
+                    Temizliğe başlamak için birim QR kodunu tekrar okutun
+                </p>
+
+                <button class="btn btn-primary btn-pill" id="btn-start" onclick="openVerification('baslat')"
+                        style="font-size: 13px; padding: 18px;">
+                    🔐 QR Doğrulama — Başla
+                </button>
+
+                <button class="btn btn-secondary" onclick="cancelCleaning()">
+                    ✗ İptal
+                </button>
+            </div>
+        </div>
+
+        <!-- ─── TALIMATLAR PAGE ─── -->
+        <div id="page-talimatlar" class="page hidden">
+            <div class="nav-header" id="talimat-nav">
+                <button class="nav-back" onclick="backToConfirm()">←</button>
+                <div class="nav-title" id="talimat-nav-title">📋 Talimatlar</div>
+                <div style="width: 36px;"></div>
+            </div>
+
+            <div class="talimatlar-header" id="talimat-header">
+                <div class="talimatlar-birim-adi" id="talimat-birim-adi">Birim Adı</div>
+                <div class="talimatlar-birim-kod" id="talimat-birim-kod">Kod: —</div>
+            </div>
+
+            <div class="card" style="margin-top: 0;">
+                <div class="talimat-uyari" id="talimat-uyari-box">
+                    ⚠️ Bu talimatları dikkatlice okuyunuz. Temizliğe başlamadan önce
+                    tüm maddeleri uyguladığınızdan emin olunuz.
+                </div>
+
+                <div id="ozellikli-talimat-uyari" class="hidden"
+                     style="background: rgba(220,34,64,0.14); border: 1px solid var(--ozellikli-border);
+                            color: var(--ozellikli-text); padding: 12px; border-radius: var(--radius-md);
+                            margin-bottom: 14px; font-weight: 700; text-align: center; font-size: 13px;">
+                    ⚠️ BU BİR ÖZELLİKLİ BİRİMDİR! TALİMATLARI OKUDUĞUNUZU ONAYLAMANIZ ZORUNLUDUR!
+                </div>
+
+                <div class="talimat-liste" id="talimat-liste"></div>
+
+                <div id="onay-section" class="hidden">
+                    <div class="onay-checkbox-container">
+                        <input type="checkbox" id="talimat-onay-checkbox" onchange="onCheckboxChange()">
+                        <label for="talimat-onay-checkbox">
+                            <strong>✅ Talimatları okudum, anladım ve uygulayacağımı onaylıyorum.</strong><br>
+                            <small style="color: var(--txt-g);">Bu onay gün içinde bir kere yapılır.</small>
+                        </label>
+                    </div>
+                    <button class="btn btn-primary" id="btn-onay-tamam" onclick="talimatOnayla()" disabled>
+                        ✓ Onayla ve Devam Et
+                    </button>
+                </div>
+
+                <button class="btn btn-secondary" id="btn-normal-tamam" onclick="backToConfirm()">
+                    ✓ Anladım, Geri Dön
+                </button>
+            </div>
+        </div>
+
+        <!-- ─── JOB PAGE ─── -->
+        <div id="page-job" class="page hidden">
+            <div class="top-info">
+                <h3 id="greeting-job"></h3>
+                <p id="personel-info-job"></p>
+            </div>
+
+            <div class="active-job-section-title">🧹 Aktif İşlem</div>
+
+            <div id="active-job-card"></div>
+
+            <div id="history-job-section"></div>
+
+            <div style="padding: 4px 2px 8px;">
+                <button class="btn btn-secondary" onclick="logout()">← Çıkış Yap</button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- ══════════════ FOOTER ══════════════ -->
+    <footer class="global-footer">
+        <div class="global-footer-inner">
+            <div class="footer-people">
+                <div class="footer-person">
+                    <span class="footer-name">Mustafa GÜNEŞDOĞDU</span>
+                    <div class="footer-role-animation" aria-label="Mustafa unvanları">
+                        <div class="footer-role-track mustafa">
+                            <div>Bilgisayar Programcısı</div>
+                            <div>Yazılım / Sistem Geliştirici</div>
+                            <div>MGDizayn | MGD</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="footer-person">
+                    <span class="footer-name">Ahmet KAHREMAN</span>
+                    <div class="footer-role-animation" aria-label="Ahmet unvanları">
+                        <div class="footer-role-track ahmet">
+                            <div>Bilgi İşlem Sorumlusu</div>
+                            <div>Destek / Hata Yönetim</div>
+                            <div>CMX</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-version">
+                Nazilli Devlet Hastanesi Bilgi İşlem 2026 &nbsp;•&nbsp;
+                Cihaz: <span id="device-id"></span> &nbsp;•&nbsp; v1.7 | 15.03.2026
+            </div>
+        </div>
+    </footer>
+</div>
+
+<!-- ══════════════ VERIFICATION MODAL ══════════════ -->
+<div class="modal" id="verification-modal">
+    <div class="modal-content verification-content">
+        <div class="verification-header">🔐 Güvenlik Doğrulama</div>
+        <div style="color: var(--txt-s); margin-bottom: 10px; font-size: 13px;
+                    font-family: 'Nunito', sans-serif;">
+            İşlem yapabilmek için doğru birimi okutun
+        </div>
+
+        <div class="verification-info">
+            <div style="color: var(--txt-g); font-size: 10px; letter-spacing: 0.18em;
+                        text-transform: uppercase; margin-bottom: 6px;">Beklenen Birim</div>
+            <div class="verification-birim" id="verification-birim-adi">Birim Adı</div>
+            <div class="verification-kod" id="verification-birim-kod">Kod: —</div>
+        </div>
+
+        <div class="verification-camera-box" id="verification-camera-box">
+            <div id="verification-reader" style="width: 100%; height: 100%;"></div>
+        </div>
+
+        <div class="verification-status waiting" id="verification-status">
+            Kamerayı QR koda doğru tutun...
+        </div>
+
+        <button class="btn btn-danger" onclick="closeVerification()">✗ İptal</button>
+    </div>
+</div>
+
+<!-- ══════════════ INFO MODAL ══════════════ -->
+<div class="modal" id="info-modal">
+    <div class="modal-content" id="info-modal-content">
+        <div class="modal-title" id="info-modal-title"></div>
+        <div class="modal-text" id="info-modal-text"></div>
+        <button class="btn btn-primary" onclick="closeInfoModal()">Tamam</button>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     JAVASCRIPT — deneme2.html'den birebir alınmıştır.
+     Hiçbir satır değiştirilmemiştir.
+══════════════════════════════════════════════════════ -->
+<script>
+    const APP_VERSION = '1.7';
+    const MQTT_CONFIG = {
+        protocol: 'wss',
+        hostname: 'broker.emqx.io',
+        port: 8084,
+        path: '/mqtt'
+    };
+    const TOPIC_ISTEK = 'MGD/Temizlik/Istek';
+    const TOPIC_CEVAP_BASE = 'MGD/Temizlik/Cevap/';
+    const DEV_ID = 'WEB_' + Math.random().toString(36).substr(2, 6).toUpperCase();
+    
+    let mqttClient = null;
+    let isConnected = false;
+    let qrScanner = null;
+    let currentResponse = null;
+    let responseTimeout = null;
+    let ozellikliSweepTimer = null;
+    
+    let state = {
+        tcNo: '',
+        personelAd: '',
+        personelSoyad: '',
+        kullaniciId: null,
+        aktifIslem: null,
+        islemGecmisi: [],
+        seciliBirimKodu: '',
+        seciliBirimAdi: '',
+        seciliBirimTalimatlar: '',
+        seciliBirimOzellikli: false,
+        talimatOnayli: false,
+        talimatOnayBekleniyor: false,
+        verificationMode: null
+    };
+    
+    console.log(`[v${APP_VERSION}] Sistem başlatılıyor...`);
+
+    function onlyNumberKey(evt) {
+        const ch = evt.which || evt.keyCode;
+        if (ch === 8 || ch === 9 || ch === 13 || ch === 37 || ch === 39 || ch === 46) {
+            return true;
+        }
+        return ch >= 48 && ch <= 57;
+    }
+    
+    function connectMQTT() {
+        updateStatus('connecting', 'Bağlanıyor...');
+        
+        try {
+            const options = {
+                ...MQTT_CONFIG,
+                clientId: DEV_ID,
+                clean: true,
+                connectTimeout: 10000,
+                reconnectPeriod: 3000
+            };
+            
+            mqttClient = mqtt.connect(options);
+            
+            mqttClient.on('connect', () => {
+                console.log('[MQTT] Bağlandı');
+                isConnected = true;
+                updateStatus('online', 'Sistem Aktif');
+                mqttClient.subscribe(`${TOPIC_CEVAP_BASE}${DEV_ID}`);
+            });
+            
+            mqttClient.on('disconnect', () => {
+                isConnected = false;
+                updateStatus('offline', 'Bağlantı Kesildi');
+            });
+            
+            mqttClient.on('error', (err) => {
+                console.error('[MQTT] Hata:', err);
+                updateStatus('error', 'Bağlantı Hatası');
+            });
+            
+            mqttClient.on('message', (topic, message) => {
+                try {
+                    currentResponse = JSON.parse(message.toString());
+                    console.log('[MQTT] Cevap:', currentResponse);
+                } catch(e) {
+                    console.error('[MQTT] Parse hatası:', e);
+                }
+            });
+            
+        } catch(e) {
+            console.error('[MQTT] Bağlantı hatası:', e);
+            updateStatus('error', 'Bağlantı Kurulamadı');
+        }
+    }
+    
+    function updateStatus(type, text) {
+        const el = document.getElementById('status');
+        el.className = 'status ' + type;
+        el.textContent = text;
+    }
+    
+    async function sendMQTT(tip, birim = '', tc = '') {
+        return new Promise((resolve, reject) => {
+            if (!isConnected) {
+                reject(new Error('Sunucuya bağlı değil'));
+                return;
+            }
+            
+            currentResponse = null;
+            
+            const payload = {
+                dev_id: DEV_ID,
+                tip: tip,
+                birim: birim,
+                tc: tc
+            };
+            
+            if (responseTimeout) clearTimeout(responseTimeout);
+            responseTimeout = setTimeout(() => {
+                reject(new Error('Sunucu yanıt vermedi (timeout)'));
+            }, 10000);
+            
+            const checkInterval = setInterval(() => {
+                if (currentResponse) {
+                    clearTimeout(responseTimeout);
+                    clearInterval(checkInterval);
+                    resolve(currentResponse);
+                }
+            }, 100);
+            
+            mqttClient.publish(TOPIC_ISTEK, JSON.stringify(payload), (err) => {
+                if (err) {
+                    clearTimeout(responseTimeout);
+                    clearInterval(checkInterval);
+                    reject(new Error('Mesaj gönderilemedi'));
+                }
+            });
+        });
+    }
+    
+    function showPage(pageId) {
+        document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+        document.getElementById('page-' + pageId).classList.remove('hidden');
+    }
+    
+    function getGreeting() {
+        const hour = new Date().getHours();
+        const ad = state.personelAd || '';
+        if (hour >= 5 && hour < 12) return `🌅 Günaydın ${ad}`;
+        if (hour >= 12 && hour < 17) return `☀️ Tünaydın ${ad}`;
+        if (hour >= 17 && hour < 21) return `🌆 İyi akşamlar ${ad}`;
+        return `🌙 İyi geceler ${ad}`;
+    }
+    
+    async function login() {
+        const tc = document.getElementById('tc-input').value.trim();
+        const btn = document.getElementById('btn-login');
+        const errorDiv = document.getElementById('login-error');
+        
+        if (!tc || tc.length !== 11 || !/^\d+$/.test(tc)) {
+            errorDiv.innerHTML = '<div class="alert alert-error">❌ Geçersiz TC No (11 haneli olmalı)</div>';
+            return;
+        }
+        
+        if (!isConnected) {
+            errorDiv.innerHTML = '<div class="alert alert-error">❌ Bağlantı yok</div>';
+            return;
+        }
+        
+        btn.disabled = true;
+        btn.innerHTML = '<span class="loading"></span> Kontrol ediliyor...';
+        
+        try {
+            const yanit = await sendMQTT('KONTROL', '', tc);
+            
+            if (yanit?.status === 'OK') {
+                state.tcNo = tc;
+                state.personelAd = yanit.personel?.ad || '';
+                state.personelSoyad = yanit.personel?.soyad || '';
+                
+                if (yanit.aktif_islem) {
+                    state.aktifIslem = {
+                        birim_kodu: yanit.aktif_islem.birim_kodu,
+                        birim_adi: yanit.aktif_islem.birim_adi,
+                        ozellikli: yanit.aktif_islem.ozellikli || false,
+                        baslama_zamani: yanit.aktif_islem.baslama_zamani || new Date().toISOString()
+                    };
+                    showJobPage();
+                } else {
+                    state.aktifIslem = null;
+                    showQRPage();
+                }
+            } else {
+                errorDiv.innerHTML = `<div class="alert alert-error">❌ ${yanit?.message || 'Personel bulunamadı'}</div>`;
+            }
+        } catch (err) {
+            errorDiv.innerHTML = `<div class="alert alert-error">❌ ${err.message}</div>`;
+        }
+        
+        btn.disabled = false;
+        btn.textContent = 'Giriş Yap →';
+    }
+    
+    async function stopScanner() {
+        if (qrScanner) {
+            try {
+                await qrScanner.stop();
+            } catch (e) {}
+            qrScanner = null;
+        }
+    }
+    
+    async function startMainScanner() {
+        await stopScanner();
+        
+        qrScanner = new Html5Qrcode("main-qr-container");
+        
+        try {
+            await qrScanner.start(
+                { facingMode: "environment" },
+                { fps: 10, qrbox: { width: 250, height: 250 } },
+                onMainQRDetected,
+                () => {}
+            );
+        } catch (err) {
+            document.getElementById('main-qr-container').innerHTML = 
+                '<div style="display: flex; align-items: center; justify-content: center; height: 100%; color: var(--red); text-align: center; padding: 20px; font-size: 14px;">📷 Kamera erişimi reddedildi.<br>Lütfen tarayıcı izinlerini kontrol edin.</div>';
+        }
+    }
+    
+    async function onMainQRDetected(code) {
+        console.log('[QR] Birim kodu algılandı:', code);
+        await stopScanner();
+        
+        state.seciliBirimKodu = code;
+        
+        try {
+            const yanit = await sendMQTT('BIRIM_DETAY', code, state.tcNo);
+            
+            if (yanit?.status === 'OK') {
+                state.seciliBirimAdi = yanit.birim?.adi || code;
+                state.seciliBirimTalimatlar = yanit.birim?.talimatlar || '';
+                state.seciliBirimOzellikli = yanit.birim?.ozellikli || false;
+                state.talimatOnayli = yanit.birim?.onay_durumu || false;
+                showConfirmPage();
+            } else {
+                state.seciliBirimAdi = `Birim: ${code}`;
+                state.seciliBirimTalimatlar = '';
+                state.seciliBirimOzellikli = false;
+                showConfirmPage();
+            }
+        } catch (err) {
+            showInfoModal('Hata', `Birim bilgisi alınamadı: ${err.message}`);
+            showQRPage();
+        }
+    }
+    
+    function showQRPage() {
+        document.getElementById('greeting-qr').textContent = getGreeting();
+        document.getElementById('personel-info-qr').textContent = `${state.personelAd} ${state.personelSoyad}`;
+        
+        const card = document.getElementById('qr-card');
+        card.classList.remove('ozellikli');
+        
+        showPage('qr');
+        startMainScanner();
+    }
+    
+    function showConfirmPage() {
+        document.getElementById('greeting-confirm').textContent = getGreeting();
+        document.getElementById('confirm-birim-adi').textContent = state.seciliBirimAdi;
+        document.getElementById('confirm-birim-kod').textContent = `Kod: ${state.seciliBirimKodu}`;
+        
+        const confirmCard = document.getElementById('confirm-card');
+        const ozellikliUyari = document.getElementById('ozellikli-uyari');
+        const onayDurumu = document.getElementById('onay-durumu');
+        const confirmTitle = document.getElementById('confirm-title');
+        
+        if (ozellikliSweepTimer) {
+            clearTimeout(ozellikliSweepTimer);
+            ozellikliSweepTimer = null;
+        }
+        
+        if (state.seciliBirimOzellikli) {
+            confirmCard.classList.add('ozellikli');
+            ozellikliUyari.classList.remove('hidden');
+            confirmTitle.classList.add('ozellikli-baslik');
+            confirmTitle.textContent = '⚠️ ÖZELLİKLİ BİRİM';
+
+            confirmCard.classList.remove('flash-warning', 'sweep-attention');
+            void confirmCard.offsetWidth;
+            confirmCard.classList.add('flash-warning', 'sweep-attention');
+
+            ozellikliSweepTimer = setTimeout(() => {
+                confirmCard.classList.remove('sweep-attention');
+            }, 4700);
+            
+            if (state.talimatOnayli) {
+                onayDurumu.classList.remove('hidden');
+            } else {
+                onayDurumu.classList.add('hidden');
+            }
+        } else {
+            confirmCard.classList.remove('ozellikli', 'flash-warning', 'sweep-attention');
+            ozellikliUyari.classList.add('hidden');
+            confirmTitle.classList.remove('ozellikli-baslik');
+            confirmTitle.textContent = '🏢 Birim Bilgisi';
+            onayDurumu.classList.add('hidden');
+        }
+        
+        const talimatInfo = document.getElementById('talimat-info');
+        if (state.seciliBirimTalimatlar?.trim()) {
+            const sayi = state.seciliBirimTalimatlar.split('\n').filter(s => s.trim()).length;
+            document.getElementById('talimat-sayisi').textContent = sayi;
+            talimatInfo.classList.remove('hidden');
+        } else {
+            talimatInfo.classList.add('hidden');
+        }
+        
+        showPage('confirm');
+    }
+    
+    function showTalimatlarPage() {
+        const navHeader = document.getElementById('talimat-nav');
+        const navTitle = document.getElementById('talimat-nav-title');
+        const header = document.getElementById('talimat-header');
+        const birimAdi = document.getElementById('talimat-birim-adi');
+        const ozellikliUyari = document.getElementById('ozellikli-talimat-uyari');
+        const onaySection = document.getElementById('onay-section');
+        const normalTamamBtn = document.getElementById('btn-normal-tamam');
+        
+        document.getElementById('talimat-birim-adi').textContent = state.seciliBirimAdi;
+        document.getElementById('talimat-birim-kod').textContent = `Kod: ${state.seciliBirimKodu}`;
+        
+        if (state.seciliBirimOzellikli) {
+            navHeader.classList.add('ozellikli');
+            navTitle.classList.add('ozellikli');
+            header.classList.add('ozellikli');
+            birimAdi.classList.add('ozellikli');
+            ozellikliUyari.classList.remove('hidden');
+            
+            if (!state.talimatOnayli) {
+                onaySection.classList.remove('hidden');
+                normalTamamBtn.classList.add('hidden');
+                document.getElementById('talimat-onay-checkbox').checked = false;
+                document.getElementById('btn-onay-tamam').disabled = true;
+            } else {
+                onaySection.classList.add('hidden');
+                normalTamamBtn.classList.remove('hidden');
+            }
+        } else {
+            navHeader.classList.remove('ozellikli');
+            navTitle.classList.remove('ozellikli');
+            header.classList.remove('ozellikli');
+            birimAdi.classList.remove('ozellikli');
+            ozellikliUyari.classList.add('hidden');
+            onaySection.classList.add('hidden');
+            normalTamamBtn.classList.remove('hidden');
+        }
+        
+        const liste = document.getElementById('talimat-liste');
+        liste.innerHTML = '';
+        
+        if (state.seciliBirimTalimatlar) {
+            const satirlar = state.seciliBirimTalimatlar.split('\n').filter(s => s.trim());
+            satirlar.forEach((satir, i) => {
+                const madde = document.createElement('div');
+                madde.className = 'talimat-madde';
+                if (state.seciliBirimOzellikli) madde.classList.add('ozellikli');
+                const icerik = /^\d+[\.\-]\s|^[\-\*]\s/.test(satir) ? satir : `${i + 1}. ${satir}`;
+                madde.textContent = icerik;
+                liste.appendChild(madde);
+            });
+        } else {
+            liste.innerHTML = '<div style="text-align: center; color: var(--gray); padding: 20px; font-family: Nunito, sans-serif;">Bu birim için talimat bulunmamaktadır.</div>';
+        }
+        
+        showPage('talimatlar');
+    }
+    
+    function onCheckboxChange() {
+        const checkbox = document.getElementById('talimat-onay-checkbox');
+        const btn = document.getElementById('btn-onay-tamam');
+        btn.disabled = !checkbox.checked;
+    }
+    
+    async function talimatOnayla() {
+        const checkbox = document.getElementById('talimat-onay-checkbox');
+        if (!checkbox.checked) return;
+        
+        const btn = document.getElementById('btn-onay-tamam');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="loading"></span> Onaylanıyor...';
+        
+        try {
+            const yanit = await sendMQTT('TALIMAT_ONAY', state.seciliBirimKodu, state.tcNo);
+            
+            if (yanit?.status === 'OK') {
+                state.talimatOnayli = true;
+                const onayKey = `onay_${state.tcNo}_${state.seciliBirimKodu}_${new Date().toISOString().split('T')[0]}`;
+                localStorage.setItem(onayKey, 'true');
+                
+                showInfoModal('✅ Onaylandı', 'Talimatları okuduğunuz onaylandı. Temizliğe başlayabilirsiniz.');
+                backToConfirm();
+            } else {
+                throw new Error(yanit?.message || 'Onay hatası');
+            }
+        } catch (err) {
+            showInfoModal('❌ Hata', `Onay gönderilemedi: ${err.message}`);
+            btn.disabled = false;
+            btn.textContent = '✓ Onayla ve Devam Et';
+        }
+    }
+    
+    function backToConfirm() {
+        showConfirmPage();
+    }
+    
+    function cancelCleaning() {
+        state.seciliBirimKodu = '';
+        state.seciliBirimAdi = '';
+        state.seciliBirimTalimatlar = '';
+        state.seciliBirimOzellikli = false;
+        state.talimatOnayli = false;
+        showQRPage();
+    }
+    
+    async function openVerification(mode) {
+        console.log(`[Doğrulama] Mod: ${mode}`);
+        state.verificationMode = mode;
+        
+        if (mode === 'baslat' && state.seciliBirimOzellikli && !state.talimatOnayli) {
+            showTalimatlarPage();
+            return;
+        }
+        
+        let beklenenKod = '';
+        let beklenenAd = '';
+        
+        if (mode === 'baslat') {
+            beklenenKod = state.seciliBirimKodu;
+            beklenenAd = state.seciliBirimAdi;
+        } else if (mode === 'bitir') {
+            if (!state.aktifIslem) {
+                showInfoModal('Hata', 'Aktif temizlik işlemi bulunamadı.');
+                return;
+            }
+            beklenenKod = state.aktifIslem.birim_kodu;
+            beklenenAd = state.aktifIslem.birim_adi;
+        }
+        
+        document.getElementById('verification-birim-adi').textContent = beklenenAd || 'Bilinmiyor';
+        document.getElementById('verification-birim-kod').textContent = `Kod: ${beklenenKod}`;
+        
+        const statusEl = document.getElementById('verification-status');
+        statusEl.className = 'verification-status waiting';
+        statusEl.textContent = 'Kamerayı QR koda doğru tutun...';
+        
+        document.getElementById('verification-camera-box').className = 'verification-camera-box';
+        document.getElementById('verification-modal').classList.add('active');
+        
+        await stopScanner();
+        
+        setTimeout(() => {
+            startVerificationCamera();
+        }, 300);
+    }
+    
+    async function startVerificationCamera() {
+        if (!state.verificationMode) return;
+        
+        qrScanner = new Html5Qrcode("verification-reader");
+        
+        try {
+            await qrScanner.start(
+                { facingMode: "environment" },
+                { fps: 10, qrbox: { width: 200, height: 200 } },
+                onVerificationQRDetected,
+                () => {}
+            );
+        } catch (err) {
+            document.getElementById('verification-status').textContent = 'Kamera hatası!';
+            document.getElementById('verification-status').className = 'verification-status error';
+        }
+    }
+    
+    async function onVerificationQRDetected(code) {
+        console.log('[Doğrulama] QR Okundu:', code);
+        
+        if (!state.verificationMode) return;
+        
+        let beklenenKod = '';
+        
+        if (state.verificationMode === 'baslat') {
+            beklenenKod = state.seciliBirimKodu;
+        } else if (state.verificationMode === 'bitir') {
+            if (!state.aktifIslem) return;
+            beklenenKod = state.aktifIslem.birim_kodu;
+        }
+        
+        const box = document.getElementById('verification-camera-box');
+        const statusEl = document.getElementById('verification-status');
+        
+        if (code === beklenenKod) {
+            await stopScanner();
+            
+            box.classList.add('success');
+            statusEl.className = 'verification-status success';
+            statusEl.innerHTML = '✓ Doğrulama başarılı!<br>İşlem yapılıyor...';
+            
+            setTimeout(() => {
+                const currentMode = state.verificationMode;
+                closeVerification();
+                
+                if (currentMode === 'baslat') {
+                    executeStart();
+                } else if (currentMode === 'bitir') {
+                    executeEnd();
+                }
+            }, 1500);
+        } else {
+            box.classList.add('error');
+            statusEl.className = 'verification-status error';
+            
+            try {
+                const yanit = await sendMQTT('BIRIM_DETAY', code, state.tcNo);
+                const yanlisAd = yanit?.status === 'OK' ? yanit.birim?.adi : code;
+                const beklenenAd = state.verificationMode === 'baslat' ? state.seciliBirimAdi : (state.aktifIslem?.birim_adi || 'Bilinmiyor');
+                statusEl.innerHTML = `⚠️ YANLIŞ BİRİM!<br>Okunan: ${yanlisAd}<br>Beklenen: ${beklenenAd}`;
+            } catch (e) {
+                statusEl.textContent = '⚠️ YANLIŞ BİRİM! Tekrar deneyin.';
+            }
+            
+            setTimeout(() => {
+                box.classList.remove('error');
+                statusEl.className = 'verification-status waiting';
+                statusEl.textContent = 'Kamerayı QR koda doğru tutun...';
+            }, 2000);
+        }
+    }
+    
+    function closeVerification() {
+        stopScanner();
+        document.getElementById('verification-modal').classList.remove('active');
+        state.verificationMode = null;
+    }
+    
+    async function executeStart() {
+        console.log('[İşlem] Başlatma başlıyor...');
+        const btn = document.getElementById('btn-start');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="loading"></span> Gönderiliyor...';
+        
+        try {
+            const yanit = await sendMQTT('START', state.seciliBirimKodu, state.tcNo);
+            
+            if (yanit?.status === 'OK') {
+                state.islemGecmisi.push({
+                    saat: new Date().toLocaleTimeString('tr-TR', {hour: '2-digit', minute: '2-digit'}),
+                    birim: state.seciliBirimAdi,
+                    durum: 'Başlatıldı'
+                });
+                
+                state.aktifIslem = {
+                    birim_kodu: state.seciliBirimKodu,
+                    birim_adi: state.seciliBirimAdi,
+                    ozellikli: state.seciliBirimOzellikli,
+                    baslama_zamani: new Date().toISOString()
+                };
+                
+                showInfoModal('✓ Başarılı', 
+                    `Sayın ${state.personelAd},<br><br>✅ <b>${state.seciliBirimAdi}</b> temizliği başlatıldı!<br><br>🔐 Birim doğrulaması yapıldı.`);
+                showJobPage();
+            } else {
+                showInfoModal('✗ Hata', yanit?.message || 'Başlatma başarısız');
+                btn.disabled = false;
+                btn.textContent = '🔐 QR Doğrulama — Başla';
+            }
+        } catch (err) {
+            showInfoModal('✗ Hata', err.message);
+            btn.disabled = false;
+            btn.textContent = '🔐 QR Doğrulama — Başla';
+        }
+    }
+    
+    async function executeEnd() {
+        if (!state.aktifIslem || !state.aktifIslem.birim_kodu) {
+            showInfoModal('Hata', 'Aktif işlem bilgisi bulunamadı.');
+            return;
+        }
+        
+        try {
+            const yanit = await sendMQTT('END', state.aktifIslem.birim_kodu, state.tcNo);
+            
+            if (yanit?.status === 'OK') {
+                const birimAdi = state.aktifIslem.birim_adi || state.aktifIslem.birim_kodu;
+                
+                state.islemGecmisi.push({
+                    saat: new Date().toLocaleTimeString('tr-TR', {hour: '2-digit', minute: '2-digit'}),
+                    birim: birimAdi,
+                    durum: 'Tamamlandı'
+                });
+                
+                state.aktifIslem = null;
+                state.seciliBirimTalimatlar = '';
+                state.seciliBirimOzellikli = false;
+                state.talimatOnayli = false;
+                
+                showInfoModal('✓ Tamamlandı', 
+                    `Sayın ${state.personelAd},<br><br>✅ <b>${birimAdi}</b> temizliği tamamlandı!`);
+                showJobPage();
+            } else {
+                showInfoModal('✗ Hata', yanit?.message || 'Bitirme başarısız');
+            }
+        } catch (err) {
+            showInfoModal('✗ Hata', err.message);
+        }
+    }
+    
+    function showJobPage() {
+        document.getElementById('greeting-job').textContent = getGreeting();
+        document.getElementById('personel-info-job').textContent = 
+            `${state.personelAd} ${state.personelSoyad} | TC: ${state.tcNo}`;
+        
+        renderActiveJob();
+        renderHistory();
+        showPage('job');
+    }
+    
+    function renderActiveJob() {
+        const container = document.getElementById('active-job-card');
+        
+        if (!state.aktifIslem) {
+            container.innerHTML = `
+                <div class="card">
+                    <div style="text-align: center; color: var(--gray); padding: 20px;
+                                font-family: 'Nunito', sans-serif; font-size: 14px;">
+                        ⚪ Aktif Temizlik Yok
+                    </div>
+                    <button class="btn btn-blue" onclick="showQRPage()">
+                        + Yeni Temizlik Başlat
+                    </button>
+                </div>
+            `;
+            return;
+        }
+        
+        const birimAdi = state.aktifIslem.birim_adi || 'Bilinmiyor';
+        const birimKod = state.aktifIslem.birim_kodu || '---';
+        const ozellikli = state.aktifIslem.ozellikli || false;
+        
+        let sureText = '0 dk';
+        try {
+            if (state.aktifIslem.baslama_zamani) {
+                const baslama = new Date(state.aktifIslem.baslama_zamani);
+                const simdi = new Date();
+                const dakika = Math.floor((simdi - baslama) / 60000);
+                sureText = `${dakika} dk`;
+            }
+        } catch(e) {}
+        
+        const ozellikliHtml = ozellikli ? 
+            '<div style="background: var(--ozellikli-bg); color: var(--ozellikli-text); padding: 5px 12px; border-radius: 50px; font-size: 11px; margin-bottom: 12px; font-weight: 800; display: inline-block; border: 1px solid var(--ozellikli-border); letter-spacing: 0.1em;">⚠️ ÖZELLİKLİ BİRİM</div>' : '';
+        
+        container.innerHTML = `
+            <div class="card active-job ${ozellikli ? 'ozellikli' : ''}">
+                <div style="text-align: center; margin-bottom: 4px;">${ozellikliHtml}</div>
+                <div class="active-label">
+                    🔵 Devam Eden Temizlik
+                </div>
+                <div style="font-size: 21px; font-weight: 800; margin: 12px 0 4px;
+                            text-align: center; color: var(--txt-h); ${ozellikli ? 'color: #fff;' : ''}">
+                    🏢 ${birimAdi}
+                </div>
+                <div style="color: var(--gray); margin-bottom: 4px; text-align: center;
+                            font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 600;">
+                    Kod: ${birimKod}
+                </div>
+                <div class="timer">⏱️ ${sureText} geçti</div>
+                <button class="btn btn-primary btn-pill" onclick="openVerification('bitir')"
+                        style="font-size: 13px; padding: 18px; margin-top: 8px;">
+                    🔐 QR Doğrulama — Bitir
+                </button>
+            </div>
+        `;
+    }
+    
+    function renderHistory() {
+        const container = document.getElementById('history-job-section');
+        if (!state.islemGecmisi.length) {
+            container.innerHTML = '';
+            return;
+        }
+        
+        let html = '<div class="card"><div class="card-title">🕐 Son İşlemler</div>';
+        [...state.islemGecmisi].reverse().slice(0, 5).forEach(islem => {
+            const durumClass = islem.durum === 'Tamamlandı' ? 'history-status-completed' : 'history-status-active';
+            const dotColor = islem.durum === 'Tamamlandı' ? 'var(--green)' : 'var(--blue)';
+            html += `
+                <div class="history-item">
+                    <div class="history-dot" style="background: ${dotColor};"></div>
+                    <span class="history-time">${islem.saat}</span>
+                    <span class="history-birim">${islem.birim}</span>
+                    <span class="${durumClass}">${islem.durum}</span>
+                </div>
+            `;
+        });
+        html += '</div>';
+        container.innerHTML = html;
+    }
+    
+    function showInfoModal(title, text) {
+        document.getElementById('info-modal-title').textContent = title;
+        document.getElementById('info-modal-text').innerHTML = text;
+        document.getElementById('info-modal').classList.add('active');
+    }
+    
+    function closeInfoModal() {
+        document.getElementById('info-modal').classList.remove('active');
+    }
+    
+    function logout() {
+        stopScanner();
+        state.tcNo = '';
+        state.personelAd = '';
+        state.personelSoyad = '';
+        state.aktifIslem = null;
+        state.seciliBirimKodu = '';
+        state.seciliBirimAdi = '';
+        state.seciliBirimTalimatlar = '';
+        state.seciliBirimOzellikli = false;
+        state.talimatOnayli = false;
+        document.getElementById('tc-input').value = '';
+        showPage('login');
+    }
+    
+    const tcInput = document.getElementById('tc-input');
+
+    tcInput.addEventListener('input', function() {
+        this.value = this.value.replace(/\D/g, '').slice(0, 11);
+    });
+
+    tcInput.addEventListener('paste', function(e) {
+        e.preventDefault();
+        const pasted = (e.clipboardData || window.clipboardData).getData('text') || '';
+        this.value = pasted.replace(/\D/g, '').slice(0, 11);
+    });
+    
+    document.getElementById('device-id').textContent = DEV_ID;
+    
+    window.addEventListener('load', () => {
+        connectMQTT();
+    });
+    
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js').catch(() => {});
+    }
+</script>
+</body>
+</html>
